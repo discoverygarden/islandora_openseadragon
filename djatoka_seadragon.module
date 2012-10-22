@@ -1,0 +1,58 @@
+<?php 
+
+function djatoka_seadragon_menu() {
+  return array(
+    'djatoka_test' => array(
+      'title' => 'Djatoka Seadragon Testing',
+      'access callback' => TRUE,
+      'page callback' => 'theme',
+      'page arguments' => array(
+        'djatoka_seadragon_viewer',
+        array(
+          'uri' => 'http://vessey-islandora.local:8080/fedora/objects/islandora:313/datastreams/JP2/content',    
+      )),
+    ),
+  );
+}
+
+function djatoka_seadragon_theme() {
+  return array(
+    'djatoka_seadragon_viewer' => array(
+      'variables' => array(
+        'uri' => '', 
+      ),
+    ),
+  );
+}
+
+//Not sure what we need here yet...  Likely some theme stuff?
+function theme_djatoka_seadragon_viewer($vars) {
+  $lib_path = libraries_get_path('seadragon');
+  $mod_path = drupal_get_path('module', 'djatoka_seadragon');
+  drupal_add_js($lib_path . '/seadragon-dev.js');
+  drupal_add_js($mod_path . '/js/djtilesource.js', array('scope' => 'footer'));
+  $id = 'djatoka-seadragon';
+  //XXX:  Requires proxy setup...
+  $djatoka_url = "http://vessey-islandora.local/adore-djatoka/resolver";
+  $resource_uri = $vars['uri'];
+
+  //The path to GUI images.
+  $image_path = $lib_path . '/img';
+
+  drupal_add_js(<<<EOJS
+Seadragon.Config.imagePath = "$image_path/";
+Seadragon.Config.debugMode = true;
+var viewer = new Seadragon.Viewer("$id");
+//viewer.addEventListener('open', function(viewer) {alert('open');});
+//viewer.addEventListener('error', function(viewer) {alert('error');});
+//viewer.addEventListener('ignore', function(viewer) {alert('ignore');});
+var tilesource = new Seadragon.DjTileSource("$djatoka_url", "$resource_uri");
+viewer.openTileSource(tilesource);
+EOJS
+, array(
+    'type' => 'inline',
+    'scope' => 'footer'
+  ));
+
+  return "<div id='$id' style='width: 600px; height: 400px; display: block;'/>";
+}

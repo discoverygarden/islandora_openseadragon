@@ -1,0 +1,6 @@
+name = Seadragon from Djatoka
+description = "Seadragon viewer sourcing from the Djatoka tile server"
+package = Islandora
+version = 7.x-dev
+core = 7.x
+php = 5.3
