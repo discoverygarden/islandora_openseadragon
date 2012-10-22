@@ -5,3 +5,16 @@ https://github.com/ksclarke/freelib-djatoka
 
 Instead of "synthesizing" the info for DZI, we create the path to access
 Djatoka directly, and obtain different regions for the tiles.
+
+-- Reverse proxy config --
+We make the assumption that we (reverse) proxy Djatoka, to fix the same-origin
+issue.
+
+For Apache, with Drupal running on the same box as Apache, a couple lines like:
+
+ProxyPass /adore-djatoka/ http://localhost:8080/adore-djatoka/
+ProxyPassReverse /adora-djatoka/ http://localhost:8080/adore-djatoka/
+
+in the Apache config somewhere (either the main apache.conf, httpd.conf, or in
+and arbitrarily named *.conf in your Apache's conf.d directory should suffice 
+to establish the reverse proxy.

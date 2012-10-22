@@ -9,7 +9,7 @@ function djatoka_seadragon_menu() {
       'page arguments' => array(
         'djatoka_seadragon_viewer',
         array(
-          'uri' => 'http://vessey-islandora.local:8080/fedora/objects/islandora:313/datastreams/JP2/content',    
+          'uri' => 'http://localhost:8080/fedora/objects/islandora:313/datastreams/JP2/content',    
       )),
     ),
   );
@@ -33,7 +33,7 @@ function theme_djatoka_seadragon_viewer($vars) {
   drupal_add_js($mod_path . '/js/djtilesource.js', array('scope' => 'footer'));
   $id = 'djatoka-seadragon';
   //XXX:  Requires proxy setup...
-  $djatoka_url = "http://vessey-islandora.local/adore-djatoka/resolver";
+  $djatoka_url = "/adore-djatoka/resolver";
   $resource_uri = $vars['uri'];
 
   //The path to GUI images.
