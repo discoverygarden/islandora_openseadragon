@@ -1,0 +1,7 @@
+A Djatoka TileSource for Seadragon
+
+Based in spirit from the JS component of
+https://github.com/ksclarke/freelib-djatoka
+
+Instead of "synthesizing" the info for DZI, we create the path to access
+Djatoka directly, and obtain different regions for the tiles.
