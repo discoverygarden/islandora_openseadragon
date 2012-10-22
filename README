@@ -18,3 +18,8 @@ ProxyPassReverse /adora-djatoka/ http://localhost:8080/adore-djatoka/
 in the Apache config somewhere (either the main apache.conf, httpd.conf, or in
 and arbitrarily named *.conf in your Apache's conf.d directory should suffice 
 to establish the reverse proxy.
+
+-- Seadragon JS --
+We assume the core Seadragon Javascript is put into sites/all/libraries/seadragon. (Much the same as Drupal deepzoom module)  It can be obtained from 
+https://github.com/aseemk/seadragon-ajax/zipball/v0.8.9
+
