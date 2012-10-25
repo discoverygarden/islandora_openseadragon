@@ -9,27 +9,29 @@
    * 
    * @class
    * @extends Seadragon.TileSource
-   * @param {string} djatoka
+   * @param {string} djatoka_url
    *   The URL of the Djatoka resolver.
    * @param {string} imageID
    *   The UR{I,L} of the image.
    */ 
-  $.DjTileSource = function(djatoka, imageID) {
-    var djts = this;
+  $.DjTileSource = function(djatoka_url, imageID) {
+  console.log(this);
+    var djThis = this;
     var tileOverlap = 0;
     var tileSize = 256;
 
-    this.baseURL = djatoka;
+
+    this.baseURL = djatoka_url;
     this.imageID = imageID;
     jQuery.ajaxSetup({async: false}); 
-    jQuery.get(djatoka, {
+    jQuery.get(djatoka_url, {
         'url_ver': 'Z39.88-2004',
         'rft_id': imageID,
         'svc_id': 'info:lanl-repo/svc/getMetadata'
       },
       function(data, textStatus, jqXHR) {
         $.TileSource.call(
-          djts, //XXX: "this" loses it's context?
+          djThis, //XXX: "this" loses it's context?
           parseInt(data.width), //get the width from
           parseInt(data.height), //get the height
           tileSize,
@@ -39,12 +41,17 @@
         );
         //XXX:  Kinda gross, but Seadragon.TileSource put the methods directly
         //  on the object, not through "prototype"...
-        djts.getTileUrl = $.DjTileSource.prototype.getTileUrl;
-        //djts.getLevelScale = function (level) {return 1;}; 
+        djThis.getTileUrl = $.DjTileSource.prototype.getTileUrl;
+
+        //djThis.getLevelScale = function (level) {return 1;}; 
       },
       'json'
     );
     jQuery.ajaxSetup({async:true});
+    
+
+    
+    
   };
 
   //Inherit from TileSource.
@@ -70,18 +77,12 @@
     //var region = bounds.y + ',' + bounds.x +  ',' + bounds.height + ',' + bounds.width;
 
     var scale = this.getLevelScale(level);
-    
+
     //XXX:  Instead, we have to multiply and cast.
-    var region = (bounds.y * this.dimensions.y * this.aspectRatio * scale).toFixed() + ',' + 
-      (bounds.x * this.dimensions.x * scale).toFixed() +  ',' + 
-      //Math.min(this.dimensions.y, 
-        (bounds.height * this.dimensions.y * this.aspectRatio * scale).toFixed()
-      //)
-      + ',' + 
-      //Math.min(this.dimensions.x, 
-        (bounds.width * this.dimensions.x * scale).toFixed()
-      //)
-      ;
+    var region = (bounds.y * this.dimensions.y * this.aspectRatio).toFixed() + ',' + 
+                 (bounds.x * this.dimensions.x).toFixed() +  ',' + 
+                 (bounds.height * this.dimensions.y * this.aspectRatio).toFixed() + ',' + 
+                 (bounds.width * this.dimensions.x).toFixed();
 
     var params = {
       'url_ver': 'Z39.88-2004',
@@ -94,4 +95,5 @@
 
     return this.baseURL + '?' + jQuery.param(params);
   };
-}(Seadragon));
+}(OpenSeadragon));
+

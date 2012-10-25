@@ -5,12 +5,7 @@ function djatoka_seadragon_menu() {
     'djatoka_test' => array(
       'title' => 'Djatoka Seadragon Testing',
       'access callback' => TRUE,
-      'page callback' => 'theme',
-      'page arguments' => array(
-        'djatoka_seadragon_viewer',
-        array(
-          'uri' => 'http://localhost:8080/fedora/objects/islandora:313/datastreams/JP2/content',    
-      )),
+      'page callback' => 'djatoka_seadragon_callback',
     ),
   );
 }
@@ -25,34 +20,52 @@ function djatoka_seadragon_theme() {
   );
 }
 
+
+function djatoka_seadragon_callback() {
+  
+  
+/*   $uri = 'http://localhost:8080/fedora/objects/islandora:313/datastreams/JP2/content'; */
+  $uri = 'http://localhost:8080/fedora/objects/islandora:507/datastreams/JP2/content';
+/*   $uri = 'http://192.168.56.195/drupal7/islandora/object/islandora:299/datastream/OBJ/view'; */
+  
+  return theme('djatoka_seadragon_viewer', array('uri' => $uri));
+}
+
+
 //Not sure what we need here yet...  Likely some theme stuff?
 function theme_djatoka_seadragon_viewer($vars) {
-  $lib_path = libraries_get_path('seadragon');
-  $mod_path = drupal_get_path('module', 'djatoka_seadragon');
-  drupal_add_js($lib_path . '/seadragon-dev.js');
-  drupal_add_js($mod_path . '/js/djtilesource.js', array('scope' => 'footer'));
-  $id = 'djatoka-seadragon';
+  // get variables
+  $library_path = libraries_get_path('openseadragon');
+  $module_path = drupal_get_path('module', 'djatoka_seadragon');
+
+  $viewer_id = 'djatoka-seadragon';
   //XXX:  Requires proxy setup...
   $djatoka_url = "/adore-djatoka/resolver";
   $resource_uri = $vars['uri'];
 
   //The path to GUI images.
-  $image_path = $lib_path . '/img';
+  $image_path = $library_path . '/images';
 
-  drupal_add_js(<<<EOJS
-Seadragon.Config.imagePath = "$image_path/";
-Seadragon.Config.debugMode = true;
-var viewer = new Seadragon.Viewer("$id");
+  // add settings
+  drupal_add_js(array('djatoka_seadragon' => array('viewer_id' => $viewer_id, 'djatoka_url' => $djatoka_url, 'resource_uri' => $resource_uri)), 'setting');
+
+  // openseadragon
+  drupal_add_js($library_path . '/openseadragon.js');
+  // djatoka tilesource
+  drupal_add_js($module_path . '/js/djtilesource.js');
+
+  drupal_add_js($module_path . '/js/djatoka_seadragon.js');
+
+  return "<div id='$viewer_id' style='width: 100%; height: 500px; display: block;'/>";
+}
+
+
+
+
+
+/* OpenSeadragon.Config.imagePath = "$image_path/"; */
+/* OpenSeadragon.Config.debugMode = true; */
+
 //viewer.addEventListener('open', function(viewer) {alert('open');});
 //viewer.addEventListener('error', function(viewer) {alert('error');});
 //viewer.addEventListener('ignore', function(viewer) {alert('ignore');});
-var tilesource = new Seadragon.DjTileSource("$djatoka_url", "$resource_uri");
-viewer.openTileSource(tilesource);
-EOJS
-, array(
-    'type' => 'inline',
-    'scope' => 'footer'
-  ));
-
-  return "<div id='$id' style='width: 600px; height: 400px; display: block;'/>";
-}
