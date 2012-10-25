@@ -85,8 +85,8 @@
     var scale = this.getLevelScale(level);
 
     //XXX:  Instead, we have to multiply and cast.
-    var region = (bounds.y * (this.dimensions.y / this.aspectRatio)).toFixed() + ',' + 
-                 (bounds.x * (this.dimensions.x / this.aspectRatio)).toFixed() +  ',' + 
+    var region = (bounds.y * this.dimensions.y * this.aspectRatio).toFixed() + ',' + 
+                 (bounds.x * this.dimensions.x).toFixed() +  ',' + 
                  this.tileSize + ',' + 
                  this.tileSize;
 
