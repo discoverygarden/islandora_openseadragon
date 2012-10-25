@@ -36,7 +36,7 @@
           parseInt(data.height), //get the height
           tileSize,
           tileOverlap,
-          0,
+          1,
           parseInt(data.levels)
         );
         //XXX:  Kinda gross, but Seadragon.TileSource put the methods directly
@@ -69,6 +69,12 @@
   $.DjTileSource.prototype.getTileUrl = function(level, x, y) {
     var bounds = this.getTileBounds(level, x, y);
 
+    
+
+    var levelScale = {0: 16, 1: 16, 2: 8, 3: 4, 4: 2, 5: 1};
+    var levelScaleVal = levelScale[level];
+
+
     //XXX:  According to docs at http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Djatoka_OpenURL_Services#info:lanl-repo.2Fsvc.2FgetRegion,
     //  something like the following should work; however, seems that djatoka
     //  dies with a number format error while trying to parse as integers.
@@ -79,10 +85,13 @@
     var scale = this.getLevelScale(level);
 
     //XXX:  Instead, we have to multiply and cast.
-    var region = (bounds.y * this.dimensions.y * this.aspectRatio).toFixed() + ',' + 
-                 (bounds.x * this.dimensions.x).toFixed() +  ',' + 
-                 (bounds.height * this.dimensions.y * this.aspectRatio).toFixed() + ',' + 
-                 (bounds.width * this.dimensions.x).toFixed();
+    var region = (bounds.y * (this.dimensions.y / this.aspectRatio)).toFixed() + ',' + 
+                 (bounds.x * (this.dimensions.x / this.aspectRatio)).toFixed() +  ',' + 
+                 this.tileSize + ',' + 
+                 this.tileSize;
+
+console.log(bounds.y + ' ' + this.dimensions.y + ' ' + this.aspectRatio);                 
+/*  console.log(level + ' ' + scale + ' ' + region); */
 
     var params = {
       'url_ver': 'Z39.88-2004',
