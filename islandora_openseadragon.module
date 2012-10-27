@@ -4,13 +4,25 @@
  * Implements hook_menu().
  */
 function islandora_openseadragon_menu() {
-  return array(
-    'djatoka_test' => array(
-      'title' => 'Djatoka Seadragon Testing',
-      'access callback' => TRUE,
-      'page callback' => 'islandora_openseadragon_callback',
-    ),
+  $items = array();
+  // for debugging
+
+  $items['djatoka_test'] = array(
+    'title' => 'Djatoka Seadragon Testing',
+    'access callback' => TRUE,
+    'page callback' => 'islandora_openseadragon_callback',
   );
+  // admin page
+  $items['admin/islandora/openseadragon'] = array(
+    'title' => 'OpenSeadragon',
+    'description' => 'Configuration for the OpenSeadragon viewer.',
+    'page callback' => 'drupal_get_form',
+    'access arguments' => array('administer site configuration'),
+    'page arguments' => array('islandora_openseadragon_admin'),
+    'file' => 'admin/islandora_openseadragon.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
 }
 
 /**
@@ -40,15 +52,21 @@ function islandora_openseadragon_islandora_large_image_get_viewer() {
   );
 }
 
-function islandora_openseadragon_callback($object_id = NULL, $dsid = NULL) {
+function islandora_openseadragon_callback($uri = NULL) {
   
+  // uri: check if it's one url or if it's an array with multiple url's.
+  // would we need a default page if it's an array? Going to the object page for page 2 it defaults to page 2 but still can be browsed:
+  // original: http://www.islandnewspapers.ca/fedora/repository/guardian:18901216-00s-003
+  // page 2: http://www.islandnewspapers.ca/fedora/repository/guardian:18901216-00s-003-002
   
+  if ($uri == NULL) {
 /*   $uri = 'http://localhost:8080/fedora/objects/islandora:313/datastreams/JP2/content'; */
 /*   $uri = 'http://localhost:8080/fedora/objects/islandora:507/datastreams/JP2/content'; */
 /*   $uri = 'http://localhost:8080/fedora/objects/islandora:511/datastreams/JP2/content'; */
-/* $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A511/OBJ/orion_hubble_6000.tif'; */
-$uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A515/OBJ/Orion_Nebula_-_Hubble_2006_mosaic_edit.tif';
+/*   $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A511/OBJ/orion_hubble_6000.tif'; */
+     $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A515/OBJ/Orion_Nebula_-_Hubble_2006_mosaic_edit.tif';
 /*   $uri = 'http://192.168.56.195/drupal7/islandora/object/islandora:299/datastream/OBJ/view'; */
+  }
   
   return theme('islandora_openseadragon_viewer', array('uri' => $uri));
 }
