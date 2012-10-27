@@ -15,7 +15,7 @@
    *   The UR{I,L} of the image.
    */ 
   $.DjTileSource = function(djatoka_url, imageID) {
-  console.log(this);
+
     var djThis = this;
     var tileOverlap = 0;
     var tileSize = 256;
@@ -90,8 +90,6 @@
                  this.tileSize + ',' + 
                  this.tileSize;
 
-console.log(bounds.y + ' ' + this.dimensions.y + ' ' + this.aspectRatio);                 
-/*  console.log(level + ' ' + scale + ' ' + region); */
 
     var params = {
       'url_ver': 'Z39.88-2004',

@@ -1,0 +1,91 @@
+<?php 
+
+/**
+ * Implements hook_menu().
+ */
+function islandora_openseadragon_menu() {
+  return array(
+    'djatoka_test' => array(
+      'title' => 'Djatoka Seadragon Testing',
+      'access callback' => TRUE,
+      'page callback' => 'islandora_openseadragon_callback',
+    ),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function islandora_openseadragon_theme() {
+  return array(
+    'islandora_openseadragon_viewer' => array(
+      'variables' => array(
+        'uri' => '', 
+      ),
+      'template' => 'theme/islandora-openseadragon',
+    ),
+  );
+}
+
+/**
+ * Implements hook_islandora_large_image_get_viewer().
+ */
+function islandora_openseadragon_islandora_large_image_get_viewer() {
+  return array(
+    'openseadragon' => array(
+      'label' => t('OpenSeadragon'),
+      'description' => t('OpenSeadragon viewer'),
+      'output' => 'islandora_openseadragon_callback',
+    ),
+  );
+}
+
+function islandora_openseadragon_callback($object_id = NULL, $dsid = NULL) {
+  
+  
+/*   $uri = 'http://localhost:8080/fedora/objects/islandora:313/datastreams/JP2/content'; */
+/*   $uri = 'http://localhost:8080/fedora/objects/islandora:507/datastreams/JP2/content'; */
+/*   $uri = 'http://localhost:8080/fedora/objects/islandora:511/datastreams/JP2/content'; */
+/* $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A511/OBJ/orion_hubble_6000.tif'; */
+$uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A515/OBJ/Orion_Nebula_-_Hubble_2006_mosaic_edit.tif';
+/*   $uri = 'http://192.168.56.195/drupal7/islandora/object/islandora:299/datastream/OBJ/view'; */
+  
+  return theme('islandora_openseadragon_viewer', array('uri' => $uri));
+}
+
+function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$variables) {
+  
+  // get variables
+  $library_path = libraries_get_path('openseadragon');
+  $module_path = drupal_get_path('module', 'islandora_openseadragon');
+
+  $variables['viewer_id'] = $viewer_id = 'islandora-openseadragon';
+  //XXX:  Requires proxy setup...
+  $djatoka_url = "/adore-djatoka/resolver";
+  $resource_uri = $variables['uri'];
+
+  //The path to GUI images.
+  $image_path = $library_path . '/images';
+
+  // include css
+  drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.theme.css');
+
+  // add settings
+  drupal_add_js(array('islandora_openseadragon' => array('viewer_id' => $viewer_id, 'djatoka_url' => $djatoka_url, 'resource_uri' => $resource_uri)), 'setting');
+
+  // openseadragon
+  drupal_add_js($library_path . '/openseadragon.js');
+  // djatoka tilesource
+  drupal_add_js($module_path . '/js/djtilesource.js');
+
+  drupal_add_js($module_path . '/js/islandora_openseadragon.js');
+}
+
+
+
+/* OpenSeadragon.Config.imagePath = "$image_path/"; */
+/* OpenSeadragon.Config.debugMode = true; */
+
+//viewer.addEventListener('open', function(viewer) {alert('open');});
+//viewer.addEventListener('error', function(viewer) {alert('error');});
+//viewer.addEventListener('ignore', function(viewer) {alert('ignore');});
