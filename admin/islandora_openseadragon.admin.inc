@@ -21,5 +21,7 @@ function islandora_openseadragon_admin() {
     '#weight' => -10
   );
 
+  // @TODO: include all/most of the OpenSeadragon settings here.
+
   return system_settings_form($form);
 }

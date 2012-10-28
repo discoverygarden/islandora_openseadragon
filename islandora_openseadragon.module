@@ -47,7 +47,8 @@ function islandora_openseadragon_islandora_large_image_get_viewer() {
     'openseadragon' => array(
       'label' => t('OpenSeadragon'),
       'description' => t('OpenSeadragon viewer'),
-      'output' => 'islandora_openseadragon_callback',
+      'configuration' => 'admin/islandora/openseadragon',
+      'callback' => 'islandora_openseadragon_callback',
     ),
   );
 }
@@ -64,7 +65,10 @@ function islandora_openseadragon_callback($uri = NULL) {
 /*   $uri = 'http://localhost:8080/fedora/objects/islandora:507/datastreams/JP2/content'; */
 /*   $uri = 'http://localhost:8080/fedora/objects/islandora:511/datastreams/JP2/content'; */
 /*   $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A511/OBJ/orion_hubble_6000.tif'; */
-     $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A515/OBJ/Orion_Nebula_-_Hubble_2006_mosaic_edit.tif';
+
+/*      $uri = 'http://192.168.56.195/drupal/fedora/repository/islandora%3A515/OBJ/Orion_Nebula_-_Hubble_2006_mosaic_edit.tif'; */
+     $uri = 'http://localhost/drupal7/islandora/object/islandora%3A515/datastream/JP2/view';
+
 /*   $uri = 'http://192.168.56.195/drupal7/islandora/object/islandora:299/datastream/OBJ/view'; */
   }
   
@@ -89,7 +93,15 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
   drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.theme.css');
 
   // add settings
-  drupal_add_js(array('islandora_openseadragon' => array('viewer_id' => $viewer_id, 'djatoka_url' => $djatoka_url, 'resource_uri' => $resource_uri)), 'setting');
+  $options = array(); // @TODO populate with admin settings
+  drupal_add_js(array(
+    'islandora_openseadragon' => array(
+      'viewer_id' => $viewer_id,
+      'djatoka_url' => $djatoka_url,
+      'resource_uri' => $resource_uri,
+      'options' => $options,
+    ),
+  ), 'setting');
 
   // openseadragon
   drupal_add_js($library_path . '/openseadragon.js');
