@@ -48,6 +48,7 @@ function islandora_openseadragon_islandora_large_image_get_viewer() {
       'label' => t('OpenSeadragon'),
       'description' => t('OpenSeadragon viewer'),
       'configuration' => 'admin/islandora/openseadragon',
+      'default_dsid' => 'JP2',
       'callback' => 'islandora_openseadragon_callback',
     ),
   );
