@@ -17,9 +17,8 @@
   $.DjTileSource = function(djatoka_url, imageID) {
 
     var djThis = this;
-    var tileOverlap = 0;
-    var tileSize = 256;
-
+    var tileOverlap = parseInt(Drupal.settings.islandora_openseadragon.tiles.tile_overlap);
+    var tileSize = parseInt(Drupal.settings.islandora_openseadragon.tiles.tile_size);
 
     this.baseURL = djatoka_url;
     this.imageID = imageID;

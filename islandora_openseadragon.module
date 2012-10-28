@@ -76,6 +76,9 @@ function islandora_openseadragon_callback($uri = NULL) {
   return theme('islandora_openseadragon_viewer', array('uri' => $uri));
 }
 
+/**
+ * Implements hook_preprocess().
+ */
 function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$variables) {
   
   // get variables
@@ -94,13 +97,18 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
   drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.theme.css');
 
   // add settings
-  $options = array(); // @TODO populate with admin settings
+  $settings = _islandora_openseadragon_get_settings();
+  $tiles = array(
+    'tile_size' => variable_get('islandora_openseadragon_tile_size', '256'),
+    'tile_overlap' => variable_get('islandora_openseadragon_tile_overlap', '0'),
+  );
   drupal_add_js(array(
     'islandora_openseadragon' => array(
       'viewer_id' => $viewer_id,
       'djatoka_url' => $djatoka_url,
       'resource_uri' => $resource_uri,
-      'options' => $options,
+      'settings' => $settings,
+      'tiles' => $tiles,
     ),
   ), 'setting');
 
@@ -108,15 +116,38 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
   drupal_add_js($library_path . '/openseadragon.js');
   // djatoka tilesource
   drupal_add_js($module_path . '/js/djtilesource.js');
-
+  // set up openseadragon
   drupal_add_js($module_path . '/js/islandora_openseadragon.js');
+}
+
+/**
+ * Get default OpenSeadragon settings.
+ */
+function _islandora_openseadragon_get_settings() {
+  return variable_get('islandora_openseadragon_settings', array(
+    'debugMode' => FALSE,
+    'animationTime' => '1.5',
+    'blendTime' => '0.1',    
+    'alwaysBlend' => FALSE,
+    'autoHideControls' => TRUE,
+    'immediateRender' => FALSE,
+    'wrapHorizontal' => FALSE,
+    'wrapVertical' => FALSE,
+    'wrapOverlays' => FALSE,
+    'panHorizontal' => TRUE,
+    'panVertical' => TRUE,
+    'minZoomImageRatio' => '0.8',
+    'maxZoomPixelRatio' => '2',
+    'visibilityRatio' => '0.5',
+    'springStiffness' => '5.0',
+    'imageLoaderLimit' => '5',
+    'clickTimeThreshold' => '300',
+    'clickDistThreshold' => '5',
+    'zoomPerClick' => '2.0',
+    'zoomPerScroll' => '1.2',
+    'zoomPerSecond' => '2.0',
+  ));
 }
 
 
 
-/* OpenSeadragon.Config.imagePath = "$image_path/"; */
-/* OpenSeadragon.Config.debugMode = true; */
-
-//viewer.addEventListener('open', function(viewer) {alert('open');});
-//viewer.addEventListener('error', function(viewer) {alert('error');});
-//viewer.addEventListener('ignore', function(viewer) {alert('ignore');});
