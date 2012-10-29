@@ -28,10 +28,7 @@ TODO:
 
 High
 
-- provide check for OpenSeadragon in libraries in install hook.
-- use libraries function to include openseadragon.
 - clean up preprocess function
-- provide removal of variables in uninstall hook
 - availablity for multiple url's through array (newspapers)
 - check for DZI, djatoka as fallback
 

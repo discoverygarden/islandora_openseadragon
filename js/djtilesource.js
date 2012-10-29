@@ -47,10 +47,6 @@
       'json'
     );
     jQuery.ajaxSetup({async:true});
-    
-
-    
-    
   };
 
   //Inherit from TileSource.
@@ -68,12 +64,6 @@
   $.DjTileSource.prototype.getTileUrl = function(level, x, y) {
     var bounds = this.getTileBounds(level, x, y);
 
-    
-
-    var levelScale = {0: 16, 1: 16, 2: 8, 3: 4, 4: 2, 5: 1};
-    var levelScaleVal = levelScale[level];
-
-
     //XXX:  According to docs at http://sourceforge.net/apps/mediawiki/djatoka/index.php?title=Djatoka_OpenURL_Services#info:lanl-repo.2Fsvc.2FgetRegion,
     //  something like the following should work; however, seems that djatoka
     //  dies with a number format error while trying to parse as integers.
@@ -88,8 +78,7 @@
                  (bounds.x * this.dimensions.x).toFixed() +  ',' + 
                  this.tileSize + ',' + 
                  this.tileSize;
-
-
+    // djatoka parameters
     var params = {
       'url_ver': 'Z39.88-2004',
       'rft_id': this.imageID,
