@@ -97,7 +97,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
   drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.theme.css');
 
   // add settings
-  $settings = _islandora_openseadragon_get_settings();
+  $settings = islandora_openseadragon_get_settings();
   $tiles = array(
     'tile_size' => variable_get('islandora_openseadragon_tile_size', '256'),
     'tile_overlap' => variable_get('islandora_openseadragon_tile_overlap', '0'),
@@ -123,7 +123,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
 /**
  * Get default OpenSeadragon settings.
  */
-function _islandora_openseadragon_get_settings() {
+function islandora_openseadragon_get_settings() {
   return variable_get('islandora_openseadragon_settings', array(
     'debugMode' => FALSE,
     'animationTime' => '1.5',

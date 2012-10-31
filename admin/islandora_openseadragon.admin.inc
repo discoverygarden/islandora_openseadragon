@@ -12,10 +12,8 @@ function islandora_openseadragon_admin($form, &$form_state) {
   // include css
   drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.admin.css');
 
-  // @TODO: add element validates for numbers
-
   // get settings
-  $settings = _islandora_openseadragon_get_settings();
+  $settings = islandora_openseadragon_get_settings();
 
   $form = array();
   $form['islandora_openseadragon_settings'] = array(
@@ -241,7 +239,7 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#type' => 'submit',
     '#value' => t('Reset to defaults'),
     '#weight' => 1,
-    '#submit' => array('_islandora_openseadragon_admin_submit'),
+    '#submit' => array('islandora_openseadragon_admin_submit'),
   );
 
   return system_settings_form($form);
@@ -251,7 +249,7 @@ function islandora_openseadragon_admin_validate($form, &$form_state) {
   
 }
 
-function _islandora_openseadragon_admin_submit($form, &$form_state) {
+function islandora_openseadragon_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
   switch ($op) {
     case 'edit-reset':
