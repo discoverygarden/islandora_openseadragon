@@ -13,11 +13,12 @@ issue.
 For Apache, with Drupal running on the same box as Apache, a couple lines like:
 
 ProxyPass /adore-djatoka/ http://localhost:8080/adore-djatoka/
-ProxyPassReverse /adora-djatoka/ http://localhost:8080/adore-djatoka/
+ProxyPassReverse /adore-djatoka/ http://localhost:8080/adore-djatoka/
 
 in the Apache config somewhere (either the main apache.conf, httpd.conf, or in
 and arbitrarily named *.conf in your Apache's conf.d directory should suffice 
 to establish the reverse proxy.
+Note: the image passed to Djatoka needs anonymous user access permissions.
 
 -- OpenSeadragon --
 We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon. It can be obtained from 
@@ -31,6 +32,7 @@ High
 - clean up preprocess function
 - availablity for multiple url's through array (newspapers)
 - check for DZI, djatoka as fallback
+- check for djatoka availability first.
 
 Medium
 - documentation
