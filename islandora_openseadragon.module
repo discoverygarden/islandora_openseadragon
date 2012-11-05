@@ -1,21 +1,26 @@
-<?php 
+<?php
+
+/**
+ * @file
+ *
+ * Hooks and callbacks for this module.
+ */
 
 /**
  * Implements hook_menu().
  */
 function islandora_openseadragon_menu() {
-  $items = array();
-  // admin page
-  $items['admin/islandora/openseadragon'] = array(
-    'title' => 'OpenSeadragon',
-    'description' => 'Configuration for the OpenSeadragon viewer.',
-    'page callback' => 'drupal_get_form',
-    'access arguments' => array('administer site configuration'),
-    'page arguments' => array('islandora_openseadragon_admin'),
-    'file' => 'admin/islandora_openseadragon.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
+  return array(
+    'admin/islandora/openseadragon' => array(
+      'title' => 'OpenSeadragon',
+      'description' => 'Configuration for the OpenSeadragon viewer.',
+      'page callback' => 'drupal_get_form',
+      'access arguments' => array('administer site configuration'),
+      'page arguments' => array('islandora_openseadragon_admin'),
+      'file' => 'admin/islandora_openseadragon.admin.inc',
+      'type' => MENU_NORMAL_ITEM,
+    )
   );
-  return $items;
 }
 
 /**
@@ -25,7 +30,7 @@ function islandora_openseadragon_theme() {
   return array(
     'islandora_openseadragon_viewer' => array(
       'variables' => array(
-        'uri' => '', 
+        'uri' => '',
       ),
       'template' => 'theme/islandora-openseadragon',
     ),
@@ -52,11 +57,11 @@ function islandora_openseadragon_islandora_viewer_info() {
  *
  * @param string $uri
  *  Image url be passed to the viewer.
- * return
- *  themed OpenSeadragon viewer
+ *
+ * @return string
+ *  HTML repersentation of the OpenSeadragon viewer
  */
 function islandora_openseadragon_callback($uri = NULL) {
-  
   return theme('islandora_openseadragon_viewer', array('uri' => $uri));
 }
 
@@ -64,74 +69,57 @@ function islandora_openseadragon_callback($uri = NULL) {
  * Implements hook_preprocess().
  */
 function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$variables) {
-  
-  // get variables
   $library_path = libraries_get_path('openseadragon');
   $module_path = drupal_get_path('module', 'islandora_openseadragon');
-
-  $variables['viewer_id'] = $viewer_id = 'islandora-openseadragon';
-  //XXX:  Requires proxy setup...
-  $djatoka_url = "/adore-djatoka/resolver";
-  $resource_uri = $variables['uri'];
-
-  //The path to GUI images.
-  $image_path = $library_path . '/images';
-
-  // include css
-  drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.theme.css');
-
-  // add settings
-  $settings = islandora_openseadragon_get_settings();
-  $tiles = array(
-    'tile_size' => variable_get('islandora_openseadragon_tile_size', '256'),
-    'tile_overlap' => variable_get('islandora_openseadragon_tile_overlap', '0'),
+  $variables['viewer_id'] = 'islandora-openseadragon';
+  $settings = array(
+    'id' => $variables['viewer_id'],
+    'prefixUrl' => url($library_path),
   );
+  $settings = array_merge($settings, islandora_openseadragon_get_settings());
   drupal_add_js(array(
-    'islandora_openseadragon' => array(
-      'viewer_id' => $viewer_id,
-      'djatoka_url' => $djatoka_url,
-      'resource_uri' => $resource_uri,
-      'settings' => $settings,
-      'tiles' => $tiles,
-    ),
-  ), 'setting');
-
-  // openseadragon
-  drupal_add_js($library_path . '/openseadragon.js');
-  // djatoka tilesource
-  drupal_add_js($module_path . '/js/djtilesource.js');
-  // set up openseadragon
-  drupal_add_js($module_path . '/js/islandora_openseadragon.js');
+      'islandora_openseadragon' => array(
+        'resourceUri' => $variables['uri'],
+        'tileSize' => variable_get('islandora_openseadragon_tile_size', '256'),
+        'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', '0'),
+        'settings' => $settings,
+      ),
+    ), 'setting');
+  drupal_add_js("$library_path/openseadragon.js");
+  drupal_add_js("$module_path/js/djtilesource.js");
+  drupal_add_js("$module_path/js/islandora_openseadragon.js");
+  drupal_add_css("$module_path/css/islandora_openseadragon.theme.css");
 }
 
 /**
- * Get default OpenSeadragon settings.
+ * Get OpenSeadragon settings.
+ *
+ * @return array
+ *   Configuration options for OpenSeadragon.
  */
 function islandora_openseadragon_get_settings() {
   return variable_get('islandora_openseadragon_settings', array(
-    'debugMode' => FALSE,
-    'animationTime' => '1.5',
-    'blendTime' => '0.1',    
-    'alwaysBlend' => FALSE,
-    'autoHideControls' => TRUE,
-    'immediateRender' => FALSE,
-    'wrapHorizontal' => FALSE,
-    'wrapVertical' => FALSE,
-    'wrapOverlays' => FALSE,
-    'panHorizontal' => TRUE,
-    'panVertical' => TRUE,
-    'minZoomImageRatio' => '0.8',
-    'maxZoomPixelRatio' => '2',
-    'visibilityRatio' => '0.5',
-    'springStiffness' => '5.0',
-    'imageLoaderLimit' => '5',
-    'clickTimeThreshold' => '300',
-    'clickDistThreshold' => '5',
-    'zoomPerClick' => '2.0',
-    'zoomPerScroll' => '1.2',
-    'zoomPerSecond' => '2.0',
-  ));
+      'debugMode' => FALSE,
+      'animationTime' => '1.5',
+      'blendTime' => '0.1',
+      'alwaysBlend' => FALSE,
+      'autoHideControls' => TRUE,
+      'immediateRender' => FALSE,
+      'wrapHorizontal' => FALSE,
+      'wrapVertical' => FALSE,
+      'wrapOverlays' => FALSE,
+      'panHorizontal' => TRUE,
+      'panVertical' => TRUE,
+      'minZoomImageRatio' => '0.8',
+      'maxZoomPixelRatio' => '2',
+      'visibilityRatio' => '0.5',
+      'springStiffness' => '5.0',
+      'imageLoaderLimit' => '5',
+      'clickTimeThreshold' => '300',
+      'clickDistThreshold' => '5',
+      'zoomPerClick' => '2.0',
+      'zoomPerScroll' => '1.2',
+      'zoomPerSecond' => '2.0',
+    )
+  );
 }
-
-
-

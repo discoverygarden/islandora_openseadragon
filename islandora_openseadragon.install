@@ -2,7 +2,8 @@
 
 /**
  * @file
- * Install file
+ *
+ * Install hooks for this module.
  */
 
 /**
@@ -10,21 +11,18 @@
  */
 function islandora_openseadragon_requirements() {
   $requirements = array();
-  // Ensure translations don't break at install time
-  $t = get_t();
-
-  // OpenSeadragon library.
+  $t = get_t(); // Ensure translations don't break at install time
   if (!function_exists('libraries_get_libraries')) {
     module_enable(array('libraries'));
   }
   if (!in_array('openseadragon', array_keys(libraries_get_libraries()))) {
+    $readme_link = l('README.txt', drupal_get_path('module', 'islandora_openseadragon') . '/README.txt') ;
     $requirements['openseadragon'] = array(
       'title' => $t('OpenSeadragon library'),
-      'description' => $t('OpenSeadragon library missing, please view the !readme for installation instructions.', array('!readme' => l('README.txt', drupal_get_path('module', 'islandora_openseadragon') . '/README.txt'))),
+      'description' => $t('OpenSeadragon library missing, please view the !readme for installation instructions.', array('!readme' => $readme_link)),
       'severity' => REQUIREMENT_ERROR,
     );
   }
-
   return $requirements;
 }
 
@@ -32,13 +30,10 @@ function islandora_openseadragon_requirements() {
  * Implements hook_uninstall().
  */
 function islandora_openseadragon_uninstall() {
-  // remove variables
   $variables = array(
     'islandora_openseadragon_settings',
     'islandora_openseadragon_tile_size',
     'islandora_openseadragon_tile_overlap',
   );
-  foreach ($variables as $variable) {
-    variable_del($variable);
-  }
+  array_walk($variables, 'variable_del');
 }

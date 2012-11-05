@@ -2,14 +2,14 @@
 
 /**
  * @file
+ *
  * Admin callbacks for Islandora OpenSeadragon
  */
- 
- /**
-  * Admin form. Descriptions taken from the deepzoom module.
-  */
+
+/**
+ * Admin form. Descriptions taken from the deepzoom module.
+ */
 function islandora_openseadragon_admin($form, &$form_state) {
-  // include css
   drupal_add_css(drupal_get_path('module', 'islandora_openseadragon') . '/css/islandora_openseadragon.admin.css');
 
   // get settings
@@ -72,8 +72,8 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#title' => t('Wrap horizontal'),
     '#default_value' => $settings['wrapHorizontal'],
     '#description' =>
-      t('Whether tiles should be "wrapped" horizontally, so that there are no left or right edges.') . '<br />' .
-      '<strong>' . t('NOTE: this is an experimental API and is not guaranteed to work. The API is also very likely to change in the future. Use at your own risk!') . '</strong>',
+    t('Whether tiles should be "wrapped" horizontally, so that there are no left or right edges.') . '<br />' .
+    '<strong>' . t('NOTE: this is an experimental API and is not guaranteed to work. The API is also very likely to change in the future. Use at your own risk!') . '</strong>',
   );
   // wrap vertical
   $form['islandora_openseadragon_settings']['wrapVertical'] = array(
@@ -81,8 +81,8 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#title' => t('Wrap horizontal'),
     '#default_value' => $settings['wrapVertical'],
     '#description' =>
-      t('Whether tiles should be "wrapped" vertically, so that there are no top or bottom edges.') . '<br />' .
-      '<strong>' . t('NOTE: this is an experimental API and is not guaranteed to work. The API is also very likely to change in the future. Use at your own risk!') . '</strong>',
+    t('Whether tiles should be "wrapped" vertically, so that there are no top or bottom edges.') . '<br />' .
+    '<strong>' . t('NOTE: this is an experimental API and is not guaranteed to work. The API is also very likely to change in the future. Use at your own risk!') . '</strong>',
   );
   // wrap overlays
   $form['islandora_openseadragon_settings']['wrapOverlays'] = array(
@@ -90,8 +90,8 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#title' => t('Wrap overlays'),
     '#default_value' => $settings['wrapOverlays'],
     '#description' =>
-      t('Whether overlays should be continually re-positioned to match any horizontal or vertical wrapping. This has no effect if neither wrapHorizontal nor wrapVertical are set.') . '<br />' .
-      '<strong>' . t('NOTE: this is an experimental API and is not guaranteed to work. The API is also very likely to change in the future. Use at your own risk!') . '</strong>',
+    t('Whether overlays should be continually re-positioned to match any horizontal or vertical wrapping. This has no effect if neither wrapHorizontal nor wrapVertical are set.') . '<br />' .
+    '<strong>' . t('NOTE: this is an experimental API and is not guaranteed to work. The API is also very likely to change in the future. Use at your own risk!') . '</strong>',
   );
   // pan horizontal
   $form['islandora_openseadragon_settings']['panHorizontal'] = array(
@@ -197,21 +197,21 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => $settings['zoomPerSecond'],
     '#description' => t('The factor by which images should zoom over each second when the zoom buttons are held down.'),
   );
-/*
-  $form['deepzoom_config']['proxyUrl'] = array(
+  /*
+    $form['deepzoom_config']['proxyUrl'] = array(
     '#title' => t('Proxy URL'),
     '#type' => 'textfield',
     '#default_value' => $config['proxyUrl'],
     '#description' => t('The URL to prefix before any AJAX requests to overcome browser cross-site restrictions. The URL should be of the form "some/proxy.aspx?site=", so that the target site URL is passed as a GET parameter to the proxy. This URL can be absolute or relative, but must be on the same domain as the HTML page. If relative, it must be relative to the HTML page.'),
-  );
+    );
 
-  $form['deepzoom_config']['imagePath'] = array(
+    $form['deepzoom_config']['imagePath'] = array(
     '#title' => t('Image path'),
     '#type' => 'textfield',
     '#default_value' => $config['imagePath'],
     '#description' => t('The path for all UI images. This can be absolute or relative. If relative, it must be relative to the HTML page. A change to this value will only affect new viewers.'),
-  );
-*/
+    );
+  */
 
 
   // tile size
@@ -245,10 +245,6 @@ function islandora_openseadragon_admin($form, &$form_state) {
   return system_settings_form($form);
 }
 
-function islandora_openseadragon_admin_validate($form, &$form_state) {
-  
-}
-
 function islandora_openseadragon_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
   switch ($op) {
@@ -256,6 +252,6 @@ function islandora_openseadragon_admin_submit($form, &$form_state) {
       variable_del('islandora_openseadragon_settings');
       variable_del('islandora_openseadragon_tile_size');
       variable_del('islandora_openseadragon_tile_overlap');
-    break;
+      break;
   }
 }

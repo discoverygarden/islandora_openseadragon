@@ -1,5 +1,6 @@
 name = Islandora OpenSeadragon
 description = "OpenSeadragon viewer with option to serve images using Djatoka"
+dependencies[] = libraries
 package = Islandora
 version = 7.x-dev
 core = 7.x
