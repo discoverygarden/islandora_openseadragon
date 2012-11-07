@@ -26,8 +26,8 @@
 	that,
 	parseInt(data.width),
 	parseInt(data.height),
-	settings.tileSize,
-	settings.tileOverlap,
+	parseInt(settings.tileSize),
+	parseInt(settings.tileOverlap),
 	1,
 	parseInt(data.levels)
       );
@@ -44,7 +44,7 @@
    * Implement the abstract function.
    *
    * @function
-   * @name Seadragon.DjTileSource.prototype.getTileUrl
+   * @name Seadragon.DjatokaTileSource.prototype.getTileUrl
    *
    * @param {Number} level
    * @param {Number} x
