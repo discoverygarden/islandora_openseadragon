@@ -78,7 +78,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
   );
   $settings = array_merge($settings, islandora_openseadragon_get_settings());
   foreach ($settings as $key => $val) {
-    if (is_float($val)) {
+    if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
       $settings[$key] = (float) $val;
     }
     elseif (is_int($val)) {
