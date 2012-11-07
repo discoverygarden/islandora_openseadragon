@@ -197,28 +197,13 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => $settings['zoomPerSecond'],
     '#description' => t('The factor by which images should zoom over each second when the zoom buttons are held down.'),
   );
-  /*
-    $form['deepzoom_config']['proxyUrl'] = array(
-    '#title' => t('Proxy URL'),
-    '#type' => 'textfield',
-    '#default_value' => $config['proxyUrl'],
-    '#description' => t('The URL to prefix before any AJAX requests to overcome browser cross-site restrictions. The URL should be of the form "some/proxy.aspx?site=", so that the target site URL is passed as a GET parameter to the proxy. This URL can be absolute or relative, but must be on the same domain as the HTML page. If relative, it must be relative to the HTML page.'),
-    );
-
-    $form['deepzoom_config']['imagePath'] = array(
-    '#title' => t('Image path'),
-    '#type' => 'textfield',
-    '#default_value' => $config['imagePath'],
-    '#description' => t('The path for all UI images. This can be absolute or relative. If relative, it must be relative to the HTML page. A change to this value will only affect new viewers.'),
-    );
-  */
-
 
   // tile size
   $form['islandora_openseadragon_tile_size'] = array(
     '#type' => 'textfield',
     '#title' => t('Tile size'),
     '#size' => 10,
+    '#element_validate' => array('element_validate_integer'),
     '#default_value' => variable_get('islandora_openseadragon_tile_size', '256'),
     '#description' => t('tile size setting.'),
   );
@@ -227,6 +212,7 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Tile overlap'),
     '#size' => 10,
+    '#element_validate' => array('element_validate_integer'),
     '#default_value' => variable_get('islandora_openseadragon_tile_overlap', '0'),
     '#description' => t('tile overlap setting.'),
   );
