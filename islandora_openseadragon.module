@@ -81,7 +81,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
     if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
       $settings[$key] = (float) $val;
     }
-    elseif (is_int($val)) {
+    elseif (filter_var($input, FILTER_VALIDATE_INT)) {
       $settings[$key] = (int) $val;
     }
   }
