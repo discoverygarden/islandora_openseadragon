@@ -77,11 +77,19 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
     'prefixUrl' => url($library_path),
   );
   $settings = array_merge($settings, islandora_openseadragon_get_settings());
+  foreach ($settings as $key => $val) {
+    if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
+      $settings[$key] = (float) $val;
+    }
+    elseif (filter_var($val, FILTER_VALIDATE_INT)) {
+      $settings[$key] = (int) $val;
+    }
+  }
   drupal_add_js(array(
       'islandoraOpenSeadragon' => array(
         'resourceUri' => $variables['uri'],
-        'tileSize' => variable_get('islandora_openseadragon_tile_size', '256'),
-        'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', '0'),
+        'tileSize' => (int) variable_get('islandora_openseadragon_tile_size', '256'),
+        'tileOverlap' => (int) variable_get('islandora_openseadragon_tile_overlap', '0'),
         'settings' => $settings,
       ),
     ), 'setting');
