@@ -77,6 +77,14 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
     'prefixUrl' => url($library_path),
   );
   $settings = array_merge($settings, islandora_openseadragon_get_settings());
+  foreach ($settings as $key => $val) {
+    if (is_int($val)) {
+      $settings[$key] = (int) $val;
+    }
+    elseif (is_float($val)) {
+      $settings[$key] = (int) $val;
+    }
+  }
   drupal_add_js(array(
       'islandoraOpenSeadragon' => array(
         'resourceUri' => $variables['uri'],
