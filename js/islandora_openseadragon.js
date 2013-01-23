@@ -4,8 +4,7 @@
       var resourceUri = settings.islandoraOpenSeadragon.resourceUri;
       var config = settings.islandoraOpenSeadragon.settings;
       var openSeadragonId = '#' + config['id'];
-      $(openSeadragonId).each(function (index) {
-          console.debug(index + ": " + $(this));
+      $(openSeadragonId).each(function () {
           if (!$(this).hasClass('processed')) {
           config.tileSources = new Array();
           resourceUri = (resourceUri instanceof Array) ? resourceUri : new Array(resourceUri);
