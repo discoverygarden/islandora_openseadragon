@@ -85,6 +85,15 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
       $settings[$key] = (int) $val;
     }
   }
+  
+  // Add a dummy overlay for testing
+  // This is where we'd jam in some hocr coordinates
+  $settings['overlays'] = array(array("x" => 0.5, 
+      "y" => 0.5,
+      "width" => 0.5,
+      "height" => 0.5,
+      "className" => "islandora-openseadragon-highlight"));
+
   drupal_add_js(array(
       'islandoraOpenSeadragon' => array(
         'resourceUri' => $variables['uri'],
