@@ -19,7 +19,7 @@ function islandora_openseadragon_menu() {
       'page arguments' => array('islandora_openseadragon_admin'),
       'file' => 'admin/islandora_openseadragon.admin.inc',
       'type' => MENU_NORMAL_ITEM,
-    )
+    ),
   );
 }
 
@@ -44,10 +44,12 @@ function islandora_openseadragon_islandora_viewer_info() {
   return array(
     'islandora_openseadragon' => array(
       'label' => t('OpenSeadragon'),
-      'description' => t('OpenSeadragon viewer with Djatoka as tilesource.'), // later we'll add DZI too
+        // Later we'll add DZI too.
+      'description' => t('OpenSeadragon viewer with Djatoka as tilesource.'),
       'configuration' => 'admin/islandora/openseadragon',
       'callback' => 'islandora_openseadragon_callback',
-      'mimetype' => array('image/jp2'), // DZI has xml as mimetype? Not sure how to handle that.
+        // DZI has xml as mimetype? Not sure how to handle that.
+      'mimetype' => array('image/jp2'),
     ),
   );
 }
@@ -56,10 +58,10 @@ function islandora_openseadragon_islandora_viewer_info() {
  * Callback function for the viewer.
  *
  * @param string $uri
- *  Image url be passed to the viewer.
+ *   Image url be passed to the viewer.
  *
  * @return string
- *  HTML repersentation of the OpenSeadragon viewer
+ *   HTML repersentation of the OpenSeadragon viewer
  */
 function islandora_openseadragon_callback($uri = NULL) {
   return theme('islandora_openseadragon_viewer', array('uri' => $uri));
@@ -85,15 +87,27 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
       $settings[$key] = (int) $val;
     }
   }
-  
-  // Add a dummy overlay for testing
-  // This is where we'd jam in some hocr coordinates
-  $settings['overlays'] = array(array("x" => 0.5, 
-      "y" => 0.5,
-      "width" => 0.5,
-      "height" => 0.5,
-      "className" => "islandora-openseadragon-highlight"));
 
+  // This is where we jam in some HOCR coordinates.
+  if (isset($_GET['terms']) && isset($_GET['pid'])) {
+    $highlighting_info = islandora_paged_content_get_highlighting_info($_GET['pid'], $_GET['terms']);
+    $highlights = $highlighting_info['bounding_boxes'];
+  
+    foreach ($highlights as $key => $highlight) {
+      // The size on the x axis is used to calculate the proportional values
+      // under the openseadragon coordinate system.
+      $highlights[$key]['x'] = $highlights[$key]['left'] / $highlighting_info['width'];
+      $highlights[$key]['y'] = $highlights[$key]['top'] / $highlighting_info['width'];
+      $highlights[$key]['width'] = ($highlights[$key]['right'] - $highlights[$key]['left']) / $highlighting_info['width'];
+      $highlights[$key]['height'] = ($highlights[$key]['bottom'] - $highlights[$key]['top']) / $highlighting_info['width'];
+      unset($highlights[$key]['left']);
+      unset($highlights[$key]['top']);
+      unset($highlights[$key]['right']);
+      unset($highlights[$key]['bottom']);
+      $highlights[$key]['className'] = "islandora-openseadragon-highlight";
+    }
+    $settings['overlays'] = $highlights;
+  }
   drupal_add_js(array(
       'islandoraOpenSeadragon' => array(
         'resourceUri' => $variables['uri'],
