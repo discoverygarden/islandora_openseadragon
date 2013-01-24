@@ -90,7 +90,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
 
   // This is where we jam in some HOCR coordinates.
   if (isset($_GET['terms']) && isset($_GET['pid'])) {
-    $highlighting_info = islandora_paged_content_get_highlighting_info($_GET['pid'], $_GET['terms']);
+    $highlighting_info = islandora_paged_content_get_highlighting_info(urldecode($_GET['pid']), urldecode($_GET['terms']));
     $highlights = $highlighting_info['bounding_boxes'];
   
     foreach ($highlights as $key => $highlight) {
