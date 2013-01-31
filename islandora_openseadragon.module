@@ -17,7 +17,7 @@ function islandora_openseadragon_menu() {
       'page callback' => 'drupal_get_form',
       'access arguments' => array('administer site configuration'),
       'page arguments' => array('islandora_openseadragon_admin'),
-      'file' => 'admin/islandora_openseadragon.admin.inc',
+      'file' => 'includes/admin.form.inc',
       'type' => MENU_NORMAL_ITEM,
     ),
   );
@@ -57,20 +57,23 @@ function islandora_openseadragon_islandora_viewer_info() {
 /**
  * Callback function for the viewer.
  *
- * @param string $uri
- *   Image url be passed to the viewer.
+ * @param array
+ *  Params required by the theme
+ *  Image url be passed to the viewer.
  *
  * @return string
  *   HTML repersentation of the OpenSeadragon viewer
  */
-function islandora_openseadragon_callback($uri = NULL) {
-  return theme('islandora_openseadragon_viewer', array('uri' => $uri));
+function islandora_openseadragon_callback($params = NULL, $fedora_object = null) {
+  $uri = $params['jp2_url'];
+  return theme('islandora_openseadragon_viewer', array('uri' => $uri, 'fedora_object' => $fedora_object));
 }
 
 /**
  * Implements hook_preprocess().
  */
 function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$variables) {
+  //fedora_object included in results, but not used
   $library_path = libraries_get_path('openseadragon');
   $module_path = drupal_get_path('module', 'islandora_openseadragon');
   $variables['viewer_id'] = 'islandora-openseadragon';
