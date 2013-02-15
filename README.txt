@@ -24,8 +24,10 @@ proxy or remove the Deny from All in mod_proxy's conf file.
 Note: the image passed to Djatoka needs anonymous user access permissions.
 
 -- OpenSeadragon --
-We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon. It can be obtained from 
-https://github.com/thatcher/openseadragon/tarball/master
+We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon. 
+The most current version breaks the Islandora integration, which will be addressed in the 
+future. The correct version for Islandora can be obtained from here:
+https://github.com/thatcher/openseadragon/tarball/1c7f5839f90c28e97c96c169fdf23da24826605f
 
 TODO:
 ====
