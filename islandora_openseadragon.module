@@ -74,17 +74,13 @@ function islandora_openseadragon_callback($params = NULL, $fedora_object = NULL)
  * Implements hook_preprocess().
  */
 function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$variables) {
-  global $base_url;
-
   // Variable fedora_object included in results, but not used.
   $library_path = libraries_get_path('openseadragon');
   $module_path = drupal_get_path('module', 'islandora_openseadragon');
   $variables['viewer_id'] = 'islandora-openseadragon';
   $settings = array(
     'id' => $variables['viewer_id'],
-    // XXX: Can't use url(), as it can add in language prefixes, which will break
-    // the URL.
-    'prefixUrl' => "$base_url/$library_path/images/",
+    'prefixUrl' => file_create_url("$library_path/images/"),
   );
 
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
