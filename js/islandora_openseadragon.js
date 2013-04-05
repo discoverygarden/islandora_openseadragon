@@ -68,10 +68,18 @@
               'svc.format': 'image/jpeg',
               'svc.region': scaled_box.y + ',' + scaled_box.x + ',' + (scaled_box.getBottomRight().y - scaled_box.y) + ',' + (scaled_box.getBottomRight().x - scaled_box.x),
             };
-            jQuery("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.islandoraOpenSeadragon.pid + '/print?' + jQuery.param({
-              'clip': source.baseURL + '?' + jQuery.param(params),
-              'dimensions': container.x + ',' + container.y,
-            }));
+            if (zoom <= 1) {
+              jQuery("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.islandoraOpenSeadragon.pid + '/print?' + jQuery.param({
+                'clip': source.baseURL + '?' + jQuery.param(params),
+                'dimensions': source.dimensions.x + ',' + source.dimensions.y,
+              }));
+            }
+            else {
+              jQuery("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.islandoraOpenSeadragon.pid + '/print?' + jQuery.param({
+                'clip': source.baseURL + '?' + jQuery.param(params),
+                'dimensions': container.x + ',' + container.y,
+              }));
+            }
           };
           viewer.addHandler("open", update_clip);
           viewer.addHandler("animationfinish", update_clip);
