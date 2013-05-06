@@ -11,7 +11,7 @@ before_install:
   - cd $HOME
   - git clone -b 7.x git://github.com/Islandora/islandora.git
   - wget http://openseadragon.github.io/releases/openseadragon-bin-0.9.124.zip
-  - unzip openseadragon-bin-0.9.124
+  - unzip openseadragon-bin-0.9.124.zip
   - git clone -b 7.x git://github.com/Islandora/islandora_paged_content
   - export ISLANDORA_DIR=$HOME/islandora
   - $HOME/islandora/tests/scripts/travis_setup.sh
