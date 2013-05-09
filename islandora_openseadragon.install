@@ -10,7 +10,8 @@
  */
 function islandora_openseadragon_requirements() {
   $requirements = array();
-  $t = get_t(); // Ensure translations don't break at install time.
+  // Ensure translations don't break at install time.
+  $t = get_t();
   if (!function_exists('libraries_get_libraries')) {
     module_enable(array('libraries'));
   }

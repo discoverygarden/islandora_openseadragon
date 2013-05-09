@@ -115,7 +115,7 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => $settings['minZoomImageRatio'],
     '#description' => t('The minimum image ratio (image size to viewer size) in both dimensions that can result from zooming out.'),
   );
-  // Maximum zoom pixel ratio
+  // Maximum zoom pixel ratio.
   $form['islandora_openseadragon_settings']['maxZoomPixelRatio'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum zoom pixel ratio'),

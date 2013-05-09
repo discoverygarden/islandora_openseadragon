@@ -7,6 +7,10 @@
  * @return string
  *   The version string, or NULL if we couldn't find it.
  */
+
+/**
+ * Get the installed version.
+ */
 function islandora_openseadragon_get_installed_version() {
   $version = &drupal_static(__FUNCTION__, NULL);
 
