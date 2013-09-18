@@ -9,7 +9,7 @@
           config.tileSources = new Array();
           resourceUri = (resourceUri instanceof Array) ? resourceUri : new Array(resourceUri);
           $.each(resourceUri, function(index, uri) {
-            var tileSource = new OpenSeadragon.DjatokaTileSource(uri, settings.islandoraOpenSeadragon);
+            var tileSource = new OpenSeadragon.DjatokaTileSource(config.djatokaServerBaseURL, uri, settings.islandoraOpenSeadragon);
             config.tileSources.push(tileSource);
           });
           var viewer = new OpenSeadragon(config);

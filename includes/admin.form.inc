@@ -26,6 +26,14 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => $settings['debugMode'],
     '#description' => t('Toggles whether messages should be logged and fail-fast behavior should be provided.'),
   );
+  // Location of the djatoka servers.
+  $form['islandora_openseadragon_settings']['djatokaServerBaseURL'] = array(
+  		'#type' => 'textfield',
+  		'#title' => t('Djatoka server base URL'),
+  		'#element_validate' => array('djatoka_base_url_validate'),
+  		'#default_value' => $settings['djatokaServerBaseURL'],
+  		'#description' => t('The location of the Djatoka server OpenURL resolver.'),
+  );
   // Animation time.
   $form['islandora_openseadragon_settings']['animationTime'] = array(
     '#type' => 'textfield',
@@ -234,6 +242,27 @@ function islandora_openseadragon_admin($form, &$form_state) {
   );
 
   return system_settings_form($form);
+}
+
+function djatoka_base_url_validate($element, &$form_state, $form) {
+  $url = $element['#value'];
+
+  if (empty($url)) {
+    form_error($element, t('This field is required.'));
+  }
+  else {
+  	// Work around drupal_http_request's not handling relative URLs
+    if (strpos($url, '/') === 0) {
+      $url = $GLOBALS['base_url'] . $url;
+    }
+
+    // Check that it's working with LOC's stable external JP2 image
+    $result = drupal_http_request(check_url($url) . '?url_ver=Z39.88-2004&rft_id=http%3A%2F%2Fmemory.loc.gov%2Fgmd%2Fgmd433%2Fg4330%2Fg4330%2Fnp000066.jp2&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=1');
+
+    if ($result->code != 200) {
+      form_error($element, t('This does not seem to be a functioning Djatoka server.'));
+    }
+  }
 }
 
 /**
