@@ -259,7 +259,7 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
       $url = $GLOBALS['base_url'] . $url;
     }
 
-    // Check that it's working with LOC's stable external JP2 image
+    // Check that it's working with LOC's stable external JP2 image.
     $result = drupal_http_request(check_url($url) . '?url_ver=Z39.88-2004&rft_id=http%3A%2F%2Fmemory.loc.gov%2Fgmd%2Fgmd433%2Fg4330%2Fg4330%2Fnp000066.jp2&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=1');
 
     if ($result->code != 200) {
