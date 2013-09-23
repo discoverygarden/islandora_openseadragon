@@ -118,7 +118,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
       $settings[$key] = (int) $val;
     }
     elseif (filter_var($val, FILTER_VALIDATE_URL)) {
-      $settings[$key] = $val;
+      $settings[$key] = check_url($val);
     }
   }
 
