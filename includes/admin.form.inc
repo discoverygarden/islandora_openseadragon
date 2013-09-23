@@ -28,11 +28,11 @@ function islandora_openseadragon_admin($form, &$form_state) {
   );
   // Location of the djatoka servers.
   $form['islandora_openseadragon_settings']['djatokaServerBaseURL'] = array(
-  		'#type' => 'textfield',
-  		'#title' => t('Djatoka server base URL'),
-  		'#element_validate' => array('djatoka_base_url_validate'),
-  		'#default_value' => $settings['djatokaServerBaseURL'],
-  		'#description' => t('The location of the Djatoka server OpenURL resolver.'),
+    '#type' => 'textfield',
+    '#title' => t('Djatoka server base URL'),
+    '#element_validate' => array('djatoka_base_url_validate'),
+    '#default_value' => $settings['djatokaServerBaseURL'],
+    '#description' => t('The location of the Djatoka server OpenURL resolver.'),
   );
   // Animation time.
   $form['islandora_openseadragon_settings']['animationTime'] = array(
@@ -244,6 +244,9 @@ function islandora_openseadragon_admin($form, &$form_state) {
   return system_settings_form($form);
 }
 
+/**
+ * Validates that the supplied djatoka base URL is a working djatoka install.
+ */
 function djatoka_base_url_validate($element, &$form_state, $form) {
   $url = $element['#value'];
 
@@ -251,7 +254,7 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
     form_error($element, t('This field is required.'));
   }
   else {
-  	// Work around drupal_http_request's not handling relative URLs
+    // Work around drupal_http_request's not handling relative URLs.
     if (strpos($url, '/') === 0) {
       $url = $GLOBALS['base_url'] . $url;
     }
