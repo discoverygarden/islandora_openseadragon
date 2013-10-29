@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="islandora_openseadragon" default="build">
+  <!--
+      Optional build properties allow outputting phpcs errors to the console.
+      To use, add this to the optional properties file: console-results=true
+  -->
+  <property file="${user.home}/.islandora-build.properties"/>
+
   <target name="build" depends="clean,prepare,lint,phploc,code_sniff,phpcpd,pdepend,doxygen,phpcb" />
 
   <target name="clean" description="Cleanup build artifacts">
@@ -40,11 +46,23 @@
     </exec>
   </target>
 
-  <target name="code_sniff" description="Checks the code for Drupal coding standard violations" >
-    <exec executable="phpcs">
-        <arg line="--standard=Drupal --report=checkstyle --report-file=${basedir}/build/logs/checkstyle.xml --extensions=php,inc,test,module,install --ignore=build/,css/ ${basedir}" />
+  <!-- Beginning of code_sniff targets. -->
+  <target name="code_sniff" description="Checks the code for Drupal coding standard violations" depends="code_sniff_config1,code_sniff_config2">
+    <exec executable="phpcs" failonerror="${phpcs_foe}">
+      <arg line="${phpcs_args} ${basedir}" />
     </exec>
   </target>
+  <target name="code_sniff_config1" description="Configures the code_sniff task to be run by a human" if="console-results">
+    <property name="phpcs_foe" value="true"/>
+    <property name="phpcs_args" value="--standard=Drupal --extensions=php,inc,test,module,install --ignore=build/,css/"/>
+    <echo message="Setting phpcs errors to be output on the console"/>
+  </target>
+  <target name="code_sniff_config2" description="Configures the code_sniff task to be run by a CI process" unless="console-results">
+    <property name="phpcs_foe" value="false"/>
+    <property name="phpcs_args" value="--standard=Drupal --report=checkstyle --report-file=${basedir}/build/logs/checkstyle.xml --extensions=php,inc,test,module,install --ignore=build/,css/"/>
+    <echo message="Setting phpcs errors to be output to a report file"/>
+  </target>
+  <!-- End of code_sniff targets. -->
 
   <target name="phpcpd" description="Copy/Paste code detection">
     <exec executable="phpcpd">
