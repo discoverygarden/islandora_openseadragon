@@ -1,3 +1,14 @@
+BUILD STATUS
+------------
+Current build status:
+[![Build Status](https://travis-ci.org/Islandora/islandora_openseadragon.png?branch=7.x)](https://travis-ci.org/Islandora/islandora_openseadragon)
+
+CI Server:
+http://jenkins.discoverygarden.ca
+
+ISLANDORA OPENSEADRAGON
+==================
+
 CONTENTS OF THIS FILE
 ---------------------
 
@@ -26,24 +37,23 @@ ProxyPass /adore-djatoka http://localhost:8080/adore-djatoka
 ProxyPassReverse /adore-djatoka http://localhost:8080/adore-djatoka
 
 in the Apache config somewhere (either the main apache.conf, httpd.conf, or in
-and arbitrarily named *.conf in your Apache's conf.d directory should suffice 
+and arbitrarily named *.conf in your Apache's conf.d directory should suffice
 to establish the reverse proxy.
+
 In Debian derived systems one will need to create location entries for each
 proxy or remove the Deny from All in mod_proxy's conf file.
 
-Note: the image passed to Djatoka needs anonymous user access permissions.
 
 DEPENDENCIES
 ------------
 
 * OpenSeadragon
-We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon. 
-The most current version breaks the Islandora integration, which will be addressed in the 
-future. The correct version for Islandora can be obtained from here:
-https://github.com/thatcher/openseadragon/tarball/1c7f5839f90c28e97c96c169fdf23da24826605f
+We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon.
+Link to Openseadragon download: http://openseadragon.github.io/releases/openseadragon-bin-0.9.124.zip
 * There is a conditional dependency on the islandora_paged_content module, but should not require
-any additional actions from the user as the solution packs that use the feature requiring the 
+any additional actions from the user as the solution packs that use the feature requiring the
 islandora_paged_content module include it in their depency lists.
+
 
 TODO
 ----

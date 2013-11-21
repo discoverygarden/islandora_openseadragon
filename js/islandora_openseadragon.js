@@ -9,7 +9,7 @@
           config.tileSources = new Array();
           resourceUri = (resourceUri instanceof Array) ? resourceUri : new Array(resourceUri);
           $.each(resourceUri, function(index, uri) {
-            var tileSource = new OpenSeadragon.DjatokaTileSource(uri, settings.islandoraOpenSeadragon);
+            var tileSource = new OpenSeadragon.DjatokaTileSource(config.djatokaServerBaseURL, uri, settings.islandoraOpenSeadragon);
             config.tileSources.push(tileSource);
           });
           var viewer = new OpenSeadragon(config);
@@ -68,9 +68,10 @@
               'svc.format': 'image/jpeg',
               'svc.region': scaled_box.y + ',' + scaled_box.x + ',' + (scaled_box.getBottomRight().y - scaled_box.y) + ',' + (scaled_box.getBottomRight().x - scaled_box.x),
             };
+            var dimensions = (zoom <= 1) ? source.dimensions.x + ',' + source.dimensions.y : container.x + ',' + container.y;
             jQuery("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.islandoraOpenSeadragon.pid + '/print?' + jQuery.param({
               'clip': source.baseURL + '?' + jQuery.param(params),
-              'dimensions': container.x + ',' + container.y,
+              'dimensions': dimensions,
             }));
           };
           viewer.addHandler("open", update_clip);

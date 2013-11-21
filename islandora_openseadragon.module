@@ -57,17 +57,19 @@ function islandora_openseadragon_islandora_viewer_info() {
  * Callback function for the viewer.
  *
  * @param array $params
- *   Params required by the theme
- *   Image url be passed to the viewer.
- * @param IslandoraFedoraObject $fedora_object
+ *   Params required by the theme. We require the keys:
+ *   - jp2_url: The URL to the JP2 image.
+ * @param IslandoraAbstractObject $fedora_object
  *   The object that we are viewing.
  *
  * @return string
  *   HTML repersentation of the OpenSeadragon viewer
  */
 function islandora_openseadragon_callback($params = NULL, $fedora_object = NULL) {
-  $uri = $params['jp2_url'];
-  return theme('islandora_openseadragon_viewer', array('uri' => $uri, 'fedora_object' => $fedora_object));
+  if (isset($params['jp2_url'])) {
+    $uri = $params['jp2_url'];
+    return theme('islandora_openseadragon_viewer', array('uri' => $uri, 'fedora_object' => $fedora_object));
+  }
 }
 
 /**
@@ -80,8 +82,33 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
   $variables['viewer_id'] = 'islandora-openseadragon';
   $settings = array(
     'id' => $variables['viewer_id'],
-    'prefixUrl' => url($library_path),
+    'prefixUrl' => file_create_url("$library_path/images/"),
   );
+
+  module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
+  $installed_version = islandora_openseadragon_get_installed_version();
+
+  if (version_compare($installed_version, '0.9.82') <= 0) {
+    // XXX: Version numbers don't quite line-up for the change in the nav image
+    // prefix URL, so now, let the hacking begin!... Just for compatibility
+    // with older versions.
+    $types = array('zoomIn', 'zoomOut', 'home', 'fullpage', 'previous', 'next');
+    $actions = array(
+      'REST' => 'rest',
+      'GROUP' => 'grouphover',
+      'HOVER' => 'hover',
+      'DOWN' => 'pressed',
+    );
+    foreach ($types as $type) {
+      foreach ($actions as $action => $namepart) {
+        $settings['navImages'][$type][$action] = format_string('!type_!action.png', array(
+          '!type' => strtolower($type),
+          '!action' => $namepart,
+        ));
+      }
+    }
+  }
+
   $settings = array_merge($settings, islandora_openseadragon_get_settings());
   foreach ($settings as $key => $val) {
     if (filter_var($val, FILTER_VALIDATE_FLOAT)) {
@@ -89,6 +116,9 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
     }
     elseif (filter_var($val, FILTER_VALIDATE_INT)) {
       $settings[$key] = (int) $val;
+    }
+    elseif (filter_var($val, FILTER_VALIDATE_URL)) {
+      $settings[$key] = check_url($val);
     }
   }
 
@@ -122,7 +152,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
 
   drupal_add_js(array(
       'islandoraOpenSeadragon' => array(
-        'pid' => isset($variables['fedora_object'])? $variables['fedora_object']->id: NULL,
+        'pid' => isset($variables['fedora_object']) ? $variables['fedora_object']->id : NULL,
         'resourceUri' => $variables['uri'],
         'tileSize' => (int) variable_get('islandora_openseadragon_tile_size', '256'),
         'tileOverlap' => (int) variable_get('islandora_openseadragon_tile_overlap', '0'),
@@ -142,29 +172,30 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
  *   Configuration options for OpenSeadragon.
  */
 function islandora_openseadragon_get_settings() {
-  return variable_get('islandora_openseadragon_settings', array(
-      'debugMode' => FALSE,
-      'animationTime' => '1.5',
-      'blendTime' => '0.1',
-      'alwaysBlend' => FALSE,
-      'autoHideControls' => TRUE,
-      'immediateRender' => FALSE,
-      'wrapHorizontal' => FALSE,
-      'wrapVertical' => FALSE,
-      'wrapOverlays' => FALSE,
-      'panHorizontal' => TRUE,
-      'panVertical' => TRUE,
-      'minZoomImageRatio' => '0.8',
-      'maxZoomPixelRatio' => '2',
-      'visibilityRatio' => '0.5',
-      'springStiffness' => '5.0',
-      'imageLoaderLimit' => '5',
-      'clickTimeThreshold' => '300',
-      'clickDistThreshold' => '5',
-      'zoomPerClick' => '2.0',
-      'zoomPerScroll' => '1.2',
-      'zoomPerSecond' => '2.0',
-    )
+  return variable_get('islandora_openseadragon_settings', array()) + array(
+    'debugMode' => FALSE,
+    'djatokaServerBaseURL' => '/adore-djatoka/resolver',
+    'animationTime' => '1.5',
+    'blendTime' => '0.1',
+    'alwaysBlend' => FALSE,
+    'autoHideControls' => TRUE,
+    'immediateRender' => FALSE,
+    'wrapHorizontal' => FALSE,
+    'wrapVertical' => FALSE,
+    'wrapOverlays' => FALSE,
+    'panHorizontal' => TRUE,
+    'panVertical' => TRUE,
+    'minZoomImageRatio' => '0.8',
+    'maxZoomPixelRatio' => '2',
+    'visibilityRatio' => '0.5',
+    'springStiffness' => '5.0',
+    'imageLoaderLimit' => '5',
+    'clickTimeThreshold' => '300',
+    'clickDistThreshold' => '5',
+    'zoomPerClick' => '2.0',
+    'zoomPerScroll' => '1.2',
+    'zoomPerSecond' => '2.0',
+    'showNavigator' => TRUE,
   );
 }
 
@@ -192,4 +223,3 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
     );
   }
 }
-
