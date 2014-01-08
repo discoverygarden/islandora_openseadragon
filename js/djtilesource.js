@@ -24,6 +24,16 @@
     this.baseURL = baseURL;
     this.imageID = imageID;
     var djatoka_get_success = function(data, textStatus, jqXHR) {
+      // Determine if the current platform is Windows.
+      if (navigator.platform.toLowerCase().indexOf('win') !== -1) {
+        // slanger, 2013-10-28: The data object includes a path to the
+        // tomcat temp directory, where the JP2 file has been cached.
+        // In Windows, this path contains backslashes, which will be
+        // misinterpreted as escaped characters, causing the viewer to
+        // break. The backslashes need to be replaced with forwardslashes.
+	    data = data.replace(/\\/g, '/');
+	    data = jQuery.parseJSON(data);
+      }
       $.TileSource.call(
 	that,
 	parseInt(data.width),
@@ -38,7 +48,11 @@
       that.getTileUrl = $.DjatokaTileSource.prototype.getTileUrl;
     };
     jQuery.ajaxSetup({async: false});
-    jQuery.get(this.baseURL, djatoka_get_params, djatoka_get_success, 'json');
+    // slanger, 2013-10-28: If the platform is Windows, the data needs to remain a
+    // string so that backslashes in paths can be replaced with forwardslashes --
+    // otherwise, the viewer will break. It can then become a JSON object.
+    dataType = (navigator.platform.toLowerCase().indexOf('win') !== -1) ? 'string' : 'json';
+    jQuery.get(this.baseURL, djatoka_get_params, djatoka_get_success, dataType);
     jQuery.ajaxSetup({async:true});
   };
   jQuery.extend($.DjatokaTileSource.prototype, $.TileSource.prototype); // Inherit from TileSource.
