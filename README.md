@@ -49,7 +49,8 @@ DEPENDENCIES
 
 * OpenSeadragon
 We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon.
-Link to Openseadragon download: http://openseadragon.github.io/releases/openseadragon-bin-0.9.124.zip
+Openseadragon .9.129 is known to work well with Islandora 
+download: http://openseadragon.github.io/releases/openseadragon-bin-0.9.129.zip
 * There is a conditional dependency on the islandora_paged_content module, but should not require
 any additional actions from the user as the solution packs that use the feature requiring the
 islandora_paged_content module include it in their depency lists.
