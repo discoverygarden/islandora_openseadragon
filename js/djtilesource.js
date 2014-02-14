@@ -24,8 +24,8 @@
     this.baseURL = baseURL;
     this.imageID = imageID;
     var djatoka_get_success = function(data, textStatus, jqXHR) {
-      // Windows returns the JP2 file path with backslashes. They get mistaken for
-      // escaped characters and the viewer breaks. Replace them with forwardslashes.
+      // Windows uses backslashes in the JP2 file path, which jQuery mistakes for escaped
+      // characters. Replace them with forwardslashes so the viewer doesn't break.
       data = data.replace(/\\/g, '/');
       data = jQuery.parseJSON(data);
       $.TileSource.call(
