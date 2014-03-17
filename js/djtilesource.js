@@ -26,8 +26,9 @@
     var djatoka_get_success = function(data, textStatus, jqXHR) {
       // Determine if the path to "imagefile" has backslashes in it.
       if (data.match(/\"imagefile\"\: \"[^\"]*?(\\).*\"/g)) {
-        // Backslashes in the JP2 file path (i.e. Windows) will get mistaken for escaped
-        // characters. Escape the backslashes themselves so the viewer doesn't break.
+        // Since Djatoka isn't returning a true JSON object (http://bit.ly/1id6dBo),
+        // backslashes in the JP2 file path (Windows) are getting mistaken for escaped
+        // characters. Escape the backslashes themselves so that viewer doesn't break.
         data = data.replace(/(\"imagefile\"\: \")(.*?)(\")/g, function (match, capture1, imagepath, capture3) {
           return capture1 + imagepath.replace(/\\/g, '\\\\') + capture3
         });
