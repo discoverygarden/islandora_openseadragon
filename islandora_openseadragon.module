@@ -10,7 +10,7 @@
  */
 function islandora_openseadragon_menu() {
   return array(
-    'admin/islandora/openseadragon' => array(
+    'admin/islandora/islandora_viewers/openseadragon' => array(
       'title' => 'OpenSeadragon',
       'description' => 'Configure the OpenSeadragon viewer.',
       'page callback' => 'drupal_get_form',
@@ -45,7 +45,7 @@ function islandora_openseadragon_islandora_viewer_info() {
       'label' => t('OpenSeadragon'),
         // Later we'll add DZI too.
       'description' => t('OpenSeadragon viewer with djatoka as tilesource.'),
-      'configuration' => 'admin/islandora/openseadragon',
+      'configuration' => 'admin/islandora/islandora_viewers/openseadragon',
       'callback' => 'islandora_openseadragon_callback',
         // DZI has xml as mimetype? Not sure how to handle that.
       'mimetype' => array('image/jp2'),
