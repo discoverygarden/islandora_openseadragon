@@ -133,17 +133,19 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
     $highlights = array();
 
     foreach ($highlighting_info as $pid => $info) {
-      foreach ($info['snippets'] as $snippet => $bounding_boxes) {
-        foreach ($bounding_boxes as $bounding_box) {
-          // The size on the x axis is used to calculate the proportional values
-          // under the openseadragon coordinate system.
-          $highlights[] = array(
-            'x' => $bounding_box['left'] / $info['page']['width'],
-            'y' => $bounding_box['top'] / $info['page']['width'],
-            'width' => ($bounding_box['right'] - $bounding_box['left']) / $info['page']['width'],
-            'height' => ($bounding_box['bottom'] - $bounding_box['top']) / $info['page']['width'],
-            'className' => "islandora-openseadragon-highlight",
-          );
+      if (array_key_exists('snippets', $info)) {
+        foreach ($info['snippets'] as $snippet => $bounding_boxes) {
+          foreach ($bounding_boxes as $bounding_box) {
+            // The size on the x axis is used to calculate the proportional
+            // values under the openseadragon coordinate system.
+            $highlights[] = array(
+              'x' => $bounding_box['left'] / $info['page']['width'],
+              'y' => $bounding_box['top'] / $info['page']['width'],
+              'width' => ($bounding_box['right'] - $bounding_box['left']) / $info['page']['width'],
+              'height' => ($bounding_box['bottom'] - $bounding_box['top']) / $info['page']['width'],
+              'className' => "islandora-openseadragon-highlight",
+            );
+          }
         }
       }
     }
