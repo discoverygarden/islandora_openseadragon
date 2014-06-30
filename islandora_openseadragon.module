@@ -30,6 +30,7 @@ function islandora_openseadragon_theme() {
     'islandora_openseadragon_viewer' => array(
       'variables' => array(
         'uri' => '',
+        'fedora_object' => NULL,
       ),
       'template' => 'theme/islandora-openseadragon',
     ),
