@@ -42,6 +42,8 @@ function islandora_openseadragon_theme() {
  */
 function islandora_openseadragon_islandora_viewer_info() {
   return array(
+    // @XXX The element returned has a width:100% but no natural flow width; it
+    // is completely dependent on it's parent.
     'islandora_openseadragon' => array(
       'label' => t('OpenSeadragon'),
         // Later we'll add DZI too.
