@@ -34,6 +34,12 @@ function islandora_openseadragon_theme() {
       ),
       'template' => 'theme/islandora-openseadragon',
     ),
+    // A link for clipping JP2 datastreams via djatoka.
+    'islandora_openseadragon_clipper' => array(
+      'variables' => array(
+        'pid' => NULL,
+      ),
+    ),
   );
 }
 
@@ -227,4 +233,15 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
       '#suffix' => '</div>',
     );
   }
+}
+
+/**
+ * Theme function to create a clipper link.
+ */
+function theme_islandora_openseadragon_clipper(&$variables) {
+  return l(
+    t('Clip Image'),
+    "islandora/object/{$variables['pid']}/print",
+    array('attributes' => array('title' => 'Clip Image', 'id' => 'clip'))
+  );
 }
