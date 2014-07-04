@@ -242,8 +242,7 @@ function theme_islandora_openseadragon_clipper(&$variables) {
   $image = theme(
     'image',
     array(
-      'path' => drupal_get_path('module', 'islandora_openseadragon') .
-        '/images/clip_icon.png',
+      'path' => drupal_get_path('module', 'islandora_openseadragon') . '/images/clip_icon.png',
     )
   );
   return l(
