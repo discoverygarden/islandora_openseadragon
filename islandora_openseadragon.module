@@ -239,9 +239,22 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
  * Theme function to create a clipper link.
  */
 function theme_islandora_openseadragon_clipper(&$variables) {
+  $image = theme(
+    'image',
+    array(
+      'path' => drupal_get_path('module', 'islandora_openseadragon') .
+        '/images/clip_icon.png',
+    )
+  );
   return l(
-    t('Clip Image'),
+    $image,
     "islandora/object/{$variables['pid']}/print",
-    array('attributes' => array('title' => 'Clip Image', 'id' => 'clip'))
+    array(
+      'attributes' => array(
+        'title' => t('Clip Image'),
+        'id' => 'clip',
+      ),
+      'html' => TRUE,
+    )
   );
 }
