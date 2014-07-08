@@ -3,8 +3,7 @@
     attach: function(context, settings) {
       var resourceUri = settings.islandoraOpenSeadragon.resourceUri;
       var config = settings.islandoraOpenSeadragon.settings;
-      var openSeadragonId = '#' + config['id'];
-      $(openSeadragonId).each(function () {
+      $('#' + config['id']).each(function () {
         if (!$(this).hasClass('processed')) {
           config.tileSources = new Array();
           resourceUri = (resourceUri instanceof Array) ? resourceUri : new Array(resourceUri);
@@ -13,6 +12,8 @@
             config.tileSources.push(tileSource);
           });
           var viewer = new OpenSeadragon(config);
+          // Make the viewer available in the global scope.
+          Drupal.settings.islandora_open_seadragon_viewer = viewer;
           var update_clip = function(viewer) {
             var fitWithinBoundingBox = function(d, max) {
               if (d.width/d.height > max.x/max.y) {

@@ -30,8 +30,15 @@ function islandora_openseadragon_theme() {
     'islandora_openseadragon_viewer' => array(
       'variables' => array(
         'uri' => '',
+        'fedora_object' => NULL,
       ),
       'template' => 'theme/islandora-openseadragon',
+    ),
+    // A link for clipping JP2 datastreams via djatoka.
+    'islandora_openseadragon_clipper' => array(
+      'variables' => array(
+        'pid' => NULL,
+      ),
     ),
   );
 }
@@ -41,6 +48,8 @@ function islandora_openseadragon_theme() {
  */
 function islandora_openseadragon_islandora_viewer_info() {
   return array(
+    // @XXX The element returned has a width:100% but no natural flow width; it
+    // is completely dependent on it's parent.
     'islandora_openseadragon' => array(
       'label' => t('OpenSeadragon'),
         // Later we'll add DZI too.
@@ -224,4 +233,27 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
       '#suffix' => '</div>',
     );
   }
+}
+
+/**
+ * Theme function to create a clipper link.
+ */
+function theme_islandora_openseadragon_clipper(&$variables) {
+  $image = theme(
+    'image',
+    array(
+      'path' => drupal_get_path('module', 'islandora_openseadragon') . '/images/clip_icon.png',
+    )
+  );
+  return l(
+    $image,
+    "islandora/object/{$variables['pid']}/print",
+    array(
+      'attributes' => array(
+        'title' => t('Clip Image'),
+        'id' => 'clip',
+      ),
+      'html' => TRUE,
+    )
+  );
 }
