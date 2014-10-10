@@ -10,7 +10,7 @@
  */
 function islandora_openseadragon_menu() {
   return array(
-    'admin/islandora/openseadragon' => array(
+    'admin/islandora/islandora_viewers/openseadragon' => array(
       'title' => 'OpenSeadragon',
       'description' => 'Configure the OpenSeadragon viewer.',
       'page callback' => 'drupal_get_form',
@@ -30,8 +30,15 @@ function islandora_openseadragon_theme() {
     'islandora_openseadragon_viewer' => array(
       'variables' => array(
         'uri' => '',
+        'fedora_object' => NULL,
       ),
       'template' => 'theme/islandora-openseadragon',
+    ),
+    // A link for clipping JP2 datastreams via djatoka.
+    'islandora_openseadragon_clipper' => array(
+      'variables' => array(
+        'pid' => NULL,
+      ),
     ),
   );
 }
@@ -41,11 +48,13 @@ function islandora_openseadragon_theme() {
  */
 function islandora_openseadragon_islandora_viewer_info() {
   return array(
+    // @XXX The element returned has a width:100% but no natural flow width; it
+    // is completely dependent on it's parent.
     'islandora_openseadragon' => array(
       'label' => t('OpenSeadragon'),
         // Later we'll add DZI too.
       'description' => t('OpenSeadragon viewer with djatoka as tilesource.'),
-      'configuration' => 'admin/islandora/openseadragon',
+      'configuration' => 'admin/islandora/islandora_viewers/openseadragon',
       'callback' => 'islandora_openseadragon_callback',
         // DZI has xml as mimetype? Not sure how to handle that.
       'mimetype' => array('image/jp2'),
@@ -133,17 +142,19 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
     $highlights = array();
 
     foreach ($highlighting_info as $pid => $info) {
-      foreach ($info['snippets'] as $snippet => $bounding_boxes) {
-        foreach ($bounding_boxes as $bounding_box) {
-          // The size on the x axis is used to calculate the proportional values
-          // under the openseadragon coordinate system.
-          $highlights[] = array(
-            'x' => $bounding_box['left'] / $info['page']['width'],
-            'y' => $bounding_box['top'] / $info['page']['width'],
-            'width' => ($bounding_box['right'] - $bounding_box['left']) / $info['page']['width'],
-            'height' => ($bounding_box['bottom'] - $bounding_box['top']) / $info['page']['width'],
-            'className' => "islandora-openseadragon-highlight",
-          );
+      if (array_key_exists('snippets', $info)) {
+        foreach ($info['snippets'] as $snippet => $bounding_boxes) {
+          foreach ($bounding_boxes as $bounding_box) {
+            // The size on the x axis is used to calculate the proportional
+            // values under the openseadragon coordinate system.
+            $highlights[] = array(
+              'x' => $bounding_box['left'] / $info['page']['width'],
+              'y' => $bounding_box['top'] / $info['page']['width'],
+              'width' => ($bounding_box['right'] - $bounding_box['left']) / $info['page']['width'],
+              'height' => ($bounding_box['bottom'] - $bounding_box['top']) / $info['page']['width'],
+              'className' => "islandora-openseadragon-highlight",
+            );
+          }
         }
       }
     }
@@ -222,4 +233,27 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
       '#suffix' => '</div>',
     );
   }
+}
+
+/**
+ * Theme function to create a clipper link.
+ */
+function theme_islandora_openseadragon_clipper(&$variables) {
+  $image = theme(
+    'image',
+    array(
+      'path' => drupal_get_path('module', 'islandora_openseadragon') . '/images/clip_icon.png',
+    )
+  );
+  return l(
+    $image,
+    "islandora/object/{$variables['pid']}/print",
+    array(
+      'attributes' => array(
+        'title' => t('Clip Image'),
+        'id' => 'clip',
+      ),
+      'html' => TRUE,
+    )
+  );
 }
