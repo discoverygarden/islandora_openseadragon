@@ -211,6 +211,15 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => $settings['zoomPerSecond'],
     '#description' => t('The factor by which images should zoom every second when the zoom buttons are held down.'),
   );
+  // Default zoom level.
+  $form['islandora_openseadragon_settings']['defaultZoomLevel'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default zoom level'),
+    '#size' => 10,
+    '#element_validate' => array('element_validate_number'),
+    '#default_value' => $settings['defaultZoomLevel'],
+    '#description' => t('The zoom level used by default for loaded OpenSeadragon viewers.'),
+  );
 
   // Tile size.
   $form['islandora_openseadragon_tile_size'] = array(
