@@ -40,7 +40,7 @@ We assume the core OpenSeadragon Javascript is put into sites/all/libraries/open
 
 Set the paths for 'Djatoka server base URL' and configure OpenSeadradon in Administration » Islandora » OpenSeadragon (admin/islandora/module).
 
-![Configuration](http://i.imgur.com/NefYqiC.png)
+![Configuration](https://camo.githubusercontent.com/c1bf991b5cc758a4420444564a91b286007e6f6e/687474703a2f2f692e696d6775722e636f6d2f4e6566597169432e706e67)
 
 ## Troubleshooting/Issues
 
