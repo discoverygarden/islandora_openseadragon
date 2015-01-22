@@ -34,7 +34,9 @@ This module requires the following modules/libraries:
 
 Install as usual, see [this](https://drupal.org/documentation/install/modules-themes/modules-7) for further information.
 
-We assume the core OpenSeadragon Javascript is put into sites/all/libraries/openseadragon. Openseadragon .9.129 is known to work well with Islandora.
+[Download](http://openseadragon.github.io/releases/openseadragon-bin-0.9.129.zip) and install the Openseadragon library to your sites/libraries folder, or run `drush openseadragon-plugin`. Openseadragon 0.9.129 is known to work well with Islandora.
+
+Note: If you use the Drush command, it is advisable to Move (not copy) the install script to your `.drush` folder and run it.
 
 ## Configuration
 
