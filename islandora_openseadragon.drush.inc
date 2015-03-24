@@ -11,6 +11,12 @@
 define('OPENSEADRAGON_DOWNLOAD_URI', 'http://openseadragon.github.io/releases/openseadragon-bin-0.9.129.zip');
 
 /**
+ * The original OpenSeadragon directory
+ */
+define('OPENSEADRAGON_ORIGINAL_DIR', 'openseadragon-bin-0.9.129');
+
+
+/**
  * Implements hook_drush_command().
  */
 function islandora_openseadragon_drush_command() {
@@ -64,8 +70,7 @@ function drush_islandora_openseadragon_plugin() {
   // Download the zip archive.
   if ($filepath = drush_download_file(OPENSEADRAGON_DOWNLOAD_URI)) {
     $filename = basename($filepath);
-    // This assumes that the extracted directory is the same name as the zip file.
-    $dirname = substr($filename, 0, strrpos($filename, '.'));
+    $dirname = OPENSEADRAGON_ORIGINAL_DIR;
 
     // Remove any existing Openseadragon plugin directory.
     if (is_dir($dirname) || is_dir('openseadragon')) {
