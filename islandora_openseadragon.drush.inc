@@ -48,7 +48,7 @@ function drush_islandora_openseadragon_plugin() {
     $path = $args[0];
   }
   else {
-    $path = 'sites/all/libraries';
+    $path = _drush_core_directory("@site:sites/all/libraries");
   }
 
   // Create the path if it does not exist.
@@ -64,7 +64,8 @@ function drush_islandora_openseadragon_plugin() {
   // Download the zip archive.
   if ($filepath = drush_download_file(OPENSEADRAGON_DOWNLOAD_URI)) {
     $filename = basename($filepath);
-    $dirname = 'openseadragon';
+    // This assumes that the extracted directory is the same name as the zip file.
+    $dirname = substr($filename, 0, strrpos($filename, '.'));
 
     // Remove any existing Openseadragon plugin directory.
     if (is_dir($dirname) || is_dir('openseadragon')) {
