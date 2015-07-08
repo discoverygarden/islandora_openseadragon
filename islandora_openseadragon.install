@@ -34,6 +34,7 @@ function islandora_openseadragon_uninstall() {
     'islandora_openseadragon_settings',
     'islandora_openseadragon_tile_size',
     'islandora_openseadragon_tile_overlap',
+    'islandora_openseadragon_fit_to_aspect_ratio',
   );
   array_walk($variables, 'variable_del');
 }
