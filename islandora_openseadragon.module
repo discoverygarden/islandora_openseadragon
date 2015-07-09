@@ -167,6 +167,7 @@ function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$var
         'resourceUri' => $variables['uri'],
         'tileSize' => (int) variable_get('islandora_openseadragon_tile_size', '256'),
         'tileOverlap' => (int) variable_get('islandora_openseadragon_tile_overlap', '0'),
+        'fitToAspectRatio' => variable_get('islandora_openseadragon_fit_to_aspect_ratio', FALSE),
         'settings' => $settings,
       ),
     ), 'setting');

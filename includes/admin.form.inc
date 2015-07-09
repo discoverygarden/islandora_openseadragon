@@ -239,6 +239,11 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => variable_get('islandora_openseadragon_tile_overlap', '0'),
     '#description' => t('The number of pixels by which each tile will overlap adjacent ones.'),
   );
+  $form['islandora_openseadragon_fit_to_aspect_ratio'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Constrain image to viewport'),
+    '#default_value' => variable_get('islandora_openseadragon_fit_to_aspect_ratio', FALSE),
+  );
 
   // Actions.
   $form['actions'] = array(

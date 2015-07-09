@@ -77,6 +77,16 @@
           };
           viewer.addHandler("open", update_clip);
           viewer.addHandler("animationfinish", update_clip);
+          if (settings.islandoraOpenSeadragon.fitToAspectRatio) {
+            viewer.addHandler("open", function (viewer) {
+              if (viewer.source.aspectRatio / viewer.viewport.getAspectRatio() <= 1) {
+                viewer.viewport.fitVertically();
+              }
+              else {
+                viewer.viewport.fitHorizontally();
+              }
+            });
+          }
           $(this).addClass('processed');
         }
       });
