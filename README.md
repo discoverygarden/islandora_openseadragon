@@ -17,7 +17,7 @@ ProxyPass /adore-djatoka http://localhost:8080/adore-djatoka
 ProxyPassReverse /adore-djatoka http://localhost:8080/adore-djatoka
 ```
 
-in the Apache config somewhere (either the main apache.conf, httpd.conf, or in and arbitrarily named *.conf in your Apache's conf.d directory should suffice to establish the reverse proxy.
+in the Apache config somewhere (either the main apache.conf, httpd.conf, or in and arbitrarily named `*.conf` in your Apache's conf.d directory should suffice to establish the reverse proxy.
 
 In Debian derived systems one will need to create location entries for each proxy or remove the Deny from All in mod_proxy's conf file.
 
