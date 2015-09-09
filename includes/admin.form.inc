@@ -271,7 +271,7 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
   else {
     // Work around drupal_http_request's not handling relative URLs.
     if (strpos($url, '/') === 0) {
-      $url = $GLOBALS['base_url'] . $url;
+      $url = $GLOBALS['base_root'] . $url;
     }
 
     // Check that it's working with LOC's stable external JP2 image.
