@@ -62,17 +62,12 @@
             var box = getDisplayRegion(viewer, new OpenSeadragon.Point(parseInt(source.dimensions.x*level), parseInt(source.dimensions.y*level)));
             var scaled_box = new OpenSeadragon.Rect(parseInt(box.x/level), parseInt(box.y/level), parseInt(box.width/level), parseInt(box.height/level));
             var params = {
-              'url_ver': 'Z39.88-2004',
-              'rft_id': source.imageID,
-              'svc_id': 'info:lanl-repo/svc/getRegion',
-              'svc_val_fmt': 'info:ofi/fmt:kev:mtx:jpeg2000',
-              'svc.format': 'image/jpeg',
-              'svc.region': scaled_box.y + ',' + scaled_box.x + ',' + (scaled_box.getBottomRight().y - scaled_box.y) + ',' + (scaled_box.getBottomRight().x - scaled_box.x),
+                'rft_id': source.imageID,
+                'svc.region': scaled_box.y + ',' + scaled_box.x + ',' + (scaled_box.getBottomRight().y - scaled_box.y) + ',' + (scaled_box.getBottomRight().x - scaled_box.x),
+                'dimensions': (zoom <= 1) ? source.dimensions.x + ',' + source.dimensions.y : container.x + ',' + container.y
             };
-            var dimensions = (zoom <= 1) ? source.dimensions.x + ',' + source.dimensions.y : container.x + ',' + container.y;
             jQuery("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.islandoraOpenSeadragon.pid + '/print?' + jQuery.param({
-              'clip': source.baseURL + '?' + jQuery.param(params),
-              'dimensions': dimensions,
+              'clip': jQuery.param(params)
             }));
           };
           viewer.addHandler("open", update_clip);

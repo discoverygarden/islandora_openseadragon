@@ -26,3 +26,60 @@ function islandora_openseadragon_get_installed_version() {
 
   return $version;
 }
+
+/**
+ * Helper to construct the URL used to retrieve a "clip" from Djatoka.
+ *
+ * @param string $params
+ *   A string containing the $_GET clip value to be parsed.
+ * @param bool $download
+ *   Whether the URL being generated is for a download link.
+ *
+ * @return bool|array
+ *   FALSE when invalid parameters passed in, otherwise an array containing:
+ *   -original_params (string): A rawurlencoded string which can be used as or
+ *   appended to the URL query string.
+ *   -djatoka_image_url (string): URL to retrieve the image from Djatoka.
+ *   -dimensions (array): An array containing the width and height of the image.
+ *   Used when rendering the image on the print page.
+ */
+function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
+  $settings = islandora_openseadragon_get_settings();
+  $decoded_params = drupal_get_query_array($params);
+  $djatoka_url = $settings['djatokaServerBaseURL'];
+  $djatoka_params = array(
+    'url_ver' => 'Z39.88-2004',
+    'svc_id' => 'info:lanl-repo/svc/getRegion',
+    'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
+    'svc.format' => 'image/jpeg',
+  );
+  // Only grab the three parameters that are expected to be there, ignore
+  // anything else.
+  $allowed_djatoka_param_keys = drupal_map_assoc(array(
+    'rft_id',
+    'svc.region',
+  ));
+  $allowed_djatoka_params = array_intersect_key($decoded_params, $allowed_djatoka_param_keys);
+  if (empty($allowed_djatoka_params)) {
+    return FALSE;
+  }
+  $url = url($djatoka_url, array(
+    'query' => $djatoka_params + $allowed_djatoka_params,
+    'absolute' => $download,
+  ));
+  $dimensions = array();
+  if (isset($decoded_params['dimensions'])) {
+    $dimensions = explode(',', $decoded_params['dimensions']);
+    $dimensions = array(
+      'width' => $dimensions[0],
+      'height' => $dimensions[1],
+    );
+  }
+  return array(
+    // XXX: Using drupal_http_build_query to avoid changing the underlying
+    // functionality in the solution packs that currently implement.
+    'original_params' => drupal_http_build_query($allowed_djatoka_params),
+    'djatoka_image_url' => $url,
+    'dimensions' => $dimensions,
+  );
+}
