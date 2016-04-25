@@ -44,6 +44,7 @@ function islandora_openseadragon_get_installed_version() {
  *   Used when rendering the image on the print page.
  */
 function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
+  global $base_root;
   $settings = islandora_openseadragon_get_settings();
   $decoded_params = drupal_get_query_array($params);
   $djatoka_url = $settings['djatokaServerBaseURL'];
@@ -53,8 +54,8 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
     'svc.format' => 'image/jpeg',
   );
-  // Only grab the three parameters that are expected to be there, ignore
-  // anything else.
+  // Only grab the two parameters that are expected to be there, ignore anything
+  // else.
   $allowed_djatoka_param_keys = drupal_map_assoc(array(
     'rft_id',
     'svc.region',
@@ -63,10 +64,19 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   if (empty($allowed_djatoka_params)) {
     return FALSE;
   }
-  $url = url($djatoka_url, array(
-    'query' => $djatoka_params + $allowed_djatoka_params,
-    'absolute' => $download,
-  ));
+  $djatoka_url_params = drupal_http_build_query($djatoka_params + $allowed_djatoka_params);
+  // XXX: See if Djatoka is relative or absolute and handle accordingly.
+  // Building up URL this way because may encounter a relative or absolute path
+  // to Djatoka. Similarly, the built in Drupal functions such as URL will
+  // construct URLs with the multi-site/language prefixs present. Lastly, not
+  // using url_is_external as a relative Djatoka path may have two slashes
+  // preceding it which it would flag falsely.
+  if (!$download || strpos($djatoka_url, 'http') === 0) {
+    $url = "$djatoka_url?$djatoka_url_params";
+  }
+  else {
+    $url = "{$base_root}{$djatoka_url}?$djatoka_url_params";
+  }
   $dimensions = array();
   if (isset($decoded_params['dimensions'])) {
     $dimensions = explode(',', $decoded_params['dimensions']);
