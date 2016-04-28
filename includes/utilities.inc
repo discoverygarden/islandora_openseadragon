@@ -64,6 +64,14 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   if (empty($allowed_djatoka_params)) {
     return FALSE;
   }
+  $rft_id = $decoded_params['rft_id'];
+  $path = parse_url($rft_id, PHP_URL_PATH);
+  // Replace the first left-most slash to get a more Drupal-y path to validate
+  // against.
+  $drupal_path = preg_replace('/\//', '', $path, 1);
+  if (!menu_get_item($drupal_path)) {
+    return FALSE;
+  }
   $djatoka_url_params = drupal_http_build_query($djatoka_params + $allowed_djatoka_params);
   // XXX: See if Djatoka is relative or absolute and handle accordingly.
   // Building up URL this way because may encounter a relative or absolute path
