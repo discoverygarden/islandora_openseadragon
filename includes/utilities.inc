@@ -69,7 +69,8 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   // Replace the first left-most slash to get a more Drupal-y path to validate
   // against.
   $drupal_path = preg_replace('/\//', '', $path, 1);
-  if (!menu_get_item($drupal_path)) {
+  $item = menu_get_item($drupal_path);
+  if (!$item || $item['path'] !== 'islandora/object/%/datastream/%/view') {
     return FALSE;
   }
   $djatoka_url_params = drupal_http_build_query($djatoka_params + $allowed_djatoka_params);
