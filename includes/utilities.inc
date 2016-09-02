@@ -66,7 +66,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   }
   $rft_id = $decoded_params['rft_id'];
   $path = parse_url($rft_id, PHP_URL_PATH);
-  // Remove sub dir from $path
+  // Remove sub dir from $path.
   if (base_path() !== '/') {
     $path = substr($path, strlen(base_path()) - 1);
   }
