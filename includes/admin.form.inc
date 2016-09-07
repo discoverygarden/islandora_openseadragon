@@ -34,6 +34,14 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#default_value' => $settings['djatokaServerBaseURL'],
     '#description' => t('The location of the Djatoka server OpenURL resolver.'),
   );
+  // Djatoka local file or PID test.
+  $form['islandora_openseadragon_settings']['djatokaJP2Image'] = array(
+    '#type' => 'textfield',
+    '#title' => t('JP2 Image Test'),
+    '#description' => t('Enter the PID of an object that has a JP2 datastream to test against Djatoka server. Defaults to LOC map image. Alternatively, you can use a local JP2 by entering this path: ' . drupal_get_path('module', 'islandora_openseadragon') . '/test/test.jp2'),
+    '#default_value' => (isset($settings['djatokaJP2Image']) ? $settings['djatokaJP2Image'] : ''),
+  );
+
   // Animation time.
   $form['islandora_openseadragon_settings']['animationTime'] = array(
     '#type' => 'textfield',
@@ -263,21 +271,54 @@ function islandora_openseadragon_admin($form, &$form_state) {
  * Validates that the supplied djatoka base URL is a working djatoka install.
  */
 function djatoka_base_url_validate($element, &$form_state, $form) {
+  module_load_include('inc', 'islandora', 'includes/utilities');
   $url = $element['#value'];
+  $image_url = 'http://memory.loc.gov/gmd/gmd433/g4330/g4330/np000066.jp2';
+  $jp2_image = $form_state['values']['islandora_openseadragon_settings']['djatokaJP2Image'];
+
+  if (islandora_is_valid_pid($jp2_image)) {
+    $object = islandora_object_load($jp2_image);
+    
+    if ($object && isset($object['JP2'])) {
+      module_load_include('inc', 'islandora', 'includes/authtokens');
+      $token = islandora_get_object_token($object->id, 'JP2', 2);
+      $image_url = url("islandora/object/{$object->id}/datastream/JP2/view",
+        array(
+          'absolute' => TRUE,
+          'query' => array('token' => $token),
+        ));
+    }
+    else {
+      dsm('object does not have a valid jp2.');
+    }
+  }
+  elseif (!empty($jp2_image))  {
+    $image_url = url($jp2_image, array('absolute' => TRUE,));
+  }
 
   if (empty($url)) {
     form_error($element, t('This field is required.'));
   }
   else {
+
     // Work around drupal_http_request's not handling relative URLs.
     if (strpos($url, '/') === 0) {
-      $url = $GLOBALS['base_root'] . $url;
+      $url = $GLOBALS['base_root'] . ':8080'  . $url;
     }
 
-    // Check that it's working with LOC's stable external JP2 image.
-    $result = drupal_http_request(check_url($url) . '?url_ver=Z39.88-2004&rft_id=http%3A%2F%2Fmemory.loc.gov%2Fgmd%2Fgmd433%2Fg4330%2Fg4330%2Fnp000066.jp2&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=1');
-
-    if ($result->code != 200) {
+    $full_url = check_url($url) . '?url_ver=Z39.88-2004&rft_id=' . $image_url . '&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=1';
+    $result = drupal_http_request($full_url);
+    $server = FALSE;
+    
+    if ($result->code == 200) {
+      $image = getimagesize($full_url);
+      
+      if (isset($image['mime']) && $image['mime'] == 'image/jpeg') {
+        $server = TRUE;
+      }
+    }
+    
+    if (!$server) {
       form_error($element, t('This does not seem to be a functioning Djatoka server.'));
     }
   }
@@ -288,6 +329,7 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
  */
 function islandora_openseadragon_admin_submit($form, &$form_state) {
   $op = $form_state['clicked_button']['#id'];
+  dpm($op);
   switch ($op) {
     case 'edit-reset':
       variable_del('islandora_openseadragon_settings');
