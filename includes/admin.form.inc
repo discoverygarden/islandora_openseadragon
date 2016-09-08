@@ -266,14 +266,14 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
   $jp2_image = drupal_get_path('module', 'islandora_openseadragon') . '/test/test.jp2';
   $image_url = file_create_url($jp2_image);
   $server_url = $element['#value'];
-  $dimensions = '0,0,100,100';
+  $dimension = 100;
   $request = array(
-    '?url_ver' => 'Z39.88-2004',
+    'url_ver' => 'Z39.88-2004',
     'rft_id' => $image_url,
     'svc_id' => 'info:lanl-repo/svc/getRegion',
     'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
     'svc.format' => 'image/jpeg',
-    'svc.region' => $dimensions,
+    'svc.region' => "0,0,$dimension,$dimension",
     'svc.level' => '1',
   );
 
@@ -284,21 +284,21 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
 
     // Work around drupal_http_request's not handling relative URLs.
     if (strpos($server_url, '/') === 0) {
-      $server_url = $GLOBALS['base_root'] . $server_url;
+      $server_url = $GLOBALS['base_root'] . ':8080' . $server_url;
     }
 
-    $full_url = $server_url . drupal_http_build_query($request);
-    $result = drupal_http_request(urldecode($full_url));
+    $full_url = $server_url . '?' . drupal_http_build_query($request);
+    $result = drupal_http_request($full_url);
     $server = FALSE;
 
     if ($result->code == 200 && $result->headers['content-type'] == 'image/jpeg') {
       $file = file_save_data($result->data, 'temporary://temp.jpg');
-      $file->status &= FILE_STATUS_PERMANENT;
+      $file->status &= ~FILE_STATUS_PERMANENT;
       $info = file_save($file);
       $info = image_get_info(drupal_realpath($file->uri));
-      $dimesnions_test = $info['width'] === 100 && $info['height'] === 100;
+      $dimensions_test = $info['width'] === $dimension && $info['height'] === $dimension;
 
-      if (isset($info['mime_type']) && $info['mime_type'] == 'image/jpeg' && $dimesnions_test) {
+      if (isset($info['mime_type']) && $info['mime_type'] == 'image/jpeg' && $dimensions_test) {
         $server = TRUE;
       }
 
