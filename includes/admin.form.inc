@@ -264,8 +264,18 @@ function islandora_openseadragon_admin($form, &$form_state) {
  */
 function djatoka_base_url_validate($element, &$form_state, $form) {
   $jp2_image = drupal_get_path('module', 'islandora_openseadragon') . '/test/test.jp2';
-  $image_url = url($jp2_image, array('absolute' => TRUE));
+  $image_url = file_create_url($jp2_image);
   $server_url = $element['#value'];
+  $dimensions = '0,0,100,100';
+  $request = array(
+    '?url_ver' => 'Z39.88-2004',
+    'rft_id' => $image_url,
+    'svc_id' => 'info:lanl-repo/svc/getRegion',
+    'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
+    'svc.format' => 'image/jpeg',
+    'svc.region' => $dimensions,
+    'svc.level' => '1',
+  );
 
   if (empty($server_url)) {
     form_error($element, t('This field is required.'));
@@ -277,16 +287,22 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
       $server_url = $GLOBALS['base_root'] . $server_url;
     }
 
-    $full_url = check_url($server_url) . '?url_ver=Z39.88-2004&rft_id=' . $image_url . '&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=1';
-    $result = drupal_http_request($full_url);
+    $full_url = $server_url . drupal_http_build_query($request);
+    $result = drupal_http_request(urldecode($full_url));
     $server = FALSE;
 
-    if ($result->code == 200) {
-      $image = getimagesize($full_url);
+    if ($result->code == 200 && $result->headers['content-type'] == 'image/jpeg') {
+      $file = file_save_data($result->data, 'temporary://temp.jpg');
+      $file->status &= FILE_STATUS_PERMANENT;
+      $info = file_save($file);
+      $info = image_get_info(drupal_realpath($file->uri));
+      $dimesnions_test = $info['width'] === 100 && $info['height'] === 100;
 
-      if (isset($image['mime']) && $image['mime'] == 'image/jpeg') {
+      if (isset($info['mime_type']) && $info['mime_type'] == 'image/jpeg' && $dimesnions_test) {
         $server = TRUE;
       }
+
+      file_delete($file);
     }
 
     if (!$server) {
