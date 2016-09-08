@@ -284,7 +284,7 @@ function djatoka_base_url_validate($element, &$form_state, $form) {
 
     // Work around drupal_http_request's not handling relative URLs.
     if (strpos($server_url, '/') === 0) {
-      $server_url = $GLOBALS['base_root'] . ':8080' . $server_url;
+      $server_url = $GLOBALS['base_root'] . $server_url;
     }
 
     $full_url = $server_url . '?' . drupal_http_build_query($request);
