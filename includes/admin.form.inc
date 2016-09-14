@@ -263,21 +263,49 @@ function islandora_openseadragon_admin($form, &$form_state) {
  * Validates that the supplied djatoka base URL is a working djatoka install.
  */
 function djatoka_base_url_validate($element, &$form_state, $form) {
-  $url = $element['#value'];
+  $jp2_image = drupal_get_path('module', 'islandora_openseadragon') . '/test/test.jp2';
+  $image_url = file_create_url($jp2_image);
+  $server_url = $element['#value'];
+  $dimension = 100;
+  $request = array(
+    'url_ver' => 'Z39.88-2004',
+    'rft_id' => $image_url,
+    'svc_id' => 'info:lanl-repo/svc/getRegion',
+    'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
+    'svc.format' => 'image/jpeg',
+    'svc.region' => "0,0,$dimension,$dimension",
+    'svc.level' => '1',
+  );
 
-  if (empty($url)) {
+  if (empty($server_url)) {
     form_error($element, t('This field is required.'));
   }
   else {
+
     // Work around drupal_http_request's not handling relative URLs.
-    if (strpos($url, '/') === 0) {
-      $url = $GLOBALS['base_root'] . $url;
+    if (strpos($server_url, '/') === 0) {
+      $server_url = $GLOBALS['base_root'] . $server_url;
     }
 
-    // Check that it's working with LOC's stable external JP2 image.
-    $result = drupal_http_request(check_url($url) . '?url_ver=Z39.88-2004&rft_id=http%3A%2F%2Fmemory.loc.gov%2Fgmd%2Fgmd433%2Fg4330%2Fg4330%2Fnp000066.jp2&svc_id=info:lanl-repo/svc/getRegion&svc_val_fmt=info:ofi/fmt:kev:mtx:jpeg2000&svc.format=image/jpeg&svc.level=1');
+    $full_url = $server_url . '?' . drupal_http_build_query($request);
+    $result = drupal_http_request($full_url);
+    $server = FALSE;
 
-    if ($result->code != 200) {
+    if ($result->code == 200 && $result->headers['content-type'] == 'image/jpeg') {
+      $file = file_save_data($result->data, 'temporary://temp.jpg');
+      $file->status &= ~FILE_STATUS_PERMANENT;
+      $info = file_save($file);
+      $info = image_get_info(drupal_realpath($file->uri));
+      $dimensions_test = $info['width'] === $dimension && $info['height'] === $dimension;
+
+      if (isset($info['mime_type']) && $info['mime_type'] == 'image/jpeg' && $dimensions_test) {
+        $server = TRUE;
+      }
+
+      file_delete($file);
+    }
+
+    if (!$server) {
       form_error($element, t('This does not seem to be a functioning Djatoka server.'));
     }
   }
