@@ -28,6 +28,8 @@ before_install:
   - ln -s $HOME/openseadragon sites/all/libraries/openseadragon
   - ln -s $HOME/islandora_paged_content sites/all/modules/islandora_paged_content
   - drush en --yes islandora_openseadragon
+ # Mysql might time out for long tests, increase the wait timeout.
+  - mysql -e 'SET @@GLOBAL.wait_timeout=1200'
 script:
   - ant -buildfile sites/all/modules/islandora_openseadragon/build.xml lint
   - $ISLANDORA_DIR/tests/scripts/line_endings.sh sites/all/modules/islandora_openseadragon
