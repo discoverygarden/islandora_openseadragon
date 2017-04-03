@@ -243,6 +243,7 @@ function islandora_openseadragon_admin($form, &$form_state) {
     '#type' => 'checkbox',
     '#title' => t('Constrain image to viewport'),
     '#default_value' => variable_get('islandora_openseadragon_fit_to_aspect_ratio', FALSE),
+    '#description' => t('On the initial page load, the entire image will be visible in the viewport.'),
   );
 
   // Actions.
