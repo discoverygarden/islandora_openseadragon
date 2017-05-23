@@ -90,9 +90,9 @@ function islandora_openseadragon_callback($params = NULL, $fedora_object = NULL)
 }
 
 /**
- * Implements hook_preprocess().
+ * Implements template_preprocess_HOOK().
  */
-function islandora_openseadragon_preprocess_islandora_openseadragon_viewer(&$variables) {
+function template_preprocess_islandora_openseadragon_viewer(&$variables) {
   // Variable fedora_object included in results, but not used.
   $library_path = libraries_get_path('openseadragon');
   $module_path = drupal_get_path('module', 'islandora_openseadragon');
