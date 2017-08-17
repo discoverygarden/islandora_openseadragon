@@ -48,7 +48,9 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   $settings = islandora_openseadragon_get_settings();
   $decoded_params = drupal_get_query_array($params);
   if (islandora_openseadragon_use_djatoka_server()) {
-    $djatoka_url = url(variable_get('islandora_openseadragon_djatoka_url', 'adore-djatoka/resolver'));
+    $djatoka_url = url(variable_get('islandora_openseadragon_djatoka_url', 'adore-djatoka/resolver'),
+      array('absolute' => TRUE)
+    );
     $djatoka_params = array(
       'url_ver' => 'Z39.88-2004',
       'svc_id' => 'info:lanl-repo/svc/getRegion',
