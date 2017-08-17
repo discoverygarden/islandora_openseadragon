@@ -1078,7 +1078,7 @@ function islandora_openseadragon_admin_ajax_djatoka_url(array $form, array $form
  *   A message describing the accessibility of the Adore-Djatoka image resolver.
  */
 function islandora_openseadragon_admin_form_djatoka_access_message($path) {
-  $url = url("http://localhost/{$path}", array(
+  $url = url("{$path}", array(
     'absolute' => TRUE,
     'query' => array(
       'url_ver' => 'Z39.88-2004',
@@ -1119,7 +1119,7 @@ function islandora_openseadragon_djatoka_url_validate(array $element, array &$fo
     form_error($element, t('This field is required.'));
   }
   else {
-    $url = url("http://localhost/{$path}", array(
+    $url = url("{$path}", array(
       'absolute' => TRUE,
       'query' => array(
         'url_ver' => 'Z39.88-2004',
