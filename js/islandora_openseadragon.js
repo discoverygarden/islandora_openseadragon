@@ -26,11 +26,14 @@
         });
       }
     },
-    detach: function() {
-      $(base).removeClass('islandoraOpenSeadragonViewer-processed');
-      $(base).removeData();
-      $(base).off();
-      delete Drupal.IslandoraOpenSeadragonViewer[base];
+    detach: function(context, settings, trigger) {
+      // Only detach if triggered from within the Openseadragon viewer.
+      if($(base).find(context['selector']).length > 0) {
+        $(base).removeClass('islandoraOpenSeadragonViewer-processed');
+        $(base).removeData();
+        $(base).off();
+        delete Drupal.IslandoraOpenSeadragonViewer[base];
+      }
     }
   };
 
