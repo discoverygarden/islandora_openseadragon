@@ -26,9 +26,9 @@
         });
       }
     },
-    detach: function(context, settings, trigger) {
-      // Only detach if triggered from within the Openseadragon viewer.
-      if($(base).find(context['selector']).length > 0) {
+    detach: function(context) {
+      // Only detach if triggered by Openseadragon viewer.
+      if ($(context).is($(base))) {
         $(base).removeClass('islandoraOpenSeadragonViewer-processed');
         $(base).removeData();
         $(base).off();
