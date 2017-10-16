@@ -49,6 +49,7 @@
    */
   Drupal.IslandoraOpenSeadragonViewer = function (base, settings) {
     var viewer = new OpenSeadragon(settings.options);
+    Drupal.settings.islandora_open_seadragon_viewer = viewer;
 
     var update_clip = function(event) {
       var viewer = event.eventSource;
