@@ -392,6 +392,7 @@ function islandora_openseadragon_djatoka_tile_source($identifier) {
  *   The URL at which an image server can access the given image datastream.
  */
 function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) {
+  module_load_include('inc', 'islandora', 'includes/authtokens');
   $pid = $datastream->parent->id;
   $dsid = $datastream->id;
   $token = islandora_get_object_token($pid, $dsid, 2);
