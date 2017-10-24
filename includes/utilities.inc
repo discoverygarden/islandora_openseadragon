@@ -45,7 +45,6 @@ function islandora_openseadragon_get_installed_version() {
  */
 function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
   global $base_root;
-  $settings = islandora_openseadragon_get_settings();
   $decoded_params = drupal_get_query_array($params);
   if (islandora_openseadragon_use_djatoka_server()) {
     $djatoka_url = url(variable_get('islandora_openseadragon_djatoka_url', 'adore-djatoka/resolver'),
@@ -306,6 +305,8 @@ function islandora_openseadragon_default_options() {
  *   The metadata required by the users chosen implementation.
  */
 function islandora_openseadragon_identifier_tile_source($identifier) {
+  $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_identifier_tile_source instead.'));
+  trigger_error(filter_xss($message), E_USER_DEPRECATED);
   switch (variable_get('islandora_openseadragon_tilesource', 'djatoka')) {
     case 'djatoka':
       return islandora_openseadragon_djatoka_tile_source($identifier);
@@ -328,7 +329,7 @@ function islandora_openseadragon_identifier_tile_source($identifier) {
  *   The metadata required by the users chosen implementation.
  */
 function islandora_openseadragon_datastream_tile_source(AbstractDatastream $datastream) {
-  $message = islandora_deprecated('7.x-1.10', t('Please use gearman-init instead.'));
+  $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_identifier_tile_source instead.'));
   trigger_error(filter_xss($message), E_USER_DEPRECATED);
 
   $identifier = islandora_openseadragon_identifier_url($datastream);
@@ -346,6 +347,9 @@ function islandora_openseadragon_datastream_tile_source(AbstractDatastream $data
  *   FALSE otherwise.
  */
 function islandora_openseadragon_iiif_tile_source($identifier) {
+  $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_identifier_tile_source instead.'));
+  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+
   $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
   $identifier = urlencode($identifier);
   return file_create_url("$base_url/$identifier");
@@ -373,6 +377,9 @@ function islandora_openseadragon_iiif_tile_source($identifier) {
  *   - maxLevel: The maximum level to attempt to load.
  */
 function islandora_openseadragon_djatoka_tile_source($identifier) {
+  $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_identifier_tile_source instead.'));
+  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+
   return array(
     'identifier' => $identifier,
     'width' => NULL,
@@ -394,7 +401,7 @@ function islandora_openseadragon_djatoka_tile_source($identifier) {
  *   The URL at which an image server can access the given image datastream.
  */
 function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) {
-  $message = islandora_deprecated('7.x-1.10', t('Please use URL passed to viewer.'));
+  $message = islandora_deprecated('7.x-1.11', t('Please use URL passed to viewer.'));
   trigger_error(filter_xss($message), E_USER_DEPRECATED);
 
   module_load_include('inc', 'islandora', 'includes/authtokens');
@@ -411,6 +418,117 @@ function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) 
       'https' => FALSE,
     )
   );
+}
+
+/**
+ * Gets a array formated for the token_replace function.
+ *
+ * @param string $pid
+ *   PID of the object.
+ * @param string $dsid
+ *   DSID of the object.
+ * @param string $token
+ *   Token for the object.
+ *
+ * @return array
+ *   Data to be passed to token_replace.
+ */
+function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
+  return array(
+    'islandora_openseadragon' => array(
+      'pid' => $pid,
+      'dsid' => $dsid,
+      'token' => $token,
+    )
+  );
+}
+
+/**
+ * Image metadata pertinent to the IIIF URL specification.
+ *
+ * @param string $pid
+ *   PID of the object.
+ * @param string $dsid
+ *   DSID of the object.
+ * @param string $token
+ *   Token for the object.
+ *
+ * @return string|bool
+ *   The IIIF URL to the image source if the URL can be successfully created,
+ *   FALSE otherwise.
+ */
+function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
+  $identifier_tokens = variable_get('islandora_openseadragon_iiif_identifier', '[islandora_openseadragon:url_token]');
+  $identifier = token_replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
+  $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
+  $identifier_encoded = urlencode($identifier);
+  return file_create_url("$base_url/$identifier_encoded");
+}
+
+/**
+ * Image metadata pertinent to the Djatoka TileSources implementation.
+ *
+ * @param string $pid
+ *   PID of the object.
+ * @param string $dsid
+ *   DSID of the object.
+ * @param string $token
+ *   Token for the object.
+ *
+ * @return array
+ *   An associative array with the required metadata for AdoraDjatoka tile
+ *   source to be rendered.
+ *   - identifier: A URL where the datastream image can be accessed.
+ *   - width: The width of the image in pixels if known.
+ *   - height: The height of the image in pixels if known.
+ *   - tileWidth: The width of the tiles to assumed to make up each pyramid
+ *     layer in pixels.
+ *   - tileHeight: The height of the tiles to assumed to make up each pyramid
+ *     layer in pixels.
+ *   - tileOverlap: The number of pixels each tile is expected to overlap
+ *     touching tiles.
+ *   - minLevel: The minimum level to attempt to load.
+ *   - maxLevel: The maximum level to attempt to load.
+ */
+function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token)
+{
+  $identifier = token_replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
+
+  return array(
+    'identifier' => $identifier,
+    'width' => NULL,
+    'height' => NULL,
+    'tileSize' => variable_get('islandora_openseadragon_tile_size', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE),
+    'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP),
+    'minLevel' => NULL,
+    'maxLevel' => NULL,
+  );
+}
+
+/**
+ * Image metadata pertinent to the users chosen TileSources implementation.
+ *
+ * @param string $pid
+ *   PID of the object.
+ * @param string $dsid
+ *   DSID of the object.
+ * @param string $token
+ *   Token for the object.
+ *
+ * @return mixed
+ *   The metadata required by the users chosen implementation.
+ */
+function islandora_openseadragon_tile_source($pid, $dsid, $token) {
+  switch (variable_get('islandora_openseadragon_tilesource', 'djatoka')) {
+    case 'djatoka':
+      return islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token);
+
+    case 'iiif':
+      return islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token);
+
+    default;
+      return array();
+  }
 }
 
 /**

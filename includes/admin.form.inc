@@ -91,7 +91,7 @@ function islandora_openseadragon_admin(array $form, array &$form_state) {
       'islandora_openseadragon_iiif_identifier' => array(
         '#type' => 'textfield',
         '#title' => t('IIIF Identifier'),
-        '#default_value' => variable_get('islandora_aspace_mods_template', ""),
+        '#default_value' => variable_get('islandora_openseadragon_iiif_identifier', '[islandora_openseadragon:url_token]'),
         '#element_validate' => array('token_element_validate'),
         '#token_types' => array('islandora_openseadragon'),
       ),

@@ -41,6 +41,12 @@ function template_preprocess_islandora_openseadragon_viewer(array &$variables) {
       'overlays' => islandora_openseadragon_viewer_query_solr_for_overlays($variables['pid']),
     ) + islandora_openseadragon_get_settings(),
   );
+  if (isset($variables['token_header']) && isset($variables['token']) && $variables['token_header']) {
+    $variables['settings']['options']['loadTilesWithAjax'] = true;
+    $variables['settings']['options']['ajaxHeaders'] = array(
+      'X-ISLANDORA-TOKEN' => $variables['token'],
+    );
+  }
 }
 
 /**
