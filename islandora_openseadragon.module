@@ -99,7 +99,7 @@ function islandora_openseadragon_islandora_viewer_info() {
 function islandora_openseadragon_callback(array $params = array(), AbstractObject $object = NULL) {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
 
-  if (isset($params['jp2_url']) && $params['jp2_url'] != NULL) {
+  if (isset($params['jp2_url']) && !(isset($params['pid']) && isset($params['dsid']) && isset($params['token']))) {
     $message = islandora_deprecated('7.x-1.11', t('The jp2_url parameter has been depreciated. Please update your code before the next release.'));
     trigger_error(filter_xss($message), E_USER_DEPRECATED);
 
