@@ -82,6 +82,29 @@ function islandora_openseadragon_admin(array $form, array &$form_state) {
         '#default_value' => $iiif_url,
         '#description' => t('The location of the IIIF Image Server.'),
       ),
+      'islandora_openseadragon_iiif_token_header' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Add token as header'),
+        '#default_value' => variable_get('islandora_openseadragon_iiif_token_header', FALSE),
+        '#description' => t('Instead of sending the token as a query parameter, it will be sent in the X-ISLANDORA-TOKEN header.'),
+      ),
+      'islandora_openseadragon_iiif_identifier' => array(
+        '#type' => 'textfield',
+        '#title' => t('IIIF Identifier'),
+        '#default_value' => variable_get('islandora_aspace_mods_template', ""),
+        '#element_validate' => array('token_element_validate'),
+        '#token_types' => array('islandora_openseadragon'),
+      ),
+      $form['settings']['archivesspace_metadata_settings']['token_tree'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Replacement patterns'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+        '#description' => theme('token_tree', array(
+          'token_types' => array('islandora_openseadragon'),
+          'global_types' => FALSE,
+         )),
+      ),
     ),
     'tilesource' => array(
       '#type' => 'fieldset',

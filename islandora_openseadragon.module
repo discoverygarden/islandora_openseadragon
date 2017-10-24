@@ -135,3 +135,43 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
     }
   }
 }
+
+/**
+ * Implements hook_token_info().
+ */
+function islandora_openseadragon_aspace_token_info() {
+  $info = array();
+
+  $info['types']['islandora_openseadragon'] = array(
+    'name' => t('Islandora Openseadragon'),
+    'description' => t('Tokens for building IIIF identifer in Islandora Openseadragon.'),
+    'needs-data' => 'islandora_openseadragon',
+  );
+
+  $info['tokens']['islandora_openseadragon']['pid'] = array(
+    'name' => t('PID'),
+    'description' => t('The objects PID.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['dsid'] = array(
+    'name' => t('DSID'),
+    'description' => t('The objects DSID.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['url'] = array(
+    'name' => t('URL'),
+    'description' => t('The URL to the object in Islandora.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['url_token'] = array(
+    'name' => t('URL with Token'),
+    'description' => t('The URL to the object in Islandora with token in the query string.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['token'] = array(
+    'name' => t('Token'),
+    'description' => t('The token that can be used to access the object in Islandora.'),
+  );
+
+  return $info;
+}
