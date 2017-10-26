@@ -95,7 +95,7 @@ function islandora_openseadragon_admin(array $form, array &$form_state) {
         '#element_validate' => array('token_element_validate'),
         '#token_types' => array('islandora_openseadragon'),
       ),
-      $form['settings']['archivesspace_metadata_settings']['token_tree'] = array(
+      'islandora_openseadragon_iiif_token_tree' => array(
         '#type' => 'fieldset',
         '#title' => t('Replacement patterns'),
         '#collapsible' => TRUE,
