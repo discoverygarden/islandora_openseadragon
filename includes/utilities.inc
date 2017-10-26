@@ -440,7 +440,7 @@ function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
       'pid' => $pid,
       'dsid' => $dsid,
       'token' => $token,
-    )
+    ),
   );
 }
 
@@ -491,8 +491,7 @@ function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
  *   - minLevel: The minimum level to attempt to load.
  *   - maxLevel: The maximum level to attempt to load.
  */
-function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token)
-{
+function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token) {
   $identifier = token_replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
 
   return array(

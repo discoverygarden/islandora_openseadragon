@@ -42,7 +42,7 @@ function template_preprocess_islandora_openseadragon_viewer(array &$variables) {
     ) + islandora_openseadragon_get_settings(),
   );
   if (isset($variables['token_header']) && isset($variables['token']) && $variables['token_header']) {
-    $variables['settings']['options']['loadTilesWithAjax'] = true;
+    $variables['settings']['options']['loadTilesWithAjax'] = TRUE;
     $variables['settings']['options']['ajaxHeaders'] = array(
       'X-ISLANDORA-TOKEN' => $variables['token'],
     );

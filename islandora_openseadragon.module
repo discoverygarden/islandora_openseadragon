@@ -213,7 +213,7 @@ function islandora_openseadragon_tokens($type, $tokens, array $data = array(), a
   $dsid = $data['islandora_openseadragon']['dsid'];
   $token = $data['islandora_openseadragon']['token'];
 
-  foreach($tokens as $name => $original) {
+  foreach ($tokens as $name => $original) {
     if ($name == 'pid') {
       $replacements[$original] = $pid;
     }
