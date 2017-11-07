@@ -463,7 +463,7 @@ function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
   $identifier = token_replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
   $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
   $identifier_encoded = urlencode($identifier);
-  return file_create_url("$base_url/$identifier_encoded");
+  return file_create_url("$base_url/$identifier_encoded/info.json");
 }
 
 /**
