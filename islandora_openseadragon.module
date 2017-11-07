@@ -111,13 +111,13 @@ function islandora_openseadragon_callback(array $params = array(), AbstractObjec
     $token = isset($matches[3]) ? $matches[3] : NULL;
 
     if (!isset($params['pid'])) {
-      $params['pid'] = $pid;
+      $params['pid'] = urldecode($pid);
     }
     if (!isset($params['dsid'])) {
-      $params['dsid'] = $dsid;
+      $params['dsid'] = urldecode($dsid);
     }
     if (!isset($params['token'])) {
-      $params['token'] = $token;
+      $params['token'] = urldecode($token);
     }
   }
 
