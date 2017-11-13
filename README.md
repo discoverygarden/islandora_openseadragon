@@ -2,7 +2,7 @@
 
 # Introduction
 
-A module to integrate OpenSeadragon and Islandora. Supports a custom Djatoka tilesource and a IIIF tilesource.
+An Islandora viewer module using OpenSeadragon. Works with large image datastreams (JPEG-2000). Supports a custom Djatoka tilesource and a IIIF tilesource.
 
 Based in spirit from the JS component of Kevin Clarke's [FreeLib-Djatoka](https://github.com/ksclarke/freelib-djatoka)
 
@@ -28,7 +28,7 @@ Note: If you use the Drush command, it is advisable to Move (not copy) the insta
 
 #### Drupal 
 
-Set the paths for 'Djatoka server base URL' and configure OpenSeadradon in Administration » Islandora » OpenSeadragon (admin/islandora/module).
+Set the paths for 'Djatoka server base URL' and configure OpenSeadragon in Administration » Islandora » OpenSeadragon (admin/islandora/module).
 
 ![Configuration](https://camo.githubusercontent.com/c1bf991b5cc758a4420444564a91b286007e6f6e/687474703a2f2f692e696d6775722e636f6d2f4e6566597169432e706e67)
 
@@ -36,7 +36,7 @@ If you have an *existing* install it's required to update Openseadragon to it's 
 with the provided Drush command.
 
 ```bash
-drush openseadragonplugin
+drush openseadragon-plugin
 ```
 
 #### Apache Reverse Proxy
