@@ -87,7 +87,9 @@ function islandora_openseadragon_islandora_viewer_info() {
  *
  * @param array $params
  *   Params required by the theme. We require the keys:
- *   - jp2_url: The URL to the JP2 image.
+ *   - pid: The PID of the object.
+ *   - dsid: This DSID being displayed.
+ *   - token: The token we are working with.
  * @param AbstractObject $object
  *   The object that we are viewing.
  *
@@ -96,17 +98,38 @@ function islandora_openseadragon_islandora_viewer_info() {
  */
 function islandora_openseadragon_callback(array $params = array(), AbstractObject $object = NULL) {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
-  $pid = isset($object->id) ? $object->id : NULL;
-  if ($pid == NULL && isset($params['jp2_url'])) {
-    // Attempt to extract it from the 'jp2_url' if the object is not provided.
+
+  if (isset($params['jp2_url']) && !(isset($params['pid']) && isset($params['dsid']) && isset($params['token']))) {
+    $message = islandora_deprecated('7.x-1.11', t('The jp2_url parameter has been depreciated. Please update your code before the next release.'));
+    trigger_error(filter_xss($message), E_USER_DEPRECATED);
+
+    // Try to mangle the jp2_url into the data we need.
     $matches = array();
-    preg_match('/object\/([^\/]*)\/datastream/', $params['jp2_url'], $matches);
+    preg_match('/object\/([^\/]*)\/datastream\/([^\/]*).*token=([^&]*)/', $params['jp2_url'], $matches);
     $pid = isset($matches[1]) ? $matches[1] : NULL;
+    $dsid = isset($matches[2]) ? $matches[2] : NULL;
+    $token = isset($matches[3]) ? $matches[3] : NULL;
+
+    if (!isset($params['pid'])) {
+      $params['pid'] = urldecode($pid);
+    }
+    if (!isset($params['dsid'])) {
+      $params['dsid'] = urldecode($dsid);
+    }
+    if (!isset($params['token'])) {
+      $params['token'] = urldecode($token);
+    }
   }
-  if (isset($params['jp2_url']) && !empty($params['jp2_url'])) {
+
+  if (isset($params['pid']) && isset($params['dsid']) && isset($params['token'])) {
+    $token_header = variable_get('islandora_openseadragon_tilesource', 'djatoka') == 'iiif'
+      && variable_get('islandora_openseadragon_iiif_token_header', FALSE);
+
     return theme('islandora_openseadragon_viewer', array(
-      'pid' => $pid,
-      'tile_sources' => islandora_openseadragon_identifier_tile_source($params['jp2_url']),
+      'pid' => $params['pid'],
+      'tile_sources' => islandora_openseadragon_tile_source($params['pid'], $params['dsid'], $params['token']),
+      'token' => $params['token'],
+      'token_header' => $token_header,
     ));
   }
 }
@@ -134,4 +157,88 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
       drupal_set_message(t('Invalid clip parameters passed.'), 'error');
     }
   }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function islandora_openseadragon_token_info() {
+  $info = array();
+
+  $info['types']['islandora_openseadragon'] = array(
+    'name' => t('Islandora Openseadragon'),
+    'description' => t('Tokens for building IIIF identifer in Islandora Openseadragon.'),
+    'needs-data' => 'islandora_openseadragon',
+  );
+
+  $info['tokens']['islandora_openseadragon']['pid'] = array(
+    'name' => t('PID'),
+    'description' => t('The objects PID.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['dsid'] = array(
+    'name' => t('DSID'),
+    'description' => t('The objects DSID.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['url'] = array(
+    'name' => t('URL'),
+    'description' => t('The URL to the object in Islandora.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['url_token'] = array(
+    'name' => t('URL with Token'),
+    'description' => t('The URL to the object in Islandora with token in the query string.'),
+  );
+
+  $info['tokens']['islandora_openseadragon']['token'] = array(
+    'name' => t('Token'),
+    'description' => t('The token that can be used to access the object in Islandora.'),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function islandora_openseadragon_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+
+  if ($type != 'islandora_openseadragon' || !isset($data['islandora_openseadragon'])) {
+    return $replacements;
+  }
+
+  $pid = $data['islandora_openseadragon']['pid'];
+  $dsid = $data['islandora_openseadragon']['dsid'];
+  $token = $data['islandora_openseadragon']['token'];
+
+  foreach ($tokens as $name => $original) {
+    if ($name == 'pid') {
+      $replacements[$original] = $pid;
+    }
+    elseif ($name == 'dsid') {
+      $replacements[$original] = $dsid;
+    }
+    elseif ($name == 'token') {
+      $replacements[$original] = $token;
+    }
+    elseif ($name == 'url' || $name == 'url_token') {
+      $options = array(
+        'absolute' => TRUE,
+        'language' => language_default(),
+        'https' => FALSE,
+      );
+
+      if ($name == 'url_token') {
+        $options['query'] = array(
+          'token' => $token,
+        );
+      }
+
+      $replacements[$original] = url("islandora/object/{$pid}/datastream/{$dsid}/view", $options);
+    }
+  }
+
+  return $replacements;
 }

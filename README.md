@@ -13,6 +13,7 @@ This module requires the following modules/libraries:
 * [Islandora](https://github.com/islandora/islandora)
 * [Tuque](https://github.com/islandora/tuque)
 * [OpenSeadragon](https://github.com/openseadragon/openseadragon/)
+* [Drupal Token Module](https://www.drupal.org/project/token)
 
 ## Installation
 

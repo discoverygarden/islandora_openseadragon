@@ -54,7 +54,8 @@ function islandora_openseadragon_uninstall() {
     'islandora_openseadragon_tilesource',
     'islandora_openseadragon_djatoka_url',
     'islandora_openseadragon_iiif_url',
-
+    'islandora_openseadragon_iiif_token_header',
+    'islandora_openseadragon_iiif_identifier',
   );
   array_walk($variables, 'variable_del');
 }
