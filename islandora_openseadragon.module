@@ -101,7 +101,7 @@ function islandora_openseadragon_callback(array $params = array(), AbstractObjec
 
   if (isset($params['jp2_url']) && !(isset($params['pid']) && isset($params['dsid']) && isset($params['token']))) {
     $message = islandora_deprecated('7.x-1.11', t('The jp2_url parameter has been depreciated. Please update your code before the next release.'));
-    trigger_error(filter_xss($message), E_USER_DEPRECATED);
+    trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
     // Try to mangle the jp2_url into the data we need.
     $matches = array();
@@ -122,15 +122,24 @@ function islandora_openseadragon_callback(array $params = array(), AbstractObjec
   }
 
   if (isset($params['pid']) && isset($params['dsid']) && isset($params['token'])) {
-    $token_header = variable_get('islandora_openseadragon_tilesource', 'djatoka') == 'iiif'
-      && variable_get('islandora_openseadragon_iiif_token_header', FALSE);
+    $token_header = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource') == 'iiif'
+      && \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_token_header');
 
-    return theme('islandora_openseadragon_viewer', array(
-      'pid' => $params['pid'],
-      'tile_sources' => islandora_openseadragon_tile_source($params['pid'], $params['dsid'], $params['token']),
-      'token' => $params['token'],
-      'token_header' => $token_header,
-    ));
+    // @FIXME
+// theme() has been renamed to _theme() and should NEVER be called directly.
+// Calling _theme() directly can alter the expected output and potentially
+// introduce security issues (see https://www.drupal.org/node/2195739). You
+// should use renderable arrays instead.
+// 
+// 
+// @see https://www.drupal.org/node/2195739
+// return theme('islandora_openseadragon_viewer', array(
+//       'pid' => $params['pid'],
+//       'tile_sources' => islandora_openseadragon_tile_source($params['pid'], $params['dsid'], $params['token']),
+//       'token' => $params['token'],
+//       'token_header' => $token_header,
+//     ));
+
   }
 }
 
@@ -239,7 +248,10 @@ function islandora_openseadragon_tokens($type, $tokens, array $data = array(), a
         );
       }
 
-      $replacements[$original] = url("islandora/object/{$pid}/datastream/{$dsid}/view", $options);
+      // @FIXME
+// url() expects a route name or an external URI.
+// $replacements[$original] = url("islandora/object/{$pid}/datastream/{$dsid}/view", $options);
+
     }
   }
 

@@ -29,7 +29,7 @@ function islandora_openseadragon_download_clip(AbstractObject $object) {
     }
     else {
       drupal_access_denied();
-      watchdog('islandora_openseadragon', 'Invalid parameters specified for downloading of a clip for @pid. Parameters attempted: @params.', array(
+      \Drupal::logger('islandora_openseadragon')->notice('Invalid parameters specified for downloading of a clip for @pid. Parameters attempted: @params.', array(
         '@pid' => $object->id,
         '@params' => $_GET['clip'],
       ));

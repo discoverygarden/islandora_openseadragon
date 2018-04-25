@@ -45,11 +45,24 @@ function islandora_openseadragon_get_installed_version() {
  */
 function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
   global $base_root;
-  $decoded_params = drupal_get_query_array($params);
+  // @FIXME
+// drupal_get_query_array() has been removed in favor of PHP's native parse_str(). You should
+// use that function instead and pass a destination array by reference.
+// For more information, see:
+// https://www.drupal.org/node/2079005
+// http://www.php.net/parse_str
+// 
+// 
+// @see https://www.drupal.org/node/2079005
+// $decoded_params = drupal_get_query_array($params);
+
   if (islandora_openseadragon_use_djatoka_server()) {
-    $djatoka_url = url(variable_get('islandora_openseadragon_djatoka_url', 'adore-djatoka/resolver'),
-      array('absolute' => TRUE)
-    );
+    // @FIXME
+// url() expects a route name or an external URI.
+// $djatoka_url = url(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
+//       array('absolute' => TRUE)
+//     );
+
     $djatoka_params = array(
       'url_ver' => 'Z39.88-2004',
       'svc_id' => 'info:lanl-repo/svc/getRegion',
@@ -58,7 +71,10 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     );
     // Only grab the two parameters that are expected to be there, ignore
     // anything else.
-    $allowed_djatoka_param_keys = drupal_map_assoc(array(
+    $allowed_djatoka_param_keys = array_combine(array(
+      'rft_id',
+      'svc.region',
+    ), array(
       'rft_id',
       'svc.region',
     ));
@@ -71,7 +87,14 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     // Replace the first left-most slash to get a more Drupal-y path to validate
     // against.
     $drupal_path = preg_replace('/\//', '', $path, 1);
-    $item = menu_get_item($drupal_path);
+    // @FIXME
+// menu_get_item() has been removed. To retrieve route information, use the
+// RouteMatch object, which you can retrieve by calling \Drupal::routeMatch().
+// 
+// 
+// @see https://www.drupal.org/node/2203305
+// $item = menu_get_item($drupal_path);
+
     if (!$item || $item['path'] !== 'islandora/object/%/datastream/%/view') {
       return FALSE;
     }
@@ -128,7 +151,11 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
  *   Configuration options for OpenSeadragon.
  */
 function islandora_openseadragon_get_settings($filter_null = TRUE) {
-  $settings = variable_get('islandora_openseadragon_settings', array()) + islandora_openseadragon_default_options();
+  // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
+$settings = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_settings') + islandora_openseadragon_default_options();
   // We have to filter NULL values, to prevent issues with javascript.
   $is_not_null = function ($val) {
     return !is_null($val);
@@ -149,149 +176,152 @@ function islandora_openseadragon_get_settings($filter_null = TRUE) {
  */
 function islandora_openseadragon_default_options() {
   $library_path = libraries_get_path('openseadragon');
-  $defaults = array(
-    'id' => 'islandora-openseadragon',
-    'element' => NULL,
-    'tileSources' => NULL,
-    'tabIndex' => 0,
-    'overlays' => NULL,
-    'prefixUrl' => url("{$library_path}/images/", array('absolute' => TRUE)),
-    'navImages' => NULL,
-    'debugMode' => FALSE,
-    'debugGridColor' => '#437AB2',
-    'blendTime' => 0,
-    'alwaysBlend' => FALSE,
-    'autoHideControls' => TRUE,
-    'immediateRender' => FALSE,
-    'defaultZoomLevel' => 0,
-    'opacity' => 1,
-    'compositeOperation' => NULL,
-    'placeholderFillStyle' => NULL,
-    'degrees' => 0,
-    'minZoomLevel' => NULL,
-    'maxZoomLevel' => NULL,
-    'homeFillsViewer' => FALSE,
-    'panHorizontal' => TRUE,
-    'panVertical' => TRUE,
-    'constrainDuringPan' => FALSE,
-    'wrapHorizontal' => FALSE,
-    'wrapVertical' => FALSE,
-    'minZoomImageRatio' => 0.9,
-    'maxZoomPixelRatio' => 1.1,
-    'smoothTileEdgesMinZoom' => 1.1,
-    'iOSDevice' => NULL,
-    'autoResize' => TRUE,
-    'preserveImageSizeOnResize' => FALSE,
-    'minScrollDeltaTime' => 50,
-    'pixelsPerWheelLine' => 40,
-    'visibilityRatio' => 0.5,
-    'viewportMargins' => NULL,
-    'imageLoaderLimit' => 0,
-    'clickTimeThreshold' => 300,
-    'clickDistThreshold' => 5,
-    'dblClickTimeThreshold' => 300,
-    'dblClickDistThreshold' => 20,
-    'springStiffness' => 6.5,
-    'animationTime' => 1.2,
-    'gestureSettingsMouse' => array(
-      'scrollToZoom' => TRUE,
-      'clickToZoom' => TRUE,
-      'dblClickToZoom' => FALSE,
-      'pinchToZoom' => FALSE,
-      'flickEnabled' => FALSE,
-      'flickMinSpeed' => 120,
-      'flickMomentum' => 0.25,
-      'pinchRotate' => FALSE,
-    ),
-    'gestureSettingsTouch' => array(
-      'scrollToZoom' => FALSE,
-      'clickToZoom' => FALSE,
-      'dblClickToZoom' => TRUE,
-      'pinchToZoom' => TRUE,
-      'flickEnabled' => TRUE,
-      'flickMinSpeed' => 120,
-      'flickMomentum' => 0.25,
-      'pinchRotate' => FALSE,
-    ),
-    'gestureSettingsPen' => array(
-      'scrollToZoom' => FALSE,
-      'clickToZoom' => TRUE,
-      'dblClickToZoom' => FALSE,
-      'pinchToZoom' => FALSE,
-      'flickEnabled' => FALSE,
-      'flickMinSpeed' => 120,
-      'flickMomentum' => 0.25,
-      'pinchRotate' => FALSE,
-    ),
-    'gestureSettingsUnknown' => array(
-      'scrollToZoom' => TRUE,
-      'clickToZoom' => FALSE,
-      'dblClickToZoom' => TRUE,
-      'pinchToZoom' => TRUE,
-      'flickEnabled' => TRUE,
-      'flickMinSpeed' => 120,
-      'flickMomentum' => 0.25,
-      'pinchRotate' => FALSE,
-    ),
-    'zoomPerClick' => 2.0,
-    'zoomPerScroll' => 1.2,
-    'zoomPerSecond' => 1.0,
-    'navigatorId' => NULL,
-    'showNavigator' => FALSE,
-    'navigatorPosition' => 'TOP_RIGHT',
-    'navigatorSizeRatio' => 0.2,
-    'navigatorMaintainSizeRatio' => FALSE,
-    'navigatorTop' => NULL,
-    'navigatorLeft' => NULL,
-    'navigatorHeight' => NULL,
-    'navigatorWidth' => NULL,
-    'navigatorAutoResize' => TRUE,
-    'navigatorAutoFade' => TRUE,
-    'navigatorRotate' => TRUE,
-    'controlsFadeDelay' => 2000,
-    'controlsFadeLength' => 1500,
-    'maxImageCacheCount' => 200,
-    'timeout' => 30000,
-    'useCanvas' => TRUE,
-    'minPixelRatio' => 0.5,
-    'mouseNavEnabled' => TRUE,
-    'showNavigationControl' => TRUE,
-    'navigationControlAnchor' => 'TOP_LEFT',
-    'showZoomControl' => TRUE,
-    'showHomeControl' => TRUE,
-    'showFullPageControl' => TRUE,
-    'showRotationControl' => FALSE,
-    'showSequenceControl' => TRUE,
-    'sequenceControlAnchor' => 'TOP_LEFT',
-    'navPrevNextWrap' => FALSE,
-    'zoomInButton' => NULL,
-    'zoomOutButton' => NULL,
-    'homeButton' => NULL,
-    'fullPageButton' => NULL,
-    'rotateLeftButton' => NULL,
-    'rotateRightButton' => NULL,
-    'previousButton' => NULL,
-    'nextButton' => NULL,
-    'sequenceMode' => FALSE,
-    'initialPage' => 0,
-    'preserveViewport' => FALSE,
-    'preserveOverlays' => FALSE,
-    'showReferenceStrip' => FALSE,
-    'referenceStripScroll' => 'horizontal',
-    'referenceStripElement' => NULL,
-    'referenceStripHeight' => NULL,
-    'referenceStripWidth' => NULL,
-    'referenceStripPosition' => 'BOTTOM_LEFT',
-    'referenceStripSizeRatio' => 0.2,
-    'collectionMode' => FALSE,
-    'collectionRows' => 3,
-    'collectionColumns' => 0,
-    'collectionLayout' => 'horizontal',
-    'collectionTileSize' => 800,
-    'collectionTileMargin' => 80,
-    'crossOriginPolicy' => FALSE,
-    'ajaxWithCredentials' => FALSE,
-  );
+  // @FIXME
+// url() expects a route name or an external URI.
+// $defaults = array(
+//     'id' => 'islandora-openseadragon',
+//     'element' => NULL,
+//     'tileSources' => NULL,
+//     'tabIndex' => 0,
+//     'overlays' => NULL,
+//     'prefixUrl' => url("{$library_path}/images/", array('absolute' => TRUE)),
+//     'navImages' => NULL,
+//     'debugMode' => FALSE,
+//     'debugGridColor' => '#437AB2',
+//     'blendTime' => 0,
+//     'alwaysBlend' => FALSE,
+//     'autoHideControls' => TRUE,
+//     'immediateRender' => FALSE,
+//     'defaultZoomLevel' => 0,
+//     'opacity' => 1,
+//     'compositeOperation' => NULL,
+//     'placeholderFillStyle' => NULL,
+//     'degrees' => 0,
+//     'minZoomLevel' => NULL,
+//     'maxZoomLevel' => NULL,
+//     'homeFillsViewer' => FALSE,
+//     'panHorizontal' => TRUE,
+//     'panVertical' => TRUE,
+//     'constrainDuringPan' => FALSE,
+//     'wrapHorizontal' => FALSE,
+//     'wrapVertical' => FALSE,
+//     'minZoomImageRatio' => 0.9,
+//     'maxZoomPixelRatio' => 1.1,
+//     'smoothTileEdgesMinZoom' => 1.1,
+//     'iOSDevice' => NULL,
+//     'autoResize' => TRUE,
+//     'preserveImageSizeOnResize' => FALSE,
+//     'minScrollDeltaTime' => 50,
+//     'pixelsPerWheelLine' => 40,
+//     'visibilityRatio' => 0.5,
+//     'viewportMargins' => NULL,
+//     'imageLoaderLimit' => 0,
+//     'clickTimeThreshold' => 300,
+//     'clickDistThreshold' => 5,
+//     'dblClickTimeThreshold' => 300,
+//     'dblClickDistThreshold' => 20,
+//     'springStiffness' => 6.5,
+//     'animationTime' => 1.2,
+//     'gestureSettingsMouse' => array(
+//       'scrollToZoom' => TRUE,
+//       'clickToZoom' => TRUE,
+//       'dblClickToZoom' => FALSE,
+//       'pinchToZoom' => FALSE,
+//       'flickEnabled' => FALSE,
+//       'flickMinSpeed' => 120,
+//       'flickMomentum' => 0.25,
+//       'pinchRotate' => FALSE,
+//     ),
+//     'gestureSettingsTouch' => array(
+//       'scrollToZoom' => FALSE,
+//       'clickToZoom' => FALSE,
+//       'dblClickToZoom' => TRUE,
+//       'pinchToZoom' => TRUE,
+//       'flickEnabled' => TRUE,
+//       'flickMinSpeed' => 120,
+//       'flickMomentum' => 0.25,
+//       'pinchRotate' => FALSE,
+//     ),
+//     'gestureSettingsPen' => array(
+//       'scrollToZoom' => FALSE,
+//       'clickToZoom' => TRUE,
+//       'dblClickToZoom' => FALSE,
+//       'pinchToZoom' => FALSE,
+//       'flickEnabled' => FALSE,
+//       'flickMinSpeed' => 120,
+//       'flickMomentum' => 0.25,
+//       'pinchRotate' => FALSE,
+//     ),
+//     'gestureSettingsUnknown' => array(
+//       'scrollToZoom' => TRUE,
+//       'clickToZoom' => FALSE,
+//       'dblClickToZoom' => TRUE,
+//       'pinchToZoom' => TRUE,
+//       'flickEnabled' => TRUE,
+//       'flickMinSpeed' => 120,
+//       'flickMomentum' => 0.25,
+//       'pinchRotate' => FALSE,
+//     ),
+//     'zoomPerClick' => 2.0,
+//     'zoomPerScroll' => 1.2,
+//     'zoomPerSecond' => 1.0,
+//     'navigatorId' => NULL,
+//     'showNavigator' => FALSE,
+//     'navigatorPosition' => 'TOP_RIGHT',
+//     'navigatorSizeRatio' => 0.2,
+//     'navigatorMaintainSizeRatio' => FALSE,
+//     'navigatorTop' => NULL,
+//     'navigatorLeft' => NULL,
+//     'navigatorHeight' => NULL,
+//     'navigatorWidth' => NULL,
+//     'navigatorAutoResize' => TRUE,
+//     'navigatorAutoFade' => TRUE,
+//     'navigatorRotate' => TRUE,
+//     'controlsFadeDelay' => 2000,
+//     'controlsFadeLength' => 1500,
+//     'maxImageCacheCount' => 200,
+//     'timeout' => 30000,
+//     'useCanvas' => TRUE,
+//     'minPixelRatio' => 0.5,
+//     'mouseNavEnabled' => TRUE,
+//     'showNavigationControl' => TRUE,
+//     'navigationControlAnchor' => 'TOP_LEFT',
+//     'showZoomControl' => TRUE,
+//     'showHomeControl' => TRUE,
+//     'showFullPageControl' => TRUE,
+//     'showRotationControl' => FALSE,
+//     'showSequenceControl' => TRUE,
+//     'sequenceControlAnchor' => 'TOP_LEFT',
+//     'navPrevNextWrap' => FALSE,
+//     'zoomInButton' => NULL,
+//     'zoomOutButton' => NULL,
+//     'homeButton' => NULL,
+//     'fullPageButton' => NULL,
+//     'rotateLeftButton' => NULL,
+//     'rotateRightButton' => NULL,
+//     'previousButton' => NULL,
+//     'nextButton' => NULL,
+//     'sequenceMode' => FALSE,
+//     'initialPage' => 0,
+//     'preserveViewport' => FALSE,
+//     'preserveOverlays' => FALSE,
+//     'showReferenceStrip' => FALSE,
+//     'referenceStripScroll' => 'horizontal',
+//     'referenceStripElement' => NULL,
+//     'referenceStripHeight' => NULL,
+//     'referenceStripWidth' => NULL,
+//     'referenceStripPosition' => 'BOTTOM_LEFT',
+//     'referenceStripSizeRatio' => 0.2,
+//     'collectionMode' => FALSE,
+//     'collectionRows' => 3,
+//     'collectionColumns' => 0,
+//     'collectionLayout' => 'horizontal',
+//     'collectionTileSize' => 800,
+//     'collectionTileMargin' => 80,
+//     'crossOriginPolicy' => FALSE,
+//     'ajaxWithCredentials' => FALSE,
+//   );
+
   return $defaults;
 }
 
@@ -306,9 +336,9 @@ function islandora_openseadragon_default_options() {
  */
 function islandora_openseadragon_identifier_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
-  switch (variable_get('islandora_openseadragon_tilesource', 'djatoka')) {
+  switch (\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource')) {
     case 'djatoka':
       return islandora_openseadragon_djatoka_tile_source($identifier);
 
@@ -331,7 +361,7 @@ function islandora_openseadragon_identifier_tile_source($identifier) {
  */
 function islandora_openseadragon_datastream_tile_source(AbstractDatastream $datastream) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
   $identifier = islandora_openseadragon_identifier_url($datastream);
   return islandora_openseadragon_identifier_tile_source($identifier);
@@ -349,9 +379,9 @@ function islandora_openseadragon_datastream_tile_source(AbstractDatastream $data
  */
 function islandora_openseadragon_iiif_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
-  $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
+  $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
   $identifier = urlencode($identifier);
   return file_create_url("$base_url/$identifier");
 }
@@ -379,14 +409,22 @@ function islandora_openseadragon_iiif_tile_source($identifier) {
  */
 function islandora_openseadragon_djatoka_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
-  return array(
+  // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
+// @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
+return array(
     'identifier' => $identifier,
     'width' => NULL,
     'height' => NULL,
-    'tileSize' => variable_get('islandora_openseadragon_tile_size', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE),
-    'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP),
+    'tileSize' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_size'),
+    'tileOverlap' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
     'minLevel' => NULL,
     'maxLevel' => NULL,
   );
@@ -403,22 +441,25 @@ function islandora_openseadragon_djatoka_tile_source($identifier) {
  */
 function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
   module_load_include('inc', 'islandora', 'includes/authtokens');
   $pid = $datastream->parent->id;
   $dsid = $datastream->id;
   $token = islandora_get_object_token($pid, $dsid, 2);
-  return url("islandora/object/{$pid}/datastream/{$dsid}/view",
-    array(
-      'absolute' => TRUE,
-      'query' => array(
-        'token' => $token,
-      ),
-      'language' => language_default(),
-      'https' => FALSE,
-    )
-  );
+  // @FIXME
+// url() expects a route name or an external URI.
+// return url("islandora/object/{$pid}/datastream/{$dsid}/view",
+//     array(
+//       'absolute' => TRUE,
+//       'query' => array(
+//         'token' => $token,
+//       ),
+//       'language' => language_default(),
+//       'https' => FALSE,
+//     )
+//   );
+
 }
 
 /**
@@ -459,9 +500,9 @@ function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
  *   FALSE otherwise.
  */
 function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
-  $identifier_tokens = variable_get('islandora_openseadragon_iiif_identifier', '[islandora_openseadragon:url_token]');
-  $identifier = token_replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
-  $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
+  $identifier_tokens = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_identifier');
+  $identifier = \Drupal::token()->replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
+  $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
   $identifier_encoded = urlencode($identifier);
   return file_create_url("$base_url/$identifier_encoded/info.json");
 }
@@ -492,14 +533,22 @@ function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
  *   - maxLevel: The maximum level to attempt to load.
  */
 function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token) {
-  $identifier = token_replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
+  $identifier = \Drupal::token()->replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
 
-  return array(
+  // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
+// @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
+return array(
     'identifier' => $identifier,
     'width' => NULL,
     'height' => NULL,
-    'tileSize' => variable_get('islandora_openseadragon_tile_size', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE),
-    'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP),
+    'tileSize' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_size'),
+    'tileOverlap' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
     'minLevel' => NULL,
     'maxLevel' => NULL,
   );
@@ -519,7 +568,7 @@ function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token) {
  *   The metadata required by the users chosen implementation.
  */
 function islandora_openseadragon_tile_source($pid, $dsid, $token) {
-  switch (variable_get('islandora_openseadragon_tilesource', 'djatoka')) {
+  switch (\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource')) {
     case 'djatoka':
       return islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token);
 
@@ -543,7 +592,7 @@ function islandora_openseadragon_tile_source($pid, $dsid, $token) {
 function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
   // Only get solr results if present and paged content solution pack is
   // enabled.
-  if (empty($_GET['solr']) || !module_exists('islandora_paged_content')) {
+  if (empty($_GET['solr']) || !\Drupal::moduleHandler()->moduleExists('islandora_paged_content')) {
     return NULL;
   }
 
@@ -583,5 +632,5 @@ function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
  *   TRUE if Djatoka server is to be used.
  */
 function islandora_openseadragon_use_djatoka_server() {
-  return variable_get('islandora_openseadragon_tilesource', 'djatoka') == 'djatoka';
+  return \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource') == 'djatoka';
 }
