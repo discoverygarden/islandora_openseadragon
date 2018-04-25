@@ -25,7 +25,8 @@ Install as
 
 [Download](https://github.com/openseadragon/openseadragon/releases/download/v2.3.1/openseadragon-bin-2.3.1.zip)
 and install the Openseadragon library to your sites/libraries folder, or run
-`drush openseadragon-plugin`. Openseadragon 2.3.1 is known to work well with Islandora.
+`drush openseadragon-plugin`. Openseadragon 2.3.1 is known to work well with
+Islandora.
 
 Note: If you use the Drush command, it is advisable to Move (not copy) the
 install script to your `.drush` folder and run it.

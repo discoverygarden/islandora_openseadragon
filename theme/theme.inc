@@ -5,6 +5,8 @@
  * This file contains all theme and preprocess functions.
  */
 
+use Drupal\Component\Utility\Html;
+
 /**
  * Implements template_preprocess_HOOK().
  *
@@ -16,14 +18,14 @@ function template_preprocess_islandora_openseadragon_viewer(array &$variables) {
   $library_path = libraries_get_path('openseadragon');
   if (isset($variables['fedora_object']) && $variables['fedora_object'] !== NULL) {
     $message = t("The parameter 'fedora_object' in theme('islandora_openseadragon_viewer') has been deprecated. As of 7.x-1.10, please update your code before the next release.");
-    trigger_error(\Drupal\Component\Utility\Html::escape($message), E_USER_DEPRECATED);
+    trigger_error(Html::escape($message), E_USER_DEPRECATED);
     // Attempt to convert 'fedora_object', to 'pid'.
     $variables['pid'] = $variables['fedora_object']->id;
   }
   if (isset($variables['uri']) && $variables['uri'] !== '') {
     $message = t("The parameter 'uri' in theme('islandora_openseadragon_viewer') has been deprecated. As of 7.x-1.10, please update your code before the next release.");
-    trigger_error(\Drupal\Component\Utility\Html::escape($message), E_USER_DEPRECATED);
-    $variables['tile_sources'] = array(islandora_openseadragon_identifier_tile_source($variables['uri']));
+    trigger_error(Html::escape($message), E_USER_DEPRECATED);
+    $variables['tile_sources'] = [islandora_openseadragon_identifier_tile_source($variables['uri'])];
   }
   $variables['id'] = $variables['viewer_id'] = 'islandora-openseadragon';
   // @FIXME
@@ -46,9 +48,9 @@ function template_preprocess_islandora_openseadragon_viewer(array &$variables) {
 
   if (isset($variables['token_header']) && isset($variables['token']) && $variables['token_header']) {
     $variables['settings']['options']['loadTilesWithAjax'] = TRUE;
-    $variables['settings']['options']['ajaxHeaders'] = array(
+    $variables['settings']['options']['ajaxHeaders'] = [
       'X-ISLANDORA-TOKEN' => $variables['token'],
-    );
+    ];
   }
 }
 
@@ -65,8 +67,8 @@ function template_process_islandora_openseadragon_viewer(array &$variables) {
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js(array(
@@ -77,8 +79,8 @@ function template_process_islandora_openseadragon_viewer(array &$variables) {
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js("$library_path/openseadragon.js", array('weight' => -4));
@@ -87,8 +89,8 @@ function template_process_islandora_openseadragon_viewer(array &$variables) {
     // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js("$module_path/js/djtilesource.js", array('weight' => -3));
@@ -97,8 +99,8 @@ function template_process_islandora_openseadragon_viewer(array &$variables) {
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_js("$module_path/js/islandora_openseadragon.js", array('weight' => -2));
@@ -106,8 +108,8 @@ function template_process_islandora_openseadragon_viewer(array &$variables) {
   // @FIXME
 // The Assets API has totally changed. CSS, JavaScript, and libraries are now
 // attached directly to render arrays using the #attached property.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2169605
 // @see https://www.drupal.org/node/2408597
 // drupal_add_css("$module_path/css/islandora_openseadragon.theme.css");
@@ -129,8 +131,8 @@ function theme_islandora_openseadragon_clipper(array &$variables) {
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // $image = theme(
 //     'image',

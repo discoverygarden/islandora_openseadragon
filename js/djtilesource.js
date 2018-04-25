@@ -1,10 +1,9 @@
-/*jslint browser: true*/
-/*global OpenSeadragon, Drupal*/
 /**
  * @file
  * Defines the source for exposing Djatoka to OpenSeadragon.
  */
-(function($) {
+
+(function ($) {
   'use strict';
 
   // Remove IIFTileSource, as it assumes Djatoka responses belong to it for some reason.
@@ -17,33 +16,35 @@
    * @memberof OpenSeadragon
    * @extends OpenSeadragon.TileSource
    */
-  $.DjatokaTileSource = function(options) {
+  $.DjatokaTileSource = function (options) {
     $.extend(true, this, options);
     $.TileSource.apply(this, [options]);
   };
 
   $.extend($.DjatokaTileSource.prototype, $.TileSource.prototype, {
-    success: function(event) {
+    success: function (event) {
       if (event.tileSource !== undefined) {
         $.extend(true, this, event.tileSource);
       }
     },
 
     /**
-     * Determine if the data and/or url imply the image service is supported by
-     * this tile source.
+     * Check the data/url imply the image service is supported by this source.
+     *
      * @function
+     *
      * @param {Object|Array} data
      * @param {String} optional - url
      */
-    supports: function(data, url) {
+    supports: function (data, url) {
       return true;
     },
 
     /**
-     * Responsible for parsing and configuring the
-     * image metadata pertinent to this TileSources implementation.
+     * Pars and configure the image metadata for this TileSource.
+     *
      * @function
+     *
      * @param {Object} data - the raw configuration
      * {
      *   "identifer" :
@@ -56,7 +57,7 @@
      *   "maxLevel" : 5
      * }
      */
-    configure: function(options) {
+    configure: function (options) {
       var data = {
         identifier: options.identifier,
         width: parseInt(options.width),
@@ -80,11 +81,14 @@
 
     /**
      * Djatoka helper function for determining the region to request.
+     *
      * @function
+     *
      * @param {String} url
+     *
      * @throws {Error}
      */
-    getRegion: function(level, x, y) {
+    getRegion: function (level, x, y) {
       var bounds = this.getTileBounds(level, x, y),
           region = {
             x: (bounds.x * this.dimensions.x).toFixed(),
@@ -96,15 +100,17 @@
     },
 
     /**
-     * Responsible for retrieving the url which will return an image for the
-     * region specified by the given x, y, and level components.
+     * Retrieve the url to an image for the region specified.
+     *
      * @function
+     *
      * @param {Number} level - z index
      * @param {Number} x
      * @param {Number} y
+     *
      * @throws {Error}
      */
-    getTileUrl: function(level, x, y) {
+    getTileUrl: function (level, x, y) {
       var baseURL = Drupal.settings.islandoraOpenSeadragon.djatokaServerBaseURL;
       return baseURL + '?' + jQuery.param({
             'url_ver': 'Z39.88-2004',
@@ -119,8 +125,11 @@
 
   /**
    * Generates a URL to fetch image meta-data from Djatoka.
+   *
    * @function
+   *
    * @param {string} pid - fedora object identifier.
+   *
    * @return {string} URL to fetch image meta-data from Djatoka.
    */
   function get_image_info_url(identifier) {

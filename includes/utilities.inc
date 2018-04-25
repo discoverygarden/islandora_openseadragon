@@ -17,7 +17,7 @@ function islandora_openseadragon_get_installed_version() {
   if ($version === NULL) {
     $path = libraries_get_path('openseadragon');
     $openseadragon_js = file_get_contents("$path/openseadragon.js");
-    $matches = array();
+    $matches = [];
     $count = preg_match('/@version\s+OpenSeadragon\s+((\d+\.){2}\d+)/i', $openseadragon_js, $matches);
     if ($count) {
       $version = $matches[1];
@@ -51,8 +51,8 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
 // For more information, see:
 // https://www.drupal.org/node/2079005
 // http://www.php.net/parse_str
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2079005
 // $decoded_params = drupal_get_query_array($params);
 
@@ -63,21 +63,24 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
 //       array('absolute' => TRUE)
 //     );
 
-    $djatoka_params = array(
+    $djatoka_params = [
       'url_ver' => 'Z39.88-2004',
       'svc_id' => 'info:lanl-repo/svc/getRegion',
       'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
       'svc.format' => 'image/jpeg',
-    );
+    ];
     // Only grab the two parameters that are expected to be there, ignore
     // anything else.
-    $allowed_djatoka_param_keys = array_combine(array(
-      'rft_id',
-      'svc.region',
-    ), array(
-      'rft_id',
-      'svc.region',
-    ));
+    $allowed_djatoka_param_keys = array_combine(
+      [
+        'rft_id',
+        'svc.region',
+      ],
+      [
+        'rft_id',
+        'svc.region',
+      ]
+    );
     $allowed_djatoka_params = array_intersect_key($decoded_params, $allowed_djatoka_param_keys);
     if (empty($allowed_djatoka_params)) {
       return FALSE;
@@ -90,8 +93,8 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     // @FIXME
 // menu_get_item() has been removed. To retrieve route information, use the
 // RouteMatch object, which you can retrieve by calling \Drupal::routeMatch().
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2203305
 // $item = menu_get_item($drupal_path);
 
@@ -111,21 +114,21 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     else {
       $url = "{$base_root}{$djatoka_url}?$djatoka_url_params";
     }
-    $dimensions = array();
+    $dimensions = [];
     if (isset($decoded_params['dimensions'])) {
       $dimensions = explode(',', $decoded_params['dimensions']);
-      $dimensions = array(
+      $dimensions = [
         'width' => $dimensions[0],
         'height' => $dimensions[1],
-      );
+      ];
     }
-    return array(
+    return [
       // XXX: Using drupal_http_build_query to avoid changing the underlying
       // functionality in the solution packs that currently implement.
       'original_params' => drupal_http_build_query($allowed_djatoka_params),
       'image_url' => $url,
       'dimensions' => $dimensions,
-    );
+    ];
   }
   else {
     $identifier = $decoded_params['identifier'];
@@ -133,11 +136,11 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     $size = $decoded_params['size'];
     $rotation = 0;
     $format = "default.jpg";
-    return array(
+    return [
       'original_params' => drupal_http_build_query($decoded_params),
       'image_url' => "{$identifier}/{$region}/{$size}/{$rotation}/{$format}",
-      'dimensions' => array(),
-    );
+      'dimensions' => [],
+    ];
   }
 }
 
@@ -151,11 +154,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
  *   Configuration options for OpenSeadragon.
  */
 function islandora_openseadragon_get_settings($filter_null = TRUE) {
-  // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
-$settings = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_settings') + islandora_openseadragon_default_options();
+  $settings = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_settings') + islandora_openseadragon_default_options();
   // We have to filter NULL values, to prevent issues with javascript.
   $is_not_null = function ($val) {
     return !is_null($val);
@@ -346,7 +345,7 @@ function islandora_openseadragon_identifier_tile_source($identifier) {
       return islandora_openseadragon_iiif_tile_source($identifier);
 
     default;
-      return array();
+      return [];
   }
 }
 
@@ -410,16 +409,7 @@ function islandora_openseadragon_iiif_tile_source($identifier) {
 function islandora_openseadragon_djatoka_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
   trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
-
-  // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
-// @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
-return array(
+  return [
     'identifier' => $identifier,
     'width' => NULL,
     'height' => NULL,
@@ -427,7 +417,7 @@ return array(
     'tileOverlap' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
     'minLevel' => NULL,
     'maxLevel' => NULL,
-  );
+  ];
 }
 
 /**
@@ -476,13 +466,13 @@ function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) 
  *   Data to be passed to token_replace.
  */
 function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
-  return array(
-    'islandora_openseadragon' => array(
+  return [
+    'islandora_openseadragon' => [
       'pid' => $pid,
       'dsid' => $dsid,
       'token' => $token,
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -534,16 +524,7 @@ function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
  */
 function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token) {
   $identifier = \Drupal::token()->replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
-
-  // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
-// @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
-return array(
+  return [
     'identifier' => $identifier,
     'width' => NULL,
     'height' => NULL,
@@ -551,7 +532,7 @@ return array(
     'tileOverlap' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
     'minLevel' => NULL,
     'maxLevel' => NULL,
-  );
+  ];
 }
 
 /**
@@ -576,7 +557,7 @@ function islandora_openseadragon_tile_source($pid, $dsid, $token) {
       return islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token);
 
     default;
-      return array();
+      return [];
   }
 }
 
@@ -597,13 +578,13 @@ function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
   }
 
   $params = $_GET['solr']['params'];
-  $params['fq'][] = format_string('PID:"!pid"', array(
+  $params['fq'][] = strtr('PID:"!pid"', [
     '!pid' => $pid,
-  ));
+  ]);
 
   module_load_include('inc', 'islandora_paged_content', 'includes/highlighting');
   $highlighting_info = islandora_paged_content_perform_solr_highlighting_query($_GET['solr']['query'], $params);
-  $highlights = array();
+  $highlights = [];
 
   foreach ($highlighting_info as $pid => $info) {
     if (array_key_exists('snippets', $info)) {
@@ -611,13 +592,13 @@ function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
         foreach ($bounding_boxes as $bounding_box) {
           // The size on the x axis is used to calculate the proportional
           // values under the openseadragon coordinate system.
-          $highlights[] = array(
+          $highlights[] = [
             'x' => $bounding_box['left'] / $info['page']['width'],
             'y' => $bounding_box['top'] / $info['page']['width'],
             'width' => ($bounding_box['right'] - $bounding_box['left']) / $info['page']['width'],
             'height' => ($bounding_box['bottom'] - $bounding_box['top']) / $info['page']['width'],
             'className' => "islandora-openseadragon-highlight",
-          );
+          ];
         }
       }
     }

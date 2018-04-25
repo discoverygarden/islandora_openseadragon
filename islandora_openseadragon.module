@@ -5,9 +5,11 @@
  * Hooks and callbacks for this module.
  */
 
+// @codingStandardsIgnoreStart
 const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
 const ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE = 256;
 const ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP = 0;
+// @codingStandardsIgnoreEnd
 
 /**
  * Implements hook_menu().
@@ -39,47 +41,46 @@ function islandora_openseadragon_menu() {
  * Implements hook_theme().
  */
 function islandora_openseadragon_theme() {
-  return array(
-    'islandora_openseadragon_viewer' => array(
-      'variables' => array(
+  return [
+    'islandora_openseadragon_viewer' => [
+      'variables' => [
         // @deprecated (7.x-1.10):
         // 'uri' and 'fedora_object' has been replaced by the use of 'pid' and
         // 'tile_sources'.
         'uri' => '',
         'fedora_object' => NULL,
         'pid' => NULL,
-        'tile_sources' => array(),
-      ),
+        'tile_sources' => [],
+      ],
       'file' => 'theme/theme.inc',
-      'template' => 'theme/islandora-openseadragon',
-    ),
+    ],
     // A link for clipping JP2 datastreams via djatoka.
-    'islandora_openseadragon_clipper' => array(
+    'islandora_openseadragon_clipper' => [
       'file' => 'theme/theme.inc',
-      'variables' => array(
+      'variables' => [
         'pid' => NULL,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 }
 
 /**
  * Implements hook_islandora_viewer_info().
  */
 function islandora_openseadragon_islandora_viewer_info() {
-  return array(
+  return [
     // @XXX The element returned has a width:100% but no natural flow width; it
     // is completely dependent on it's parent.
-    'islandora_openseadragon' => array(
+    'islandora_openseadragon' => [
       'label' => t('OpenSeadragon'),
       // Later we'll add DZI too.
       'description' => t('OpenSeadragon viewer with djatoka as tilesource.'),
       'configuration' => 'admin/islandora/islandora_viewers/openseadragon',
       'callback' => 'islandora_openseadragon_callback',
       // DZI has xml as mimetype? Not sure how to handle that.
-      'mimetype' => array('image/jp2'),
-    ),
-  );
+      'mimetype' => ['image/jp2'],
+    ],
+  ];
 }
 
 /**
@@ -96,7 +97,7 @@ function islandora_openseadragon_islandora_viewer_info() {
  * @return string
  *   HTML representation of the OpenSeadragon viewer
  */
-function islandora_openseadragon_callback(array $params = array(), AbstractObject $object = NULL) {
+function islandora_openseadragon_callback(array $params = [], AbstractObject $object = NULL) {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
 
   if (isset($params['jp2_url']) && !(isset($params['pid']) && isset($params['dsid']) && isset($params['token']))) {
@@ -104,7 +105,7 @@ function islandora_openseadragon_callback(array $params = array(), AbstractObjec
     trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
 
     // Try to mangle the jp2_url into the data we need.
-    $matches = array();
+    $matches = [];
     preg_match('/object\/([^\/]*)\/datastream\/([^\/]*).*token=([^&]*)/', $params['jp2_url'], $matches);
     $pid = isset($matches[1]) ? $matches[1] : NULL;
     $dsid = isset($matches[2]) ? $matches[2] : NULL;
@@ -152,15 +153,15 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
     $clip_parts = islandora_openseadragon_construct_clip_url($_GET['clip']);
     if ($clip_parts) {
       $variables['clip'] = $clip_parts['original_params'];
-      $variables['content']['clip'] = array(
+      $variables['content']['clip'] = [
         '#weight' => 0,
         '#prefix' => "<div id='clip'>",
-        '#markup' => theme_image(array(
+        '#markup' => theme_image([
           'path' => $clip_parts['image_url'],
           'attributes' => $clip_parts['dimensions'],
-        )),
+        ]),
         '#suffix' => '</div>',
-      );
+      ];
     }
     else {
       drupal_set_message(t('Invalid clip parameters passed.'), 'error');
@@ -172,38 +173,38 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
  * Implements hook_token_info().
  */
 function islandora_openseadragon_token_info() {
-  $info = array();
+  $info = [];
 
-  $info['types']['islandora_openseadragon'] = array(
+  $info['types']['islandora_openseadragon'] = [
     'name' => t('Islandora Openseadragon'),
     'description' => t('Tokens for building IIIF identifer in Islandora Openseadragon.'),
     'needs-data' => 'islandora_openseadragon',
-  );
+  ];
 
-  $info['tokens']['islandora_openseadragon']['pid'] = array(
+  $info['tokens']['islandora_openseadragon']['pid'] = [
     'name' => t('PID'),
     'description' => t('The objects PID.'),
-  );
+  ];
 
-  $info['tokens']['islandora_openseadragon']['dsid'] = array(
+  $info['tokens']['islandora_openseadragon']['dsid'] = [
     'name' => t('DSID'),
     'description' => t('The objects DSID.'),
-  );
+  ];
 
-  $info['tokens']['islandora_openseadragon']['url'] = array(
+  $info['tokens']['islandora_openseadragon']['url'] = [
     'name' => t('URL'),
     'description' => t('The URL to the object in Islandora.'),
-  );
+  ];
 
-  $info['tokens']['islandora_openseadragon']['url_token'] = array(
+  $info['tokens']['islandora_openseadragon']['url_token'] = [
     'name' => t('URL with Token'),
     'description' => t('The URL to the object in Islandora with token in the query string.'),
-  );
+  ];
 
-  $info['tokens']['islandora_openseadragon']['token'] = array(
+  $info['tokens']['islandora_openseadragon']['token'] = [
     'name' => t('Token'),
     'description' => t('The token that can be used to access the object in Islandora.'),
-  );
+  ];
 
   return $info;
 }
@@ -211,8 +212,8 @@ function islandora_openseadragon_token_info() {
 /**
  * Implements hook_tokens().
  */
-function islandora_openseadragon_tokens($type, $tokens, array $data = array(), array $options = array()) {
-  $replacements = array();
+function islandora_openseadragon_tokens($type, $tokens, array $data = [], array $options = []) {
+  $replacements = [];
 
   if ($type != 'islandora_openseadragon' || !isset($data['islandora_openseadragon'])) {
     return $replacements;
@@ -233,19 +234,19 @@ function islandora_openseadragon_tokens($type, $tokens, array $data = array(), a
       $replacements[$original] = $token;
     }
     elseif ($name == 'url' || $name == 'url_token') {
-      $options = array(
+      $options = [
         'absolute' => TRUE,
         'language' => language_default(),
         'https' => (function_exists('drupal_is_https') ?
           drupal_is_https() :
           (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on')
         ),
-      );
+      ];
 
       if ($name == 'url_token') {
-        $options['query'] = array(
+        $options['query'] = [
           'token' => $token,
-        );
+        ];
       }
 
       // @FIXME
