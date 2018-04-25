@@ -10,58 +10,31 @@
  */
 function islandora_openseadragon_requirements() {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
-  $requirements = array();
+  $requirements = [];
   // Ensure translations don't break at install time.
   $t = 't';
   if (!function_exists('libraries_get_libraries')) {
-    module_enable(array('libraries'));
+    \Drupal::service('module_installer')->install(['libraries']);
   }
   if (!in_array('openseadragon', array_keys(libraries_get_libraries()))) {
-    // @FIXME
-// l() expects a Url object, created from a route name or external URI.
-// $readme_link = l($t('README'), drupal_get_path('module', 'islandora_openseadragon') . '/README.txt');
-
-    $requirements['openseadragon'] = array(
+    $requirements['openseadragon'] = [
       'title' => $t('OpenSeadragon library'),
-      'description' => $t('OpenSeadragon library missing; please consult the !readme for installation instructions.', array('!readme' => $readme_link)),
+      'description' => $t('OpenSeadragon library missing; please consult the module README.md for installation instructions.'),
       'severity' => REQUIREMENT_ERROR,
-    );
+    ];
   }
   else {
     $installed_version = islandora_openseadragon_get_installed_version();
     if (version_compare($installed_version, ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION) < 0) {
-      // @FIXME
-// l() expects a Url object, created from a route name or external URI.
-// $readme_link = l($t('README'), drupal_get_path('module', 'islandora_openseadragon') . '/README.txt');
-
-      $requirements['openseadragon'] = array(
+      $requirements['openseadragon'] = [
         'title' => $t('OpenSeadragon library'),
-        'description' => $t('OpenSeadragon library version (%installed_version) does not match required version (%required_version); please consult the !readme for installation instructions.', array(
+        'description' => $t('OpenSeadragon library version (%installed_version) does not match required version (%required_version); please consult the module README for installation instructions.', [
           '%installed_version' => $installed_version,
           '%required_version' => ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION,
-          '!readme' => $readme_link,
-        )),
+        ]),
         'severity' => REQUIREMENT_ERROR,
-      );
+      ];
     }
   }
   return $requirements;
-}
-
-/**
- * Implements hook_uninstall().
- */
-function islandora_openseadragon_uninstall() {
-  $variables = array(
-    'islandora_openseadragon_settings',
-    'islandora_openseadragon_tile_size',
-    'islandora_openseadragon_tile_overlap',
-    'islandora_openseadragon_fit_to_aspect_ratio',
-    'islandora_openseadragon_tilesource',
-    'islandora_openseadragon_djatoka_url',
-    'islandora_openseadragon_iiif_url',
-    'islandora_openseadragon_iiif_token_header',
-    'islandora_openseadragon_iiif_identifier',
-  );
-  array_walk($variables, 'variable_del');
 }

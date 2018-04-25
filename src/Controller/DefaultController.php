@@ -1,7 +1,4 @@
-<?php /**
- * @file
- * Contains \Drupal\islandora_openseadragon\Controller\DefaultController.
- */
+<?
 
 namespace Drupal\islandora_openseadragon\Controller;
 

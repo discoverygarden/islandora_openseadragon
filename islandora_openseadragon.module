@@ -5,9 +5,9 @@
  * Hooks and callbacks for this module.
  */
 
-define('ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION', '2.3.1');
-define('ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE', 256);
-define('ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP', 0);
+const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
+const ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE = 256;
+const ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP = 0;
 
 /**
  * Implements hook_menu().
@@ -130,8 +130,8 @@ function islandora_openseadragon_callback(array $params = array(), AbstractObjec
 // Calling _theme() directly can alter the expected output and potentially
 // introduce security issues (see https://www.drupal.org/node/2195739). You
 // should use renderable arrays instead.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2195739
 // return theme('islandora_openseadragon_viewer', array(
 //       'pid' => $params['pid'],

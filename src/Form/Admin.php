@@ -1,17 +1,12 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\islandora_openseadragon\Form\IslandoraOpenseadragonAdmin.
- */
-
 namespace Drupal\islandora_openseadragon\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
-class IslandoraOpenseadragonAdmin extends ConfigFormBase {
+class Admin extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
@@ -65,8 +60,8 @@ class IslandoraOpenseadragonAdmin extends ConfigFormBase {
     // Calling _theme() directly can alter the expected output and potentially
     // introduce security issues (see https://www.drupal.org/node/2195739). You
     // should use renderable arrays instead.
-    // 
-    // 
+    //
+    //
     // @see https://www.drupal.org/node/2195739
     // $form = array(
     //     'islandora_openseadragon_tilesource' => array(
