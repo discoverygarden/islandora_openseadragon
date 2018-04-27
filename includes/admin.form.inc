@@ -5,18 +5,22 @@
  * Admin callbacks for Islandora OpenSeadragon.
  */
 
+use Drupal\Core\Url;
+use Drupal\Component\Utility\Html;
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Get the element to render for the AJAX event that triggered this callback.
  *
  * @param array $form
  *   The Drupal form definition.
- * @param array $form_state
+ * @param Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  *
  * @return array
  *   The form element to render.
  */
-function islandora_openseadragon_admin_ajax_djatoka_url(array $form, array $form_state) {
+function islandora_openseadragon_admin_ajax_djatoka_url(array $form, FormStateInterface $form_state) {
   return $form['djatoka']['islandora_openseadragon_djatoka_url'];
 }
 
@@ -30,40 +34,51 @@ function islandora_openseadragon_admin_ajax_djatoka_url(array $form, array $form
  *   A message describing the accessibility of the Adore-Djatoka image resolver.
  */
 function islandora_openseadragon_admin_form_djatoka_access_message($path) {
-  // @FIXME
-// url() expects a route name or an external URI.
-// $url = url("{$path}", array(
-//     'absolute' => TRUE,
-//     'query' => array(
-//       'url_ver' => 'Z39.88-2004',
-//       'rft_id' => 'http://memory.loc.gov/gmd/gmd433/g4330/g4330/np000066.jp2',
-//       'svc_id' => 'info:lanl-repo/svc/getRegion',
-//       'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
-//       'svc.format' => 'image/jpeg',
-//       'svc.level' => '1',
-//     ),
-//   ));
+  try {
+    $url = Url::fromUri(
+      $path,
+      [
+        'absolute' => TRUE,
+        'query' => [
+          'url_ver' => 'Z39.88-2004',
+          'rft_id' => 'http://memory.loc.gov/gmd/gmd433/g4330/g4330/np000066.jp2',
+          'svc_id' => 'info:lanl-repo/svc/getRegion',
+          'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
+          'svc.format' => 'image/jpeg',
+          'svc.level' => '1',
+        ],
+      ]
+    )->toString();
 
-  // @FIXME
-// drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
-// with Drupal core.
-//
-//
-// @see https://www.drupal.org/node/1862446
-// @see http://docs.guzzlephp.org/en/latest
-// $result = drupal_http_request($url);
-
-  if ($result->code == 200) {
-    $confirmation_message = theme_image(array('path' => 'misc/watchdog-ok.png', 'attributes' => array()));
-    $confirmation_message .= t('Successfully connected to Adore Djatoka Server.');
+    $client = \Drupal::httpClient();
+    $result = $client->request('GET', $url);
+    if ($result->getStatusCode() == 200) {
+      $image = [
+        '#theme' => 'image',
+        '#uri' => Url::fromUri('base:core/misc/icons/73b355/check.svg')->toString(),
+      ];
+      $message = t('Successfully connected to Adore Djatoka Server.');
+    }
+    else {
+      $image = [
+        '#theme' => 'image',
+        '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
+      ];
+      $message = t('Unable to connect to Adore Djatoka Server at @path', [
+        '@path' => $path,
+      ]);
+    }
   }
-  else {
-    $confirmation_message = theme_image(array('path' => 'misc/watchdog-error.png', 'attributes' => array()));
-    $confirmation_message .= t('Unable to connect to Adore Djatoka Server at !path', array(
-      '!path' => $path,
-    ));
+  catch (Exception $e) {
+    $image = [
+      '#theme' => 'image',
+      '#uri' => Url::fromUri('base:core/misc/icons/e32700/error.svg')->toString(),
+    ];
+    $message = t('An exception occurred unable to connect to Adore Djatoka Server at @path', [
+      '@path' => $path,
+    ]);
   }
-  return $confirmation_message;
+  return \Drupal::service('renderer')->render($image) . $message;
 }
 
 /**
@@ -71,58 +86,41 @@ function islandora_openseadragon_admin_form_djatoka_access_message($path) {
  *
  * @param array $element
  *   The element to validate.
- * @param array $form_state
+ * @param Drupal\Core\Form\FormStateInterface $form_state
  *   Drupal form state.
  * @param array $form
  *   Drupal form.
  */
-function islandora_openseadragon_djatoka_url_validate(array $element, array &$form_state, array $form) {
+function islandora_openseadragon_djatoka_url_validate(array $element, FormStateInterface $form_state, array $form) {
   $path = $element['#value'];
   if (empty($path)) {
-    form_error($element, t('This field is required.'));
+    $form_state->setError($element, t('This field is required.'));
   }
   else {
-    // @FIXME
-// url() expects a route name or an external URI.
-// $url = url("{$path}", array(
-//       'absolute' => TRUE,
-//       'query' => array(
-//         'url_ver' => 'Z39.88-2004',
-//         'rft_id' => 'http://memory.loc.gov/gmd/gmd433/g4330/g4330/np000066.jp2',
-//         'svc_id' => 'info:lanl-repo/svc/getRegion',
-//         'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
-//         'svc.format' => 'image/jpeg',
-//         'svc.level' => '1',
-//       ),
-//     ));
-
-    // @FIXME
-// drupal_http_request() has been replaced by the Guzzle HTTP client, which is bundled
-// with Drupal core.
-//
-//
-// @see https://www.drupal.org/node/1862446
-// @see http://docs.guzzlephp.org/en/latest
-// $result = drupal_http_request($url);
-
-    if ($result->code != 200) {
-      form_error($element, t('This does not seem to be a functioning Djatoka server.'));
+    try {
+      $url = Url::fromUri(
+        $path,
+        [
+          'absolute' => TRUE,
+          'query' => [
+            'url_ver' => 'Z39.88-2004',
+            'rft_id' => 'http://memory.loc.gov/gmd/gmd433/g4330/g4330/np000066.jp2',
+            'svc_id' => 'info:lanl-repo/svc/getRegion',
+            'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
+            'svc.format' => 'image/jpeg',
+            'svc.level' => '1',
+          ],
+        ]
+      )->toString();
+      $client = \Drupal::httpClient();
+      $result = $client->request('GET', $url);
+      if ($result->getStatusCode() != 200) {
+        $form_state->setError($element, t('This does not seem to be a functioning Djatoka server.'));
+      }
     }
-  }
-}
-
-/**
- * Validate the form.
- *
- * @param array $form
- *   Drupal form.
- * @param array $form_state
- *   Drupal form state.
- */
-function islandora_openseadragon_admin_validate(array $form, array &$form_state) {
-  if ($form_state['values']['islandora_openseadragon_tilesource'] == 'djatoka') {
-    $element = $form['djatoka']['islandora_openseadragon_djatoka_url'];
-    islandora_openseadragon_djatoka_url_validate($element, $form_state, $form);
+    catch (Exception $e) {
+      $form_state->setError($element, t('This does not seem to be a functioning Djatoka server.'));
+    }
   }
 }
 
@@ -131,16 +129,17 @@ function islandora_openseadragon_admin_validate(array $form, array &$form_state)
  *
  * @param array $form
  *   Drupal form.
- * @param array $form_state
+ * @param Drupal\Core\Form\FormStateInterface $form_state
  *   Drupal form state.
  */
-function islandora_openseadragon_admin_submit_reset(array $form, array &$form_state) {
-  $op = $form_state['clicked_button']['#id'];
+function islandora_openseadragon_admin_submit_reset(array $form, FormStateInterface $form_state) {
+  $op = $form_state->getTriggeringElement()['#id'];
   switch ($op) {
     case 'edit-reset':
-      \Drupal::config('islandora_openseadragon.settings')->clear('islandora_openseadragon_settings')->save();
-      \Drupal::config('islandora_openseadragon.settings')->clear('islandora_openseadragon_tile_size')->save();
-      \Drupal::config('islandora_openseadragon.settings')->clear('islandora_openseadragon_tile_overlap')->save();
+      $config = \Drupal::configFactory()->getEditable('islandora_basic_collection.settings');
+      $config->clear('islandora_openseadragon_settings')->save();
+      $config->clear('islandora_openseadragon_tile_size')->save();
+      $config->clear('islandora_openseadragon_tile_overlap')->save();
       break;
   }
 }
@@ -150,15 +149,15 @@ function islandora_openseadragon_admin_submit_reset(array $form, array &$form_st
  *
  * @param array $form
  *   The Drupal form.
- * @param array $form_state
+ * @param Drupal\Core\Form\FormStateInterface $form_state
  *   The Drupal form state.
  */
-function islandora_openseadragon_admin_submit_normalize(array $form, array &$form_state) {
+function islandora_openseadragon_admin_submit_normalize(array $form, FormStateInterface $form_state) {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
-  _islandora_openseadragon_normalize_settings($form_state['values']['islandora_openseadragon_settings']);
+  _islandora_openseadragon_normalize_settings($form_state->getValue('islandora_openseadragon_settings'));
   // Get default to match array formatting.
   $default_settings = islandora_openseadragon_default_options();
-  _islandora_openseadragon_filter_settings($form_state['values']['islandora_openseadragon_settings'], $default_settings);
+  _islandora_openseadragon_filter_settings($form_state->getValue('islandora_openseadragon_settings'), $default_settings);
 }
 
 /**
@@ -197,7 +196,7 @@ function _islandora_openseadragon_normalize_setting($value) {
     return (float) $value;
   }
   elseif (filter_var($value, FILTER_VALIDATE_URL) !== FALSE) {
-    return \Drupal\Component\Utility\Html::escape($value);
+    return Html::escape($value);
   }
   return $value;
 }

@@ -1,0 +1,7 @@
+islandora_openseadragon.admin:
+  path: '/admin/config/islandora/islandora_viewers/openseadragon'
+  defaults:
+    _title: 'OpenSeadragon'
+    _form: '\Drupal\islandora_openseadragon\Form\Admin'
+  requirements:
+    _permission: 'administer site configuration'

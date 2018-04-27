@@ -1,0 +1,22 @@
+islandora_openseadragon.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    islandora_openseadragon_settings:
+      type: sequence
+    islandora_openseadragon_tile_size:
+      type: integer
+    islandora_openseadragon_tile_overlap:
+      type: integer
+    islandora_openseadragon_fit_to_aspect_ratio:
+      type: boolean
+    islandora_openseadragon_tilesource:
+      type: string
+    islandora_openseadragon_djatoka_url:
+      type: string
+    islandora_openseadragon_iiif_url:
+      type: string
+    islandora_openseadragon_iiif_token_header:
+      type: boolean
+    islandora_openseadragon_iiif_identifier:
+      type: string

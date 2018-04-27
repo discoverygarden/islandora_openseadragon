@@ -47,24 +47,19 @@ class Admin extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    module_load_include('inc', 'islandora', 'includes/utilities');
-    module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
+    $form_state->loadInclude('islandora', 'inc', 'includes/utilities');
+    $form_state->loadInclude('islandora_openseadragon', 'inc', 'includes/utilities');
+    $form_state->loadInclude('islandora_openseadragon', 'inc', 'includes/admin.form');
+
     $settings = islandora_openseadragon_get_settings(FALSE);
     $version = islandora_openseadragon_get_installed_version();
-    $djatoka_url = islandora_system_settings_form_default_value('islandora_openseadragon_djatoka_url', 'adore-djatoka/resolver', $form_state);
-    $iiif_url = islandora_system_settings_form_default_value('islandora_openseadragon_iiif_url', 'iiif', $form_state);
-    // @FIXME
-    // Could not extract the default value because it is either indeterminate, or
-    // not scalar. You'll need to provide a default value in
-    // config/install/islandora_openseadragon.settings.yml and config/schema/islandora_openseadragon.schema.yml.
-    // @FIXME
-    // theme() has been renamed to _theme() and should NEVER be called directly.
-    // Calling _theme() directly can alter the expected output and potentially
-    // introduce security issues (see https://www.drupal.org/node/2195739). You
-    // should use renderable arrays instead.
-    //
-    //
-    // @see https://www.drupal.org/node/2195739
+    $djatoka_url = $form_state->getValue('islandora_openseadragon_djatoka_url') ?
+      $form_state->getValue('islandora_openseadragon_djatoka_url') :
+      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url');
+    $iiif_url = $form_state->getValue('islandora_openseadragon_iiif_url') ?
+      $form_state->getValue('islandora_openseadragon_iiif_url') :
+      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url');
+
     $form = [
       'islandora_openseadragon_tilesource' => [
         '#type' => 'select',
@@ -79,7 +74,7 @@ class Admin extends ConfigFormBase {
       'islandora_openseadragon_fit_to_aspect_ratio' => [
         '#type' => 'checkbox',
         '#title' => $this->t('Constrain image to viewport'),
-        '#default_value' => islandora_system_settings_form_default_value('islandora_openseadragon_fit_to_aspect_ratio', FALSE, $form_state),
+        '#default_value' => $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_fit_to_aspect_ratio'),
         '#description' => $this->t('On the initial page load, the entire image will be visible in the viewport.'),
       ],
       'djatoka' => [
@@ -92,18 +87,18 @@ class Admin extends ConfigFormBase {
           ],
         ],
         'islandora_openseadragon_djatoka_url' => [
+          '#type' => 'textfield',
           '#prefix' => '<div id="islandora-openseadragon-djatoka-path-wrapper">',
           '#suffix' => '</div>',
-          '#type' => 'textfield',
           '#title' => $this->t('Adore-Djatoka Image Server Base URL'),
           '#title_display' => 'invisible',
           '#default_value' => $djatoka_url,
-          '#description' => $this->t('The location of the Adore-Djatoka server OpenURL resolver. <br/> !confirmation_message', [
-            '!confirmation_message' => islandora_openseadragon_admin_form_djatoka_access_message($djatoka_url),
-          ]),
+          '#description' => $this->t('The location of the Adore-Djatoka server OpenURL resolver. <br/>')
+          . islandora_openseadragon_admin_form_djatoka_access_message($djatoka_url),
           '#ajax' => [
             'callback' => 'islandora_openseadragon_admin_ajax_djatoka_url',
             'wrapper' => 'islandora-openseadragon-djatoka-path-wrapper',
+            'disable-refocus' => TRUE,
           ],
         ],
       ],
@@ -142,10 +137,11 @@ class Admin extends ConfigFormBase {
           '#title' => $this->t('Replacement patterns'),
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
-          '#description' => theme('token_tree', [
-            'token_types' => ['islandora_openseadragon'],
-            'global_types' => FALSE,
-          ]),
+          '#description' => [
+            '#theme' => 'token_tree',
+            '#token_types' => ['islandora_openseadragon'],
+            '#global_types' => FALSE,
+          ],
         ],
       ],
       'tilesource' => [
@@ -153,18 +149,16 @@ class Admin extends ConfigFormBase {
         '#title' => $this->t('Open Seadragon Tile Source settings'),
         '#description' => $this->t('<p>These settings will apply to all tile sources globally. See the <a href="https://openseadragon.github.io/docs/OpenSeadragon.TileSource.html#TileSource">documentation</a> for more details.</p>'),
         'islandora_openseadragon_tile_size' => [
-          '#type' => 'textfield',
+          '#type' => 'number',
           '#title' => $this->t('Tile Size'),
           '#default_value' => $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_size'),
-          '#element_validate' => ['element_validate_number'],
           '#size' => 10,
           '#description' => $this->t('The size of the tiles to assumed to make up each pyramid layer in pixels. Tile size determines the point at which the image pyramid must be divided into a matrix of smaller images.'),
         ],
         'islandora_openseadragon_tile_overlap' => [
-          '#type' => 'textfield',
+          '#type' => 'number',
           '#title' => $this->t('Tile Overlap'),
           '#default_value' => $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
-          '#element_validate' => ['element_validate_number'],
           '#size' => 10,
           '#description' => $this->t('The number of pixels each tile is expected to overlap touching tiles.'),
         ],
@@ -182,10 +176,9 @@ class Admin extends ConfigFormBase {
           // We don't provide "element" as configurable to users.
           // We don't provide "tileSources" as configurable to users.
           'tabIndex' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Tab Index'),
             '#default_value' => $settings['tabIndex'],
-            '#element_validate' => ['element_validate_number'],
             '#size' => 10,
             '#description' => $this->t('Tabbing order index to assign to the viewer element. Positive values are selected in increasing order. When tabIndex is 0 source order is used. A negative value omits the viewer from the tabbing order.'),
           ],
@@ -202,10 +195,9 @@ class Admin extends ConfigFormBase {
             '#description' => $this->t('Color of the grid in debug mode.'),
           ],
           'blendTime' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Blend time'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['blendTime'],
             '#description' => $this->t('Specifies the duration of animation as higher or lower level tiles are replacing the existing tile.'),
           ],
@@ -228,18 +220,16 @@ class Admin extends ConfigFormBase {
             '#description' => $this->t('Render the best closest level first, ignoring the lowering levels which provide the effect of very blurry to sharp. It is recommended to change setting to true for mobile devices.'),
           ],
           'defaultZoomLevel' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Default zoom level'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['defaultZoomLevel'],
             '#description' => $this->t('Zoom level to use when image is first opened or the home button is clicked. If 0, adjusts to fit viewer.'),
           ],
           'opacity' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Opacity'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['opacity'],
             '#description' => $this->t('Default opacity of the tiled images (1=opaque, 0=transparent)'),
           ],
@@ -262,7 +252,7 @@ class Admin extends ConfigFormBase {
               'copy',
               'xor',
             ], [
-              NULL,
+              '',
               'source-over',
               'source-atop',
               'source-in',
@@ -283,26 +273,23 @@ class Admin extends ConfigFormBase {
             '#description' => $this->t('Draws a colored rectangle behind the tile if it is not loaded yet. You can pass a CSS color value like "#FF8800".'),
           ],
           'degrees' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Initial Rotation'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['degrees'],
             '#description' => $this->t('Initial rotation in degrees.'),
           ],
           'minZoomLevel' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Minimum Zoom Level'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['minZoomLevel'],
             '#description' => $this->t('Minimum Zoom Level (integer).'),
           ],
           'maxZoomLevel' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Maximum Zoom Level'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['maxZoomLevel'],
             '#description' => $this->t('Maximum Zoom Level (integer).'),
           ],
@@ -343,25 +330,25 @@ class Admin extends ConfigFormBase {
           ],
           'minZoomImageRatio' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Minimum zoom image ratio'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['minZoomImageRatio'],
             '#description' => $this->t('The minimum percentage ( expressed as a number between 0 and 1 ) of the viewport height or width at which the zoom out will be constrained. Setting it to 0, for example will allow you to zoom out infinity.'),
           ],
           'maxZoomPixelRatio' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Maximum zoom pixel ratio'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['maxZoomPixelRatio'],
             '#description' => $this->t('The maximum ratio to allow a zoom-in to affect the highest level pixel ratio. This can be set to Infinity to allow "infinite" zooming into the image though it is less effective visually if the HTML5 Canvas is not available on the viewing device.'),
           ],
           'smoothTileEdgesMinZoom' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Smooth Tile Edges Minimum Zoom'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['smoothTileEdgesMinZoom'],
             '#description' => $this->t('A zoom percentage ( where 1 is 100% ) of the highest resolution level. When zoomed in beyond this value alternative compositing will be used to smooth out the edges between tiles. This will have a performance impact. Can be set to Infinity to turn it off. Note: This setting is ignored on iOS devices due to a known bug (See <a href="https://github.com/openseadragon/openseadragon/issues/952">https://github.com/openseadragon/openseadragon/issues/952</a>).'),
           ],
@@ -379,82 +366,75 @@ class Admin extends ConfigFormBase {
             '#description' => $this->t('Set to true to have the image size preserved when the viewer is re-sized. This requires Auto Resize to be enabled (default).'),
           ],
           'minScrollDeltaTime' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Minimum Scroll Delta Time'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['minScrollDeltaTime'],
             '#description' => $this->t('Number of milliseconds between canvas-scroll events. This value helps normalize the rate of canvas-scroll events between different devices, causing the faster devices to slow down enough to make the zoom control more manageable.'),
           ],
           'pixelsPerWheelLine' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Pixels Per Wheel Line'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['pixelsPerWheelLine'],
             '#description' => $this->t('For pixel-resolution scrolling devices, the number of pixels equal to one scroll line.'),
           ],
           'visibilityRatio' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Visibility ratio'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['visibilityRatio'],
             '#description' => $this->t("The percentage ( as a number from 0 to 1 ) of the source image which must be kept within the viewport. If the image is dragged beyond that limit, it will 'bounce' back until the minimum visibility ratio is achieved. Setting this to 0 and wrapHorizontal ( or wrapVertical ) to true will provide the effect of an infinitely scrolling viewport."),
           ],
           'imageLoaderLimit' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Image loader limit'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['imageLoaderLimit'],
             '#description' => $this->t('The maximum number of image requests to make concurrently. By default it is set to 0 allowing the browser to make the maximum number of image requests in parallel as allowed by the browsers policy.'),
           ],
           'clickTimeThreshold' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Click time threshold'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['clickTimeThreshold'],
             '#description' => $this->t('The number of milliseconds within which a pointer down-up event combination will be treated as a click gesture.'),
           ],
           'clickDistThreshold' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Click distance threshold'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['clickDistThreshold'],
             '#description' => $this->t('The maximum distance allowed between a pointer down event and a pointer up event to be treated as a click gesture.'),
           ],
           'dblClickTimeThreshold' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Double click distance threshold'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['dblClickTimeThreshold'],
             '#description' => $this->t('The number of milliseconds within which two pointer down-up event combinations will be treated as a double-click gesture.'),
           ],
           'dblClickDistThreshold' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Double click distance threshold'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['dblClickDistThreshold'],
             '#description' => $this->t('The maximum distance allowed between two pointer click events to be treated as a double-click gesture.'),
           ],
           'springStiffness' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Spring stiffness'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['springStiffness'],
             '#description' => $this->t('Determines how sharply the springs used for animations move.'),
           ],
           'animationTime' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Animation time'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['animationTime'],
             '#description' => $this->t('Specifies the animation duration per each OpenSeadragon.Spring which occur when the image is dragged or zoomed.'),
           ],
@@ -495,18 +475,17 @@ class Admin extends ConfigFormBase {
               '#description' => $this->t('Enable flick gesture.'),
             ],
             'flickMinSpeed' => [
-              '#type' => 'textfield',
+              '#type' => 'number',
               '#title' => $this->t('Flick Minimum Speed'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsMouse']['flickMinSpeed'],
               '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
             ],
             'flickMomentum' => [
               '#type' => 'textfield',
+              '#element_validate' => ['::validateNumber'],
               '#title' => $this->t('Flick Momentum'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsMouse']['flickMomentum'],
               '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
             ],
@@ -554,18 +533,17 @@ class Admin extends ConfigFormBase {
               '#description' => $this->t('Enable flick gesture.'),
             ],
             'flickMinSpeed' => [
-              '#type' => 'textfield',
+              '#type' => 'number',
               '#title' => $this->t('Flick Minimum Speed'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsTouch']['flickMinSpeed'],
               '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
             ],
             'flickMomentum' => [
               '#type' => 'textfield',
+              '#element_validate' => ['::validateNumber'],
               '#title' => $this->t('Flick Momentum'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsTouch']['flickMomentum'],
               '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
             ],
@@ -613,18 +591,17 @@ class Admin extends ConfigFormBase {
               '#description' => $this->t('Enable flick gesture.'),
             ],
             'flickMinSpeed' => [
-              '#type' => 'textfield',
+              '#type' => 'number',
               '#title' => $this->t('Flick Minimum Speed'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsPen']['flickMinSpeed'],
               '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
             ],
             'flickMomentum' => [
               '#type' => 'textfield',
+              '#element_validate' => ['::validateNumber'],
               '#title' => $this->t('Flick Momentum'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsPen']['flickMomentum'],
               '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
             ],
@@ -672,18 +649,17 @@ class Admin extends ConfigFormBase {
               '#description' => $this->t('Enable flick gesture.'),
             ],
             'flickMinSpeed' => [
-              '#type' => 'textfield',
+              '#type' => 'number',
               '#title' => $this->t('Flick Minimum Speed'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsUnknown']['flickMinSpeed'],
               '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
             ],
             'flickMomentum' => [
               '#type' => 'textfield',
+              '#element_validate' => ['::validateNumber'],
               '#title' => $this->t('Flick Momentum'),
               '#size' => 10,
-              '#element_validate' => ['element_validate_number'],
               '#default_value' => $settings['gestureSettingsPen']['flickMomentum'],
               '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
             ],
@@ -695,26 +671,24 @@ class Admin extends ConfigFormBase {
             ],
           ],
           'zoomPerClick' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Zoom per click'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['zoomPerClick'],
             '#description' => $this->t('The "zoom distance" per mouse click or touch tap. Note: Setting this to 1.0 effectively disables the click-to-zoom feature (also see gestureSettings[Mouse|Touch|Pen].clickToZoom/dblClickToZoom).'),
           ],
           'zoomPerScroll' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Zoom per scroll'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['zoomPerScroll'],
             '#description' => $this->t('The "zoom distance" per mouse scroll or touch pinch. Note: Setting this to 1.0 effectively disables the mouse-wheel zoom feature (also see gestureSettings[Mouse|Touch|Pen].scrollToZoom}).'),
           ],
           'zoomPerSecond' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Zoom per second'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['zoomPerSecond'],
             '#description' => $this->t('The number of seconds to animate a single zoom event over.'),
           ],
@@ -756,9 +730,9 @@ class Admin extends ConfigFormBase {
               ],
               'navigatorSizeRatio' => [
                 '#type' => 'textfield',
+                '#element_validate' => ['::validateNumber'],
                 '#title' => $this->t('Navigator Size Ratio'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['navigatorSizeRatio'],
                 '#description' => $this->t('Ratio of navigator size to viewer size. Ignored if navigator[Height|Width] are specified.'),
               ],
@@ -769,34 +743,30 @@ class Admin extends ConfigFormBase {
                 '#description' => $this->t('If true, the navigator minimap is resized (using navigatorSizeRatio) when the viewer size changes.'),
               ],
               'navigatorTop' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Navigator Top Position'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['navigatorTop'],
                 '#description' => $this->t('Specifies the location of the navigator minimap (see Navigator Position).'),
               ],
               'navigatorLeft' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Navigator Left Position'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['navigatorLeft'],
                 '#description' => $this->t('Specifies the location of the navigator minimap (see Navigator Position).'),
               ],
               'navigatorHeight' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Navigator Height'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['navigatorHeight'],
                 '#description' => $this->t('Specifies the size of the navigator minimap (see Navigator Position). If specified, Navigator Size Ratio and Navigator Maintain Size Ratio are ignored.'),
               ],
               'navigatorWidth' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Navigator Width'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['navigatorWidth'],
                 '#description' => $this->t('Specifies the size of the navigator minimap (see Navigator Position). If specified, Navigator Size Ratio and Navigator Maintain Size Ratio are ignored.'),
               ],
@@ -827,42 +797,37 @@ class Admin extends ConfigFormBase {
             ],
           ],
           'controlsFadeDelay' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Controls Fade Delay'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['controlsFadeDelay'],
             '#description' => $this->t('The number of milliseconds to wait once the user has stopped interacting with the interface before begining to fade the controls. Assumes showNavigationControl and autoHideControls are both true.'),
           ],
           'controlsFadeLength' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Controls Fade Length'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['controlsFadeLength'],
             '#description' => $this->t('The number of milliseconds to animate the controls fading out.'),
           ],
           'controlsFadeDelay' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Controls Fade Delay'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['controlsFadeDelay'],
             '#description' => $this->t('The number of milliseconds to wait once the user has stopped interacting with the interface before begining to fade the controls. Assumes showNavigationControl and autoHideControls are both true.'),
           ],
           'maxImageCacheCount' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('Controls Fade Delay'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['maxImageCacheCount'],
             '#description' => $this->t('The max number of images we should keep in memory (per drawer).'),
           ],
           'timeout' => [
-            '#type' => 'textfield',
+            '#type' => 'number',
             '#title' => $this->t('timeout'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['timeout'],
           ],
           'useCanvas' => [
@@ -873,9 +838,9 @@ class Admin extends ConfigFormBase {
           ],
           'minPixelRatio' => [
             '#type' => 'textfield',
+            '#element_validate' => ['::validateNumber'],
             '#title' => $this->t('Minimum Pixel Ratio'),
             '#size' => 10,
-            '#element_validate' => ['element_validate_number'],
             '#default_value' => $settings['minPixelRatio'],
             '#description' => $this->t('The higher the minPixelRatio, the lower the quality of the image that is considered sufficient to stop rendering a given zoom level. For example, if you are targeting mobile devices with less bandwith you may try setting this to 1.5 or higher.'),
           ],
@@ -1037,18 +1002,16 @@ class Admin extends ConfigFormBase {
                 // We don't provide "referenceStripElement" as configurable
                 // to users.
                 'referenceStripHeight' => [
-                  '#type' => 'textfield',
+                  '#type' => 'number',
                   '#title' => $this->t('Reference Strip Height'),
                   '#size' => 10,
-                  '#element_validate' => ['element_validate_number'],
                   '#default_value' => $settings['referenceStripHeight'],
                   '#description' => $this->t('Height of the reference strip in pixels.'),
                 ],
                 'referenceStripWidth' => [
-                  '#type' => 'textfield',
+                  '#type' => 'number',
                   '#title' => $this->t('Reference Strip Width'),
                   '#size' => 10,
-                  '#element_validate' => ['element_validate_number'],
                   '#default_value' => $settings['referenceStripWidth'],
                   '#description' => $this->t('Width of the reference strip in pixels.'),
                 ],
@@ -1071,9 +1034,9 @@ class Admin extends ConfigFormBase {
                 ],
                 'referenceStripSizeRatio' => [
                   '#type' => 'textfield',
+                  '#element_validate' => ['::validateNumber'],
                   '#title' => $this->t('Reference Strip Size Ratio'),
                   '#size' => 10,
-                  '#element_validate' => ['element_validate_number'],
                   '#default_value' => $settings['referenceStripSizeRatio'],
                   '#description' => $this->t('Ratio of reference strip size to viewer size.'),
                 ],
@@ -1097,18 +1060,16 @@ class Admin extends ConfigFormBase {
                 ],
               ],
               'collectionRows' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Collection Rows'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['collectionRows'],
                 '#description' => $this->t('If collectionMode is true, specifies how many rows the grid should have. Use 1 to make a line. If collectionLayout is "vertical", specifies how many columns instead.'),
               ],
               'collectionColumns' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Collection Columns'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['collectionColumns'],
                 '#description' => $this->t('If collectionMode is true, specifies how many columns the grid should have. Use 1 to make a line. If collectionLayout is "vertical", specifies how many rows instead. Ignored if collectionRows is not set to a falsy value.'),
               ],
@@ -1133,10 +1094,9 @@ class Admin extends ConfigFormBase {
                 '#description' => $this->t('If collectionMode is true, specifies the size, in viewport coordinates, for each TiledImage to fit into. The TiledImage will be centered within a square of the specified size.'),
               ],
               'collectionTileMargin' => [
-                '#type' => 'textfield',
+                '#type' => 'number',
                 '#title' => $this->t('Collection Tile Margin'),
                 '#size' => 10,
-                '#element_validate' => ['element_validate_number'],
                 '#default_value' => $settings['collectionTileMargin'],
                 '#description' => $this->t('If collectionMode is true, specifies the margin, in viewport coordinates, between each TiledImage.'),
               ],
@@ -1168,6 +1128,18 @@ class Admin extends ConfigFormBase {
     if ($form_state->getValue(['islandora_openseadragon_tilesource']) == 'djatoka') {
       $element = $form['djatoka']['islandora_openseadragon_djatoka_url'];
       islandora_openseadragon_djatoka_url_validate($element, $form_state, $form);
+    }
+  }
+
+  /**
+   * Validate numbers, number type fails on decimals.
+   */
+  public function validateNumber(array &$element, FormStateInterface $form_state) {
+    $value = $element['#value'];
+    if ($value != '' && !is_numeric($value)) {
+      $form_state->setError($element, $this->t('%name must be a number.', [
+        '%name' => $element['#title'],
+      ]));
     }
   }
 
