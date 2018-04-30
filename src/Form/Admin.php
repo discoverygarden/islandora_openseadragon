@@ -45,17 +45,16 @@ class Admin extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = $this->config('islandora_openseadragon.settings');
-
-    foreach (Element::children($form) as $variable) {
-      $config->set($variable, $form_state->getValue($form[$variable]['#parents']));
-    }
+    $config->set('islandora_openseadragon_settings', $form_state->getValue('islandora_openseadragon_settings'));
+    $config->set('islandora_openseadragon_tile_size', $form_state->getValue('islandora_openseadragon_tile_size'));
+    $config->set('islandora_openseadragon_tile_overlap', $form_state->getValue('islandora_openseadragon_tile_overlap'));
+    $config->set('islandora_openseadragon_fit_to_aspect_ratio', $form_state->getValue('islandora_openseadragon_fit_to_aspect_ratio'));
+    $config->set('islandora_openseadragon_tilesource', $form_state->getValue('islandora_openseadragon_tilesource'));
+    $config->set('islandora_openseadragon_djatoka_url', $form_state->getValue('islandora_openseadragon_djatoka_url'));
+    $config->set('islandora_openseadragon_iiif_url', $form_state->getValue('islandora_openseadragon_iiif_url'));
+    $config->set('islandora_openseadragon_iiif_token_header', $form_state->getValue('islandora_openseadragon_iiif_token_header'));
+    $config->set('islandora_openseadragon_iiif_identifier', $form_state->getValue('islandora_openseadragon_iiif_identifier'));
     $config->save();
-
-    if (method_exists($this, '_submitForm')) {
-      $this->_submitForm($form, $form_state);
-    }
-
-    parent::submitForm($form, $form_state);
   }
 
   /**
