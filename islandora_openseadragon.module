@@ -5,6 +5,8 @@
  * Hooks and callbacks for this module.
  */
 
+use Drupal\Core\Url;
+
 // @codingStandardsIgnoreStart
 const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
 const ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE = 256;
@@ -239,11 +241,10 @@ function islandora_openseadragon_tokens($type, $tokens, array $data = [], array 
           'token' => $token,
         ];
       }
-
-      // @FIXME
-// url() expects a route name or an external URI.
-// $replacements[$original] = url("islandora/object/{$pid}/datastream/{$dsid}/view", $options);
-
+      $replacements[$original] = Url::fromRoute(
+        'islandora.view_datastream',
+        ['object' => $pid, 'datastream' => $dsid]
+      );
     }
   }
 

@@ -6,10 +6,32 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Drupal\token\TreeBuilderInterface;
+
 /**
  * Module administration form.
  */
 class Admin extends ConfigFormBase {
+
+  protected $treeBuilder;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct(TreeBuilderInterface $tree_builder) {
+    $this->treeBuilder = $tree_builder;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('token.tree_builder')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -59,6 +81,11 @@ class Admin extends ConfigFormBase {
     $iiif_url = $form_state->getValue('islandora_openseadragon_iiif_url') ?
       $form_state->getValue('islandora_openseadragon_iiif_url') :
       $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url');
+    $token_tree = [
+      'islandora_openseadragon' => [
+        'tokens' => $this->treeBuilder->buildTree('islandora_openseadragon', []),
+      ],
+    ];
 
     $form = [
       'islandora_openseadragon_tilesource' => [
@@ -137,6 +164,10 @@ class Admin extends ConfigFormBase {
           '#title' => $this->t('Replacement patterns'),
           '#collapsible' => TRUE,
           '#collapsed' => TRUE,
+          'tokens' => [
+            '#type' => 'token_tree_table',
+            '#token_tree' => $token_tree,
+          ],
           '#description' => [
             '#theme' => 'token_tree',
             '#token_types' => ['islandora_openseadragon'],
