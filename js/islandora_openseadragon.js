@@ -3,7 +3,7 @@
  * Displays OpenSeadragon viewer.
  */
 
-(function ($) {
+(function ($, Drupal) {
   'use strict';
 
   /**
@@ -21,7 +21,7 @@
       // Use custom element #id if set.
       base = '#' + settings.islandoraOpenSeadragon.options.id;
       if (Drupal.IslandoraOpenSeadragonViewer[base] === undefined) {
-        $(base, document).once('islandoraOpenSeadragonViewer', function () {
+        $(base, document).once('islandoraOpenSeadragonViewer').each(function () {
           Drupal.IslandoraOpenSeadragonViewer[base] = new Drupal.IslandoraOpenSeadragonViewer(base, settings.islandoraOpenSeadragon);
         });
       }
@@ -49,7 +49,7 @@
    */
   Drupal.IslandoraOpenSeadragonViewer = function (base, settings) {
     var viewer = new OpenSeadragon(settings.options);
-    Drupal.settings.islandora_open_seadragon_viewer = viewer;
+    drupalSettings.islandora_open_seadragon_viewer = viewer;
 
     var update_clip = function (event) {
       var viewer = event.eventSource;
@@ -116,7 +116,7 @@
           'size': (zoom <= 1) ? source.dimensions.x + ',' + source.dimensions.y : container.x + ',' + container.y
         };
       }
-      $("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.pid + '/print?' + $.param({
+      $("#clip").attr('href',  drupalSettings.path.baseUrl + 'islandora/object/' + settings.pid + '/print?' + $.param({
             'clip': $.param(params)
        }));
     };
@@ -137,4 +137,4 @@
     }
 
   };
-})(jQuery);
+})(jQuery, Drupal);

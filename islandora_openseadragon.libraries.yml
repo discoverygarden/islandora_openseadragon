@@ -1,0 +1,28 @@
+openseadragon:
+  version: 1.x
+  js: {}
+viewer:
+  version: 1.x
+  css:
+    base:
+      css/islandora_openseadragon.theme.css: {}
+  js:
+    js/islandora_openseadragon.js: {}
+  dependencies:
+    - islandora_openseadragon/openseadragon
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal
+djatoka-viewer:
+  version: 1.x
+  css:
+    base:
+      css/islandora_openseadragon.theme.css: {}
+  js:
+    js/djtilesource.js: {}
+    js/islandora_openseadragon.js: {}
+  dependencies:
+    - islandora_openseadragon/openseadragon
+    - core/jquery
+    - core/drupalSettings
+    - core/drupal

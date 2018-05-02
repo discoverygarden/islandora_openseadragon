@@ -9,6 +9,8 @@
  */
 
 use Drupal\Core\Url;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Get the installed version.
@@ -47,23 +49,12 @@ function islandora_openseadragon_get_installed_version() {
  */
 function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
   global $base_root;
-  // @FIXME
-// drupal_get_query_array() has been removed in favor of PHP's native parse_str(). You should
-// use that function instead and pass a destination array by reference.
-// For more information, see:
-// https://www.drupal.org/node/2079005
-// http://www.php.net/parse_str
-//
-//
-// @see https://www.drupal.org/node/2079005
-// $decoded_params = drupal_get_query_array($params);
-
+  $decoded_params = NULL;
+  parse_str($params, $decoded_params);
   if (islandora_openseadragon_use_djatoka_server()) {
-    // @FIXME
-// url() expects a route name or an external URI.
-// $djatoka_url = url(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
-//       array('absolute' => TRUE)
-//     );
+    $djatoka_url = Url::fromUri(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
+      ['absolute' => TRUE]
+    )->toString();
 
     $djatoka_params = [
       'url_ver' => 'Z39.88-2004',
@@ -89,21 +80,12 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     }
     $rft_id = $decoded_params['rft_id'];
     $path = parse_url($rft_id, PHP_URL_PATH);
-    // Replace the first left-most slash to get a more Drupal-y path to validate
-    // against.
-    $drupal_path = preg_replace('/\//', '', $path, 1);
-    // @FIXME
-// menu_get_item() has been removed. To retrieve route information, use the
-// RouteMatch object, which you can retrieve by calling \Drupal::routeMatch().
-//
-//
-// @see https://www.drupal.org/node/2203305
-// $item = menu_get_item($drupal_path);
-
-    if (!$item || $item['path'] !== 'islandora/object/%/datastream/%/view') {
+    $router = \Drupal::service('router.no_access_checks');
+    $route = $router->match($path);
+    if ($route['_route'] !== 'islandora.view_datastream') {
       return FALSE;
     }
-    $djatoka_url_params = drupal_http_build_query($djatoka_params + $allowed_djatoka_params);
+    $djatoka_url_params = UrlHelper::buildQuery($djatoka_params + $allowed_djatoka_params);
     // XXX: See if Djatoka is relative or absolute and handle accordingly.
     // Building up URL this way because may encounter a relative or absolute
     // path to Djatoka. Similarly, the built in Drupal functions such as URL
@@ -127,7 +109,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     return [
       // XXX: Using drupal_http_build_query to avoid changing the underlying
       // functionality in the solution packs that currently implement.
-      'original_params' => drupal_http_build_query($allowed_djatoka_params),
+      'original_params' => UrlHelper::buildQuery($allowed_djatoka_params),
       'image_url' => $url,
       'dimensions' => $dimensions,
     ];
@@ -139,7 +121,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     $rotation = 0;
     $format = "default.jpg";
     return [
-      'original_params' => drupal_http_build_query($decoded_params),
+      'original_params' => UrlHelper::buildQuery($decoded_params),
       'image_url' => "{$identifier}/{$region}/{$size}/{$rotation}/{$format}",
       'dimensions' => [],
     ];
@@ -183,7 +165,7 @@ function islandora_openseadragon_default_options() {
     'tileSources' => NULL,
     'tabIndex' => 0,
     'overlays' => NULL,
-    'prefixUrl' => Url::fromUri("base:{$library_path}/images/", ['absolute' => TRUE]),
+    'prefixUrl' => Url::fromUri("base:{$library_path}/images/", ['absolute' => TRUE])->toString(),
     'navImages' => NULL,
     'debugMode' => FALSE,
     'debugGridColor' => '#437AB2',
@@ -335,8 +317,7 @@ function islandora_openseadragon_default_options() {
  */
 function islandora_openseadragon_identifier_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
-
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
   switch (\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource')) {
     case 'djatoka':
       return islandora_openseadragon_djatoka_tile_source($identifier);
@@ -360,7 +341,7 @@ function islandora_openseadragon_identifier_tile_source($identifier) {
  */
 function islandora_openseadragon_datastream_tile_source(AbstractDatastream $datastream) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
   $identifier = islandora_openseadragon_identifier_url($datastream);
   return islandora_openseadragon_identifier_tile_source($identifier);
@@ -378,7 +359,7 @@ function islandora_openseadragon_datastream_tile_source(AbstractDatastream $data
  */
 function islandora_openseadragon_iiif_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
   $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
   $identifier = urlencode($identifier);
@@ -408,7 +389,7 @@ function islandora_openseadragon_iiif_tile_source($identifier) {
  */
 function islandora_openseadragon_djatoka_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
   return [
     'identifier' => $identifier,
     'width' => NULL,
@@ -431,25 +412,27 @@ function islandora_openseadragon_djatoka_tile_source($identifier) {
  */
 function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(\Drupal\Component\Utility\Xss::filter($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
   module_load_include('inc', 'islandora', 'includes/authtokens');
   $pid = $datastream->parent->id;
   $dsid = $datastream->id;
   $token = islandora_get_object_token($pid, $dsid, 2);
-  // @FIXME
-// url() expects a route name or an external URI.
-// return url("islandora/object/{$pid}/datastream/{$dsid}/view",
-//     array(
-//       'absolute' => TRUE,
-//       'query' => array(
-//         'token' => $token,
-//       ),
-//       'language' => language_default(),
-//       'https' => FALSE,
-//     )
-//   );
-
+  return Url::fromRoute(
+    'islandora.view_datastream_view',
+    [
+      'object' => $pid,
+      'datastream' => $dsid,
+    ],
+    [
+      'absolute' => TRUE,
+      'query' => [
+        'token' => $token,
+      ],
+      'language' => language_default(),
+      'https' => FALSE,
+    ]
+  )->toString();
 }
 
 /**
@@ -588,7 +571,7 @@ function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
 
   foreach ($highlighting_info as $pid => $info) {
     if (array_key_exists('snippets', $info)) {
-      foreach ($info['snippets'] as $snippet => $bounding_boxes) {
+      foreach ($info['snippets'] as $bounding_boxes) {
         foreach ($bounding_boxes as $bounding_box) {
           // The size on the x axis is used to calculate the proportional
           // values under the openseadragon coordinate system.

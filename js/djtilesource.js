@@ -3,9 +3,8 @@
  * Defines the source for exposing Djatoka to OpenSeadragon.
  */
 
-(function ($) {
+(function ($, Drupal) {
   'use strict';
-
   // Remove IIFTileSource, as it assumes Djatoka responses belong to it for some reason.
   $.IIIFTileSource = undefined;
 
@@ -111,7 +110,7 @@
      * @throws {Error}
      */
     getTileUrl: function (level, x, y) {
-      var baseURL = Drupal.settings.islandoraOpenSeadragon.djatokaServerBaseURL;
+      var baseURL = drupalSettings.islandoraOpenSeadragon.djatokaServerBaseURL;
       return baseURL + '?' + jQuery.param({
             'url_ver': 'Z39.88-2004',
             'rft_id': this.identifier,
@@ -133,11 +132,11 @@
    * @return {string} URL to fetch image meta-data from Djatoka.
    */
   function get_image_info_url(identifier) {
-    var baseURL = Drupal.settings.islandoraOpenSeadragon.djatokaServerBaseURL;
+    var baseURL = drupalSettings.islandoraOpenSeadragon.djatokaServerBaseURL;
     return baseURL + '?' + jQuery.param({
           url_ver: "Z39.88-2004",
           rft_id: identifier,
           svc_id: "info:lanl-repo/svc/getMetadata"
         });
   }
-}(OpenSeadragon));
+}(OpenSeadragon, Drupal));
