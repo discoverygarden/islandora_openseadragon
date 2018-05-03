@@ -10,7 +10,7 @@ islandora_openseadragon.download_clip:
   defaults:
     perms: 'view fedora repository objects'
     _title: 'Download Clip'
-    _form: '\Drupal\islandora_openseadragon\Form\Admin'
+    _controller: '\Drupal\islandora_openseadragon\Controller\DefaultController::downloadClip'
   requirements:
     _islandora_object_access: 'TRUE'
   options:

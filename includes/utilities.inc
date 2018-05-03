@@ -50,7 +50,12 @@ function islandora_openseadragon_get_installed_version() {
 function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
   global $base_root;
   $decoded_params = NULL;
+  // The func parse_str strips dots.
   parse_str($params, $decoded_params);
+  if (isset($decoded_params['svc_region'])) {
+    $decoded_params['svc.region'] = $decoded_params['svc_region'];
+    unset($decoded_params['svc_region']);
+  }
   if (islandora_openseadragon_use_djatoka_server()) {
     $djatoka_url = Url::fromUri(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
       ['absolute' => TRUE]
@@ -60,20 +65,14 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
       'url_ver' => 'Z39.88-2004',
       'svc_id' => 'info:lanl-repo/svc/getRegion',
       'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
-      'svc.format' => 'image/jpeg',
+      'svc_format' => 'image/jpeg',
     ];
     // Only grab the two parameters that are expected to be there, ignore
     // anything else.
-    $allowed_djatoka_param_keys = array_combine(
-      [
-        'rft_id',
-        'svc.region',
-      ],
-      [
-        'rft_id',
-        'svc.region',
-      ]
-    );
+    $allowed_djatoka_param_keys = [
+      'rft_id' => 'rft_id',
+      'svc.region' => 'svc.region',
+    ];
     $allowed_djatoka_params = array_intersect_key($decoded_params, $allowed_djatoka_param_keys);
     if (empty($allowed_djatoka_params)) {
       return FALSE;
@@ -116,7 +115,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   }
   else {
     $identifier = $decoded_params['identifier'];
-    $region = $decoded_params['region'];
+    $region = $decoded_params['svc.region'];
     $size = $decoded_params['size'];
     $rotation = 0;
     $format = "default.jpg";

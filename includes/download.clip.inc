@@ -5,6 +5,8 @@
  * Defines menu callback for downloading a clip of the given image.
  */
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 /**
  * Menu callback downloads the given clip.
  *
@@ -23,17 +25,18 @@ function islandora_openseadragon_download_clip(AbstractObject $object) {
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
       curl_setopt($ch, CURLOPT_HEADER, 0);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_URL, $clip_parts['image_url']);
-      curl_exec($ch);
+      $return = curl_exec($ch);
       curl_close($ch);
     }
     else {
-      drupal_access_denied();
       \Drupal::logger('islandora_openseadragon')->notice('Invalid parameters specified for downloading of a clip for @pid. Parameters attempted: @params.', [
         '@pid' => $object->id,
         '@params' => $_GET['clip'],
       ]);
+      throw new NotFoundHttpException();
     }
   }
-  drupal_exit();
+  return $return;
 }
