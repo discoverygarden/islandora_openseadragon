@@ -8,6 +8,10 @@
  *   The version string, or NULL if we couldn't find it.
  */
 
+use Drupal\Core\Url;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
+
 /**
  * Get the installed version.
  */
@@ -17,7 +21,7 @@ function islandora_openseadragon_get_installed_version() {
   if ($version === NULL) {
     $path = libraries_get_path('openseadragon');
     $openseadragon_js = file_get_contents("$path/openseadragon.js");
-    $matches = array();
+    $matches = [];
     $count = preg_match('/@version\s+OpenSeadragon\s+((\d+\.){2}\d+)/i', $openseadragon_js, $matches);
     if ($count) {
       $version = $matches[1];
@@ -45,37 +49,42 @@ function islandora_openseadragon_get_installed_version() {
  */
 function islandora_openseadragon_construct_clip_url($params, $download = FALSE) {
   global $base_root;
-  $decoded_params = drupal_get_query_array($params);
+  $decoded_params = NULL;
+  // The func parse_str strips dots.
+  parse_str($params, $decoded_params);
+  if (isset($decoded_params['svc_region'])) {
+    $decoded_params['svc.region'] = $decoded_params['svc_region'];
+    unset($decoded_params['svc_region']);
+  }
   if (islandora_openseadragon_use_djatoka_server()) {
-    $djatoka_url = url(variable_get('islandora_openseadragon_djatoka_url', 'adore-djatoka/resolver'),
-      array('absolute' => TRUE)
-    );
-    $djatoka_params = array(
+    $djatoka_url = Url::fromUri(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
+      ['absolute' => TRUE]
+    )->toString();
+
+    $djatoka_params = [
       'url_ver' => 'Z39.88-2004',
       'svc_id' => 'info:lanl-repo/svc/getRegion',
       'svc_val_fmt' => 'info:ofi/fmt:kev:mtx:jpeg2000',
-      'svc.format' => 'image/jpeg',
-    );
+      'svc_format' => 'image/jpeg',
+    ];
     // Only grab the two parameters that are expected to be there, ignore
     // anything else.
-    $allowed_djatoka_param_keys = drupal_map_assoc(array(
-      'rft_id',
-      'svc.region',
-    ));
+    $allowed_djatoka_param_keys = [
+      'rft_id' => 'rft_id',
+      'svc.region' => 'svc.region',
+    ];
     $allowed_djatoka_params = array_intersect_key($decoded_params, $allowed_djatoka_param_keys);
     if (empty($allowed_djatoka_params)) {
       return FALSE;
     }
     $rft_id = $decoded_params['rft_id'];
     $path = parse_url($rft_id, PHP_URL_PATH);
-    // Replace the first left-most slash to get a more Drupal-y path to validate
-    // against.
-    $drupal_path = preg_replace('/\//', '', $path, 1);
-    $item = menu_get_item($drupal_path);
-    if (!$item || $item['path'] !== 'islandora/object/%/datastream/%/view') {
+    $router = \Drupal::service('router.no_access_checks');
+    $route = $router->match($path);
+    if ($route['_route'] !== 'islandora.view_datastream') {
       return FALSE;
     }
-    $djatoka_url_params = drupal_http_build_query($djatoka_params + $allowed_djatoka_params);
+    $djatoka_url_params = UrlHelper::buildQuery($djatoka_params + $allowed_djatoka_params);
     // XXX: See if Djatoka is relative or absolute and handle accordingly.
     // Building up URL this way because may encounter a relative or absolute
     // path to Djatoka. Similarly, the built in Drupal functions such as URL
@@ -88,33 +97,33 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     else {
       $url = "{$base_root}{$djatoka_url}?$djatoka_url_params";
     }
-    $dimensions = array();
+    $dimensions = [];
     if (isset($decoded_params['dimensions'])) {
       $dimensions = explode(',', $decoded_params['dimensions']);
-      $dimensions = array(
+      $dimensions = [
         'width' => $dimensions[0],
         'height' => $dimensions[1],
-      );
+      ];
     }
-    return array(
+    return [
       // XXX: Using drupal_http_build_query to avoid changing the underlying
       // functionality in the solution packs that currently implement.
-      'original_params' => drupal_http_build_query($allowed_djatoka_params),
+      'original_params' => UrlHelper::buildQuery($allowed_djatoka_params),
       'image_url' => $url,
       'dimensions' => $dimensions,
-    );
+    ];
   }
   else {
     $identifier = $decoded_params['identifier'];
-    $region = $decoded_params['region'];
+    $region = $decoded_params['svc.region'];
     $size = $decoded_params['size'];
     $rotation = 0;
     $format = "default.jpg";
-    return array(
-      'original_params' => drupal_http_build_query($decoded_params),
+    return [
+      'original_params' => UrlHelper::buildQuery($decoded_params),
       'image_url' => "{$identifier}/{$region}/{$size}/{$rotation}/{$format}",
-      'dimensions' => array(),
-    );
+      'dimensions' => [],
+    ];
   }
 }
 
@@ -128,7 +137,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
  *   Configuration options for OpenSeadragon.
  */
 function islandora_openseadragon_get_settings($filter_null = TRUE) {
-  $settings = variable_get('islandora_openseadragon_settings', array()) + islandora_openseadragon_default_options();
+  $settings = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_settings') + islandora_openseadragon_default_options();
   // We have to filter NULL values, to prevent issues with javascript.
   $is_not_null = function ($val) {
     return !is_null($val);
@@ -149,13 +158,13 @@ function islandora_openseadragon_get_settings($filter_null = TRUE) {
  */
 function islandora_openseadragon_default_options() {
   $library_path = libraries_get_path('openseadragon');
-  $defaults = array(
+  $defaults = [
     'id' => 'islandora-openseadragon',
     'element' => NULL,
     'tileSources' => NULL,
     'tabIndex' => 0,
     'overlays' => NULL,
-    'prefixUrl' => url("{$library_path}/images/", array('absolute' => TRUE)),
+    'prefixUrl' => Url::fromUri("base:{$library_path}/images/", ['absolute' => TRUE])->toString(),
     'navImages' => NULL,
     'debugMode' => FALSE,
     'debugGridColor' => '#437AB2',
@@ -193,7 +202,7 @@ function islandora_openseadragon_default_options() {
     'dblClickDistThreshold' => 20,
     'springStiffness' => 6.5,
     'animationTime' => 1.2,
-    'gestureSettingsMouse' => array(
+    'gestureSettingsMouse' => [
       'scrollToZoom' => TRUE,
       'clickToZoom' => TRUE,
       'dblClickToZoom' => FALSE,
@@ -202,8 +211,8 @@ function islandora_openseadragon_default_options() {
       'flickMinSpeed' => 120,
       'flickMomentum' => 0.25,
       'pinchRotate' => FALSE,
-    ),
-    'gestureSettingsTouch' => array(
+    ],
+    'gestureSettingsTouch' => [
       'scrollToZoom' => FALSE,
       'clickToZoom' => FALSE,
       'dblClickToZoom' => TRUE,
@@ -212,8 +221,8 @@ function islandora_openseadragon_default_options() {
       'flickMinSpeed' => 120,
       'flickMomentum' => 0.25,
       'pinchRotate' => FALSE,
-    ),
-    'gestureSettingsPen' => array(
+    ],
+    'gestureSettingsPen' => [
       'scrollToZoom' => FALSE,
       'clickToZoom' => TRUE,
       'dblClickToZoom' => FALSE,
@@ -222,8 +231,8 @@ function islandora_openseadragon_default_options() {
       'flickMinSpeed' => 120,
       'flickMomentum' => 0.25,
       'pinchRotate' => FALSE,
-    ),
-    'gestureSettingsUnknown' => array(
+    ],
+    'gestureSettingsUnknown' => [
       'scrollToZoom' => TRUE,
       'clickToZoom' => FALSE,
       'dblClickToZoom' => TRUE,
@@ -232,7 +241,7 @@ function islandora_openseadragon_default_options() {
       'flickMinSpeed' => 120,
       'flickMomentum' => 0.25,
       'pinchRotate' => FALSE,
-    ),
+    ],
     'zoomPerClick' => 2.0,
     'zoomPerScroll' => 1.2,
     'zoomPerSecond' => 1.0,
@@ -291,7 +300,8 @@ function islandora_openseadragon_default_options() {
     'collectionTileMargin' => 80,
     'crossOriginPolicy' => FALSE,
     'ajaxWithCredentials' => FALSE,
-  );
+  ];
+
   return $defaults;
 }
 
@@ -306,9 +316,8 @@ function islandora_openseadragon_default_options() {
  */
 function islandora_openseadragon_identifier_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
-
-  switch (variable_get('islandora_openseadragon_tilesource', 'djatoka')) {
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
+  switch (\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource')) {
     case 'djatoka':
       return islandora_openseadragon_djatoka_tile_source($identifier);
 
@@ -316,7 +325,7 @@ function islandora_openseadragon_identifier_tile_source($identifier) {
       return islandora_openseadragon_iiif_tile_source($identifier);
 
     default;
-      return array();
+      return [];
   }
 }
 
@@ -331,7 +340,7 @@ function islandora_openseadragon_identifier_tile_source($identifier) {
  */
 function islandora_openseadragon_datastream_tile_source(AbstractDatastream $datastream) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
   $identifier = islandora_openseadragon_identifier_url($datastream);
   return islandora_openseadragon_identifier_tile_source($identifier);
@@ -349,9 +358,9 @@ function islandora_openseadragon_datastream_tile_source(AbstractDatastream $data
  */
 function islandora_openseadragon_iiif_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
-  $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
+  $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
   $identifier = urlencode($identifier);
   return file_create_url("$base_url/$identifier");
 }
@@ -379,17 +388,16 @@ function islandora_openseadragon_iiif_tile_source($identifier) {
  */
 function islandora_openseadragon_djatoka_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
-
-  return array(
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
+  return [
     'identifier' => $identifier,
     'width' => NULL,
     'height' => NULL,
-    'tileSize' => variable_get('islandora_openseadragon_tile_size', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE),
-    'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP),
+    'tileSize' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_size'),
+    'tileOverlap' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
     'minLevel' => NULL,
     'maxLevel' => NULL,
-  );
+  ];
 }
 
 /**
@@ -403,22 +411,27 @@ function islandora_openseadragon_djatoka_tile_source($identifier) {
  */
 function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
-  trigger_error(filter_xss($message), E_USER_DEPRECATED);
+  trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
   module_load_include('inc', 'islandora', 'includes/authtokens');
   $pid = $datastream->parent->id;
   $dsid = $datastream->id;
   $token = islandora_get_object_token($pid, $dsid, 2);
-  return url("islandora/object/{$pid}/datastream/{$dsid}/view",
-    array(
+  return Url::fromRoute(
+    'islandora.view_datastream_view',
+    [
+      'object' => $pid,
+      'datastream' => $dsid,
+    ],
+    [
       'absolute' => TRUE,
-      'query' => array(
+      'query' => [
         'token' => $token,
-      ),
+      ],
       'language' => language_default(),
       'https' => FALSE,
-    )
-  );
+    ]
+  )->toString();
 }
 
 /**
@@ -435,13 +448,13 @@ function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) 
  *   Data to be passed to token_replace.
  */
 function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
-  return array(
-    'islandora_openseadragon' => array(
+  return [
+    'islandora_openseadragon' => [
       'pid' => $pid,
       'dsid' => $dsid,
       'token' => $token,
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -459,9 +472,9 @@ function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
  *   FALSE otherwise.
  */
 function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
-  $identifier_tokens = variable_get('islandora_openseadragon_iiif_identifier', '[islandora_openseadragon:url_token]');
-  $identifier = token_replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
-  $base_url = rtrim(variable_get('islandora_openseadragon_iiif_url', 'iiif'), '/');
+  $identifier_tokens = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_identifier');
+  $identifier = \Drupal::token()->replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
+  $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
   $identifier_encoded = urlencode($identifier);
   return file_create_url("$base_url/$identifier_encoded/info.json");
 }
@@ -492,17 +505,16 @@ function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
  *   - maxLevel: The maximum level to attempt to load.
  */
 function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token) {
-  $identifier = token_replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
-
-  return array(
+  $identifier = \Drupal::token()->replace('[islandora_openseadragon:url_token]', islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
+  return [
     'identifier' => $identifier,
     'width' => NULL,
     'height' => NULL,
-    'tileSize' => variable_get('islandora_openseadragon_tile_size', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE),
-    'tileOverlap' => variable_get('islandora_openseadragon_tile_overlap', ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_OVERLAP),
+    'tileSize' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_size'),
+    'tileOverlap' => \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tile_overlap'),
     'minLevel' => NULL,
     'maxLevel' => NULL,
-  );
+  ];
 }
 
 /**
@@ -519,7 +531,7 @@ function islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token) {
  *   The metadata required by the users chosen implementation.
  */
 function islandora_openseadragon_tile_source($pid, $dsid, $token) {
-  switch (variable_get('islandora_openseadragon_tilesource', 'djatoka')) {
+  switch (\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource')) {
     case 'djatoka':
       return islandora_openseadragon_djatoka_pid_tile_source($pid, $dsid, $token);
 
@@ -527,7 +539,7 @@ function islandora_openseadragon_tile_source($pid, $dsid, $token) {
       return islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token);
 
     default;
-      return array();
+      return [];
   }
 }
 
@@ -543,32 +555,32 @@ function islandora_openseadragon_tile_source($pid, $dsid, $token) {
 function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
   // Only get solr results if present and paged content solution pack is
   // enabled.
-  if (empty($_GET['solr']) || !module_exists('islandora_paged_content')) {
+  if (empty($_GET['solr']) || !\Drupal::moduleHandler()->moduleExists('islandora_paged_content')) {
     return NULL;
   }
 
   $params = $_GET['solr']['params'];
-  $params['fq'][] = format_string('PID:"!pid"', array(
+  $params['fq'][] = strtr('PID:"!pid"', [
     '!pid' => $pid,
-  ));
+  ]);
 
   module_load_include('inc', 'islandora_paged_content', 'includes/highlighting');
   $highlighting_info = islandora_paged_content_perform_solr_highlighting_query($_GET['solr']['query'], $params);
-  $highlights = array();
+  $highlights = [];
 
   foreach ($highlighting_info as $pid => $info) {
     if (array_key_exists('snippets', $info)) {
-      foreach ($info['snippets'] as $snippet => $bounding_boxes) {
+      foreach ($info['snippets'] as $bounding_boxes) {
         foreach ($bounding_boxes as $bounding_box) {
           // The size on the x axis is used to calculate the proportional
           // values under the openseadragon coordinate system.
-          $highlights[] = array(
+          $highlights[] = [
             'x' => $bounding_box['left'] / $info['page']['width'],
             'y' => $bounding_box['top'] / $info['page']['width'],
             'width' => ($bounding_box['right'] - $bounding_box['left']) / $info['page']['width'],
             'height' => ($bounding_box['bottom'] - $bounding_box['top']) / $info['page']['width'],
             'className' => "islandora-openseadragon-highlight",
-          );
+          ];
         }
       }
     }
@@ -583,5 +595,5 @@ function islandora_openseadragon_viewer_query_solr_for_overlays($pid) {
  *   TRUE if Djatoka server is to be used.
  */
 function islandora_openseadragon_use_djatoka_server() {
-  return variable_get('islandora_openseadragon_tilesource', 'djatoka') == 'djatoka';
+  return \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource') == 'djatoka';
 }

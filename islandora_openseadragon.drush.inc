@@ -19,17 +19,17 @@ define('OPENSEADRAGON_ORIGINAL_DIR', 'openseadragon-bin-2.3.1');
  * Implements hook_drush_command().
  */
 function islandora_openseadragon_drush_command() {
-  $items = array();
+  $items = [];
   // The key in the $items array is the name of the command.
-  $items['openseadragon-plugin'] = array(
+  $items['openseadragon-plugin'] = [
     'callback' => 'drush_islandora_openseadragon_plugin',
     'description' => dt('Download and install the Openseadragon plugin.'),
     'bootstrap' => DRUSH_BOOTSTRAP_DRUSH,
-    'arguments' => array(
+    'arguments' => [
       'path' => dt('Optional. A path where to install the Openseadragon plugin. If omitted Drush will use the default location.'),
-    ),
-    'aliases' => array('openseadragonplugin'),
-  );
+    ],
+    'aliases' => ['openseadragonplugin'],
+  ];
 
   return $items;
 }
@@ -59,7 +59,7 @@ function drush_islandora_openseadragon_plugin() {
   // Create the path if it does not exist.
   if (!is_dir($path)) {
     drush_op('mkdir', $path);
-    drush_log(dt('Directory @path was created', array('@path' => $path)), 'notice');
+    drush_log(dt('Directory @path was created', ['@path' => $path]), 'notice');
   }
 
   // Set the directory to the download location.
@@ -75,7 +75,7 @@ function drush_islandora_openseadragon_plugin() {
     if (is_dir($dirname) || is_dir('openseadragon')) {
       drush_delete_dir($dirname, TRUE);
       drush_delete_dir('openseadragon', TRUE);
-      drush_log(dt('A existing Openseadragon plugin was deleted from @path', array('@path' => $path)), 'notice');
+      drush_log(dt('A existing Openseadragon plugin was deleted from @path', ['@path' => $path]), 'notice');
     }
 
     // Decompress the zip archive.
@@ -89,10 +89,10 @@ function drush_islandora_openseadragon_plugin() {
   }
 
   if (is_dir($dirname)) {
-    drush_log(dt('Openseadragon plugin has been installed in @path', array('@path' => $path)), 'success');
+    drush_log(dt('Openseadragon plugin has been installed in @path', ['@path' => $path]), 'success');
   }
   else {
-    drush_log(dt('Drush was unable to install the Openseadragon plugin to @path', array('@path' => $path)), 'error');
+    drush_log(dt('Drush was unable to install the Openseadragon plugin to @path', ['@path' => $path]), 'error');
   }
 
   // Set working directory back to the previous working directory.

@@ -1,0 +1,5 @@
+islandora_openseadragon.admin:
+  route_name: islandora_openseadragon.admin
+  parent: islandora.viewers_admin
+  title: 'OpenSeadragon'
+  description: 'Configure the OpenSeadragon viewer.'

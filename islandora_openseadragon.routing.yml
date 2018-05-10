@@ -1,0 +1,19 @@
+islandora_openseadragon.admin:
+  path: '/admin/config/islandora/islandora_viewers/openseadragon'
+  defaults:
+    _title: 'OpenSeadragon'
+    _form: '\Drupal\islandora_openseadragon\Form\Admin'
+  requirements:
+    _permission: 'administer site configuration'
+islandora_openseadragon.download_clip:
+  path: '/islandora/object/{object}/download_clip'
+  defaults:
+    perms: 'view fedora repository objects'
+    _title: 'Download Clip'
+    _controller: '\Drupal\islandora_openseadragon\Controller\DefaultController::downloadClip'
+  requirements:
+    _islandora_object_access: 'TRUE'
+  options:
+    parameters:
+      object:
+        type: object

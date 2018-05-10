@@ -1,14 +1,14 @@
-/*jslint browser: true*/
-/*global OpenSeadragon, Drupal*/
 /**
  * @file
  * Displays OpenSeadragon viewer.
  */
-(function($) {
+
+(function ($, Drupal) {
   'use strict';
 
   /**
    * The DOM element that represents the Singleton Instance of this class.
+   *
    * @type {string}
    */
   var base = '#islandora-openseadragon';
@@ -17,16 +17,16 @@
    * Initialize the OpenSeadragon Viewer.
    */
   Drupal.behaviors.islandoraOpenSeadragon = {
-    attach: function(context, settings) {
+    attach: function (context, settings) {
       // Use custom element #id if set.
       base = '#' + settings.islandoraOpenSeadragon.options.id;
       if (Drupal.IslandoraOpenSeadragonViewer[base] === undefined) {
-        $(base, document).once('islandoraOpenSeadragonViewer', function () {
+        $(base, document).once('islandoraOpenSeadragonViewer').each(function () {
           Drupal.IslandoraOpenSeadragonViewer[base] = new Drupal.IslandoraOpenSeadragonViewer(base, settings.islandoraOpenSeadragon);
         });
       }
     },
-    detach: function(context) {
+    detach: function (context) {
       // Only detach if triggered by Openseadragon viewer.
       if ($(context).is($(base))) {
         $(base).removeClass('islandoraOpenSeadragonViewer-processed');
@@ -49,25 +49,26 @@
    */
   Drupal.IslandoraOpenSeadragonViewer = function (base, settings) {
     var viewer = new OpenSeadragon(settings.options);
-    Drupal.settings.islandora_open_seadragon_viewer = viewer;
+    drupalSettings.islandora_open_seadragon_viewer = viewer;
 
-    var update_clip = function(event) {
+    var update_clip = function (event) {
       var viewer = event.eventSource;
-      var fitWithinBoundingBox = function(d, max) {
+      var fitWithinBoundingBox = function (d, max) {
         if (d.width / d.height > max.x / max.y) {
           return new OpenSeadragon.Point(max.x, parseInt(d.height * max.x / d.width));
-        } else {
+        }
+        else {
           return new OpenSeadragon.Point(parseInt(d.width * max.y / d.height), max.y);
         }
       };
 
-      var getDisplayRegion = function(viewer, source) {
+      var getDisplayRegion = function (viewer, source) {
         // Determine portion of scaled image that is being displayed.
         var box = new OpenSeadragon.Rect(0, 0, source.x, source.y);
         var container = viewer.viewport.getContainerSize();
         var bounds = viewer.viewport.getBounds();
         // If image is offset to the left.
-        if (bounds.x > 0){
+        if (bounds.x > 0) {
           box.x = box.x - viewer.viewport.pixelFromPoint(new OpenSeadragon.Point(0,0)).x;
         }
         // If full image doesn't fit.
@@ -115,7 +116,7 @@
           'size': (zoom <= 1) ? source.dimensions.x + ',' + source.dimensions.y : container.x + ',' + container.y
         };
       }
-      $("#clip").attr('href',  Drupal.settings.basePath + 'islandora/object/' + settings.pid + '/print?' + $.param({
+      $("#clip").attr('href',  drupalSettings.path.baseUrl + 'islandora/object/' + settings.pid + '/print?' + $.param({
             'clip': $.param(params)
        }));
     };
@@ -136,4 +137,4 @@
     }
 
   };
-})(jQuery);
+})(jQuery, Drupal);

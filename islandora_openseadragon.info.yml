@@ -1,0 +1,11 @@
+name: 'Islandora OpenSeadragon'
+description: 'OpenSeadragon viewer with option to serve images using djatoka'
+dependencies:
+  - :islandora
+  - libraries:libraries
+  - token:token
+package: 'Islandora Viewers'
+configure: islandora_openseadragon.admin
+core: 8.x
+type: module
+php: '5.5.9'
