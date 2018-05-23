@@ -167,7 +167,6 @@ class Admin extends ConfigFormBase {
             '#token_tree' => $token_tree,
           ],
           '#description' => [
-            '#theme' => 'token_tree',
             '#token_types' => ['islandora_openseadragon'],
             '#global_types' => FALSE,
           ],
