@@ -125,26 +125,6 @@ function islandora_openseadragon_djatoka_url_validate(array $element, FormStateI
 }
 
 /**
- * Handles a submit from the admin pane.
- *
- * @param array $form
- *   Drupal form.
- * @param Drupal\Core\Form\FormStateInterface $form_state
- *   Drupal form state.
- */
-function islandora_openseadragon_admin_submit_reset(array $form, FormStateInterface $form_state) {
-  $op = $form_state->getTriggeringElement()['#id'];
-  switch ($op) {
-    case 'edit-reset':
-      $config = \Drupal::configFactory()->getEditable('islandora_basic_collection.settings');
-      $config->clear('islandora_openseadragon_settings')->save();
-      $config->clear('islandora_openseadragon_tile_size')->save();
-      $config->clear('islandora_openseadragon_tile_overlap')->save();
-      break;
-  }
-}
-
-/**
  * Normalizes the settings so they can be used by Openseadragon.
  *
  * @param array $form

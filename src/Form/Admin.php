@@ -1135,15 +1135,6 @@ class Admin extends ConfigFormBase {
           // We don't provide "ajaxWithCredentials" as configurable to users.
         ],
       ],
-      'actions' => [
-        '#type' => 'actions',
-        'reset' => [
-          '#type' => 'submit',
-          '#value' => $this->t('Reset to defaults'),
-          '#weight' => 1,
-          '#submit' => ['islandora_openseadragon_admin_submit_reset'],
-        ],
-      ],
       '#submit' => ['islandora_openseadragon_admin_submit_normalize'],
     ];
 
