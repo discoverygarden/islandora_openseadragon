@@ -81,7 +81,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     $path = parse_url($rft_id, PHP_URL_PATH);
     $router = \Drupal::service('router.no_access_checks');
     $route = $router->match($path);
-    if ($route['_route'] !== 'islandora.view_datastream') {
+    if ($route['_route'] !== 'islandora.view_datastream_view') {
       return FALSE;
     }
     $djatoka_url_params = UrlHelper::buildQuery($djatoka_params + $allowed_djatoka_params);
@@ -426,7 +426,7 @@ function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) 
     [
       'absolute' => TRUE,
       'query' => [
-        'token' => $token,
+        'islandora_token' => $token,
       ],
       'language' => language_default(),
       'https' => FALSE,
