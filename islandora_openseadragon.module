@@ -230,7 +230,7 @@ function islandora_openseadragon_tokens($type, $tokens, array $data = [], array 
         ];
       }
       $replacements[$original] = Url::fromRoute(
-        'islandora.view_datastream',
+        'islandora.view_datastream_view',
         ['object' => $pid, 'datastream' => $dsid],
         $options
       )->toString();
