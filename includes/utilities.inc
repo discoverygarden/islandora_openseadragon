@@ -426,7 +426,7 @@ function islandora_openseadragon_identifier_url(AbstractDatastream $datastream) 
     [
       'absolute' => TRUE,
       'query' => [
-        'token' => $token,
+        'islandora_token' => $token,
       ],
       'language' => language_default(),
       'https' => FALSE,

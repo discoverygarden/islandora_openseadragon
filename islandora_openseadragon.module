@@ -226,7 +226,7 @@ function islandora_openseadragon_tokens($type, $tokens, array $data = [], array 
 
       if ($name == 'url_token') {
         $options['query'] = [
-          'token' => $token,
+          'islandora_token' => $token,
         ];
       }
       $replacements[$original] = Url::fromRoute(
