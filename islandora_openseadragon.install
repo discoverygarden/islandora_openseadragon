@@ -10,6 +10,7 @@
  */
 function islandora_openseadragon_requirements() {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
+  module_load_include('module', 'islandora_openseadragon', 'islandora_openseadragon');
   $requirements = [];
   // Ensure translations don't break at install time.
   $t = 't';
