@@ -11,6 +11,7 @@ viewer:
   dependencies:
     - islandora_openseadragon/openseadragon
     - core/jquery
+    - core/jquery.once
     - core/drupalSettings
     - core/drupal
 djatoka-viewer:
@@ -24,5 +25,6 @@ djatoka-viewer:
   dependencies:
     - islandora_openseadragon/openseadragon
     - core/jquery
+    - core/jquery.once
     - core/drupalSettings
     - core/drupal
