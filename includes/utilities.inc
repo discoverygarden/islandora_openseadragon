@@ -476,7 +476,7 @@ function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
   $identifier = \Drupal::token()->replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
   $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
   $identifier_encoded = urlencode($identifier);
-  return file_create_url("$base_url/$identifier_encoded/info.json");
+  return Url::fromUri("$base_url/$identifier_encoded/info.json")->toString();
 }
 
 /**
