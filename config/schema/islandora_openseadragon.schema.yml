@@ -1,5 +1,5 @@
 islandora_openseadragon.settings:
-  type: mapping
+  type: config_object
   label: Settings
   mapping:
     islandora_openseadragon_settings:
