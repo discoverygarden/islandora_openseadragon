@@ -7,6 +7,7 @@
 
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Xss;
+use Drupal\user\Entity\User;
 
 // @codingStandardsIgnoreStart
 const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
@@ -96,8 +97,13 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
   }
 
   if (isset($params['pid']) && isset($params['dsid']) && isset($params['token'])) {
-    $token_header = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource') == 'iiif'
-      && \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_token_header');
+    $renderer = \Drupal::service('renderer');
+    $config = \Drupal::config('islandora_openseadragon.settings');
+
+    $param_object = islandora_object_load($params['pid']);
+
+    $token_header = $config->get('islandora_openseadragon_tilesource') == 'iiif'
+      && $config->get('islandora_openseadragon_iiif_token_header');
     $settings = islandora_openseadragon_get_viewer_settings(
       [
         'pid' => $params['pid'],
@@ -117,8 +123,20 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
           'islandoraOpenSeadragon' => $settings,
         ],
       ],
+      '#cache' => [
+        'contexts' => [
+          'user',
+        ],
+      ],
     ];
-    return \Drupal::service('renderer')->render($viewer);
+
+    $renderer->addCacheableDependency($viewer, $config);
+    $renderer->addCacheableDependency($viewer, $object);
+    $renderer->addCacheableDependency($viewer, $param_object);
+    $renderer->addCacheableDependency($viewer, $param_object[$params['dsid']]);
+    $renderer->addCacheableDependency($viewer, User::load(\Drupal::currentUser()->id()));
+
+    return $renderer->render($viewer);
   }
 }
 
