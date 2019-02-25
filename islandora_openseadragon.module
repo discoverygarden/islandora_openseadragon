@@ -154,18 +154,31 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
     module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
     $clip_parts = islandora_openseadragon_construct_clip_url($_GET['clip']);
     if ($clip_parts) {
+      $renderer = \Drupal::service('renderer');
       $variables['clip'] = $clip_parts['original_params'];
       $image = [
         '#theme' => 'image',
         '#uri' => $clip_parts['image_url'],
         '#attributes' => $clip_parts['dimensions'],
+        '#cache' => [
+          'contexts' => [
+            'url.query_args',
+            'user',
+          ],
+        ],
       ];
-      $rendered_image = \Drupal::service('renderer')->render($image);
+
       $variables['content']['clip'] = [
         '#weight' => 0,
         '#prefix' => "<div id='clip'>",
-        '#markup' => $rendered_image,
+        '#markup' => $renderer->render($image),
         '#suffix' => '</div>',
+        '#cache' => [
+          'contexts' => [
+            'url.query_args',
+            'user',
+          ],
+        ],
       ];
     }
     else {
