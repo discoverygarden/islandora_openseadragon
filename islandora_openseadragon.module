@@ -127,14 +127,20 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
         'contexts' => [
           'user',
         ],
+        // XXX: Given our response here includes an auth token, let's prevent
+        // caching.
+        'max-age' => 0,
       ],
     ];
 
     $renderer->addCacheableDependency($viewer, $config);
+    $renderer->addCacheableDependency($viewer, User::load(\Drupal::currentUser()->id()));
+    // XXX: Our Tuque objects do not (presently) implement the
+    // CacheableDependencyInterface, so adding them effectively prevents
+    // caching of the dependent content.
     $renderer->addCacheableDependency($viewer, $object);
     $renderer->addCacheableDependency($viewer, $param_object);
     $renderer->addCacheableDependency($viewer, $param_object[$params['dsid']]);
-    $renderer->addCacheableDependency($viewer, User::load(\Drupal::currentUser()->id()));
 
     return $renderer->render($viewer);
   }
