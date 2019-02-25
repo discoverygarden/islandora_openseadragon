@@ -115,7 +115,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
   }
   else {
     $identifier = $decoded_params['identifier'];
-    $region = $decoded_params['svc.region'];
+    $region = $decoded_params['region'];
     $size = $decoded_params['size'];
     $rotation = 0;
     $format = "default.jpg";
