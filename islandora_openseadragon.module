@@ -7,6 +7,7 @@
 
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Xss;
+use Drupal\user\Entity\User;
 
 // @codingStandardsIgnoreStart
 const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
@@ -96,8 +97,13 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
   }
 
   if (isset($params['pid']) && isset($params['dsid']) && isset($params['token'])) {
-    $token_header = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource') == 'iiif'
-      && \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_token_header');
+    $renderer = \Drupal::service('renderer');
+    $config = \Drupal::config('islandora_openseadragon.settings');
+
+    $param_object = islandora_object_load($params['pid']);
+
+    $token_header = $config->get('islandora_openseadragon_tilesource') == 'iiif'
+      && $config->get('islandora_openseadragon_iiif_token_header');
     $settings = islandora_openseadragon_get_viewer_settings(
       [
         'pid' => $params['pid'],
@@ -117,8 +123,26 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
           'islandoraOpenSeadragon' => $settings,
         ],
       ],
+      '#cache' => [
+        'contexts' => [
+          'user',
+        ],
+        // XXX: Given our response here includes an auth token, let's prevent
+        // caching.
+        'max-age' => 0,
+      ],
     ];
-    return \Drupal::service('renderer')->render($viewer);
+
+    $renderer->addCacheableDependency($viewer, $config);
+    $renderer->addCacheableDependency($viewer, User::load(\Drupal::currentUser()->id()));
+    // XXX: Our Tuque objects do not (presently) implement the
+    // CacheableDependencyInterface, so adding them effectively prevents
+    // caching of the dependent content.
+    $renderer->addCacheableDependency($viewer, $object);
+    $renderer->addCacheableDependency($viewer, $param_object);
+    $renderer->addCacheableDependency($viewer, $param_object[$params['dsid']]);
+
+    return $renderer->render($viewer);
   }
 }
 
@@ -130,18 +154,31 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
     module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
     $clip_parts = islandora_openseadragon_construct_clip_url($_GET['clip']);
     if ($clip_parts) {
+      $renderer = \Drupal::service('renderer');
       $variables['clip'] = $clip_parts['original_params'];
       $image = [
         '#theme' => 'image',
         '#uri' => $clip_parts['image_url'],
         '#attributes' => $clip_parts['dimensions'],
+        '#cache' => [
+          'contexts' => [
+            'url.query_args',
+            'user',
+          ],
+        ],
       ];
-      $rendered_image = \Drupal::service('renderer')->render($image);
+
       $variables['content']['clip'] = [
         '#weight' => 0,
         '#prefix' => "<div id='clip'>",
-        '#markup' => $rendered_image,
+        '#markup' => $renderer->render($image),
         '#suffix' => '</div>',
+        '#cache' => [
+          'contexts' => [
+            'url.query_args',
+            'user',
+          ],
+        ],
       ];
     }
     else {
