@@ -1,6 +1,9 @@
 islandora_openseadragon_js_config:
   type: mapping
   mapping:
+    # We don't provide "id" as configurable to users.
+    # We don't provide "element" as configurable to users.
+    # We don't provide "tileSources" as configurable to users.
     tabIndex:
       type: float
       label: Tab Index
@@ -324,6 +327,7 @@ islandora_openseadragon_js_config:
     sequenceMode:
       type: boolean
       label: Sequence Mode
+    # We don't provide "initialPage" as configurable to users.
     preserveViewport:
       type: boolean
       label: Preserve View-port
