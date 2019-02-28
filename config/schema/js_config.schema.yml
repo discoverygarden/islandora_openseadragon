@@ -112,117 +112,17 @@ islandora_openseadragon_js_config:
       type: float
       label: Animation time
     gestureSettingsMouse:
-      type: mapping
+      type: islandora_openseadragon_gesture_settings
       label: Mouse Pointer Gesture Settings
-      mapping:
-        scrollToZoom:
-          type: boolean
-          label: Scroll To Zoom
-        clickToZoom:
-          type: boolean
-          label: Click To Zoom
-        dblClickToZoom:
-          type: boolean
-          label: Double Click To Zoom
-        pinchToZoom:
-          type: boolean
-          label: Pinch To Zoom
-        flickEnabled:
-          type: boolean
-          label: Flick Gesture
-        flickMinSpeed:
-          type: float
-          label: Flick Minimum Speed
-        flickMomentum:
-          type: float
-          label: Flick Momentum
-        pinchRotate:
-          type: boolean
-          label: Pinch Rotate
     gestureSettingsTouch:
-      type: mapping
+      type: islandora_openseadragon_gesture_settings
       label: Touch Pointer Gesture Settings
-      mapping:
-        scrollToZoom:
-          type: boolean
-          label: Scroll To Zoom
-        clickToZoom:
-          type: boolean
-          label: Click To Zoom
-        dblClickToZoom:
-          type: boolean
-          label: Double Click To Zoom
-        pinchToZoom:
-          type: boolean
-          label: Pinch To Zoom
-        flickEnabled:
-          type: boolean
-          label: Flick Gesture
-        flickMinSpeed:
-          type: float
-          label: Flick Minimum Speed
-        flickMomentum:
-          type: float
-          label: Flick Momentum
-        pinchRotate:
-          type: boolean
-          label: Pinch Rotate
     gestureSettingsPen:
-      type: mapping
+      type: islandora_openseadragon_gesture_settings
       label: Pen Pointer Gesture Settings
-      mapping:
-        scrollToZoom:
-          type: boolean
-          label: Scroll To Zoom
-        clickToZoom:
-          type: boolean
-          label: Click To Zoom
-        dblClickToZoom:
-          type: boolean
-          label: Double Click To Zoom
-        pinchToZoom:
-          type: boolean
-          label: Pinch To Zoom
-        flickEnabled:
-          type: boolean
-          label: Flick Gesture
-        flickMinSpeed:
-          type: float
-          label: Flick Minimum Speed
-        flickMomentum:
-          type: float
-          label: Flick Momentum
-        pinchRotate:
-          type: boolean
-          label: Pinch Rotate
     gestureSettingsUnknown:
-      type: mapping
+      type: islandora_openseadragon_gesture_settings
       label: Unknown Pointer Gesture Settings
-      mapping:
-        scrollToZoom:
-          type: boolean
-          label: Scroll To Zoom
-        clickToZoom:
-          type: boolean
-          label: Click To Zoom
-        dblClickToZoom:
-          type: boolean
-          label: Double Click To Zoom
-        pinchToZoom:
-          type: boolean
-          label: Pinch To Zoom
-        flickEnabled:
-          type: boolean
-          label: Flick Gesture
-        flickMinSpeed:
-          type: float
-          label: Flick Minimum Speed
-        flickMomentum:
-          type: float
-          label: Flick Momentum
-        pinchRotate:
-          type: boolean
-          label: Pinch Rotate
     zoomPerClick:
       type: float
       label: Zoom per click

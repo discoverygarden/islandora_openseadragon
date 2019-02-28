@@ -1,0 +1,27 @@
+islandora_openseadragon_gesture_settings:
+  type: mapping
+  mapping:
+    scrollToZoom:
+      type: boolean
+      label: Scroll To Zoom
+    clickToZoom:
+      type: boolean
+      label: Click To Zoom
+    dblClickToZoom:
+      type: boolean
+      label: Double Click To Zoom
+    pinchToZoom:
+      type: boolean
+      label: Pinch To Zoom
+    flickEnabled:
+      type: boolean
+      label: Flick Gesture
+    flickMinSpeed:
+      type: float
+      label: Flick Minimum Speed
+    flickMomentum:
+      type: float
+      label: Flick Momentum
+    pinchRotate:
+      type: boolean
+      label: Pinch Rotate
