@@ -1,3 +1,5 @@
+# Essentially a transformation of the form, somewhat based on:
+# @see http://openseadragon.github.io/docs/OpenSeadragon.html#.Options
 islandora_openseadragon_js_config:
   type: mapping
   nullable: true

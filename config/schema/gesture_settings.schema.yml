@@ -1,3 +1,4 @@
+# @see http://openseadragon.github.io/docs/OpenSeadragon.html#.GestureSettings
 islandora_openseadragon_gesture_settings:
   type: mapping
   mapping:
