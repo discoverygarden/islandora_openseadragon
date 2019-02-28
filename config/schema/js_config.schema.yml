@@ -1,5 +1,6 @@
 islandora_openseadragon_js_config:
   type: mapping
+  nullable: true
   mapping:
     # We don't provide "id" as configurable to users.
     # We don't provide "element" as configurable to users.

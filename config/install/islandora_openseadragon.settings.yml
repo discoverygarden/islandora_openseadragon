@@ -1,4 +1,4 @@
-islandora_openseadragon_settings: []
+islandora_openseadragon_settings: {}
 islandora_openseadragon_tile_size: 256
 islandora_openseadragon_tile_overlap: 0
 islandora_openseadragon_fit_to_aspect_ratio: false
