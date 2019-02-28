@@ -1,0 +1,372 @@
+islandora_openseadragon_js_config:
+  type: mapping
+  mapping:
+    tabIndex:
+      type: float
+      label: Tab Index
+    debugMode:
+      type: boolean
+      label: Debug mode
+    debugGridColor:
+      type: color_hex
+      label: Debug Grid Color
+    blendTime:
+      type: float
+      label: Blend time
+    alwaysBlend:
+      type: boolean
+      label: Always blend
+    autoHideControls:
+      type: boolean
+      label: Auto-hide controls
+    immediateRender:
+      type: boolean
+      label: Immediate render
+    defaultZoomLevel:
+      type: float
+      label: Default zoom level
+    opacity:
+      type: float
+      label: Opacity
+    compositeOperation:
+      type: string
+      label: Composite Operation
+    placeholderFillStyle:
+      type: string
+      label: Placeholder Fill Style
+    degrees:
+      type: float
+      label: Initial Rotation
+    minZoomLevel:
+      type: float
+      label: Minimum Zoom Level
+    maxZoomLevel:
+      type: float
+      label: Maximum Zoom Level
+    homeFillsViewer:
+      type: boolean
+      label: Home Button Fills Viewer
+    panHorizontal:
+      type: boolean
+      label: Pan horizontal
+    panVertical:
+      type: boolean
+      label: Pan vertical
+    constrainDuringPan:
+      type: boolean
+      label: Constrain During Pan
+    wrapHorizontal:
+      type: boolean
+      label: Wrap horizontal
+    wrapVertical:
+      type: boolean
+      label: Wrap vertical
+    minZoomImageRatio:
+      type: float
+      label: Minimum zoom image ratio
+    maxZoomPixelRatio:
+      type: float
+      label: Maximum zoom pixel ratio
+    smoothTileEdgesMinZoom:
+      type: float
+      label: Smooth Tile Edges Minimum Zoom
+    # We don't provide "iOSDevice" as configurable to users.
+    autoResize:
+      type: boolean
+      label: Auto Resize
+    preserveImageSizeOnResize:
+      type: boolean
+      label: Preserve Image Size On Resize
+    minScrollDeltaTime:
+      type: float
+      label: Minimum Scroll Delta Time
+    pixelsPerWheelLine:
+      type: float
+      label: Pixels Per Wheel Line
+    visibilityRatio:
+      type: float
+      label: Visibility ratio
+    imageLoaderLimit:
+      type: float
+      label: Image loader limit
+    clickTimeThreshold:
+      type: float
+      label: Click time threshold
+    clickDistThreshold:
+      type: float
+      label: Click distance threshold
+    dblClickTimeThreshold:
+      type: float
+      label: Double click distance threshold
+    dblClickDistThreshold:
+      type: float
+      label: Double click distance threshold
+    springStiffness:
+      type: float
+      label: Spring stiffness
+    animationTime:
+      type: float
+      label: Animation time
+    gestureSettingsMouse:
+      type: mapping
+      label: Mouse Pointer Gesture Settings
+      mapping:
+        scrollToZoom:
+          type: boolean
+          label: Scroll To Zoom
+        clickToZoom:
+          type: boolean
+          label: Click To Zoom
+        dblClickToZoom:
+          type: boolean
+          label: Double Click To Zoom
+        pinchToZoom:
+          type: boolean
+          label: Pinch To Zoom
+        flickEnabled:
+          type: boolean
+          label: Flick Gesture
+        flickMinSpeed:
+          type: float
+          label: Flick Minimum Speed
+        flickMomentum:
+          type: float
+          label: Flick Momentum
+        pinchRotate:
+          type: boolean
+          label: Pinch Rotate
+    gestureSettingsTouch:
+      type: mapping
+      label: Touch Pointer Gesture Settings
+      mapping:
+        scrollToZoom:
+          type: boolean
+          label: Scroll To Zoom
+        clickToZoom:
+          type: boolean
+          label: Click To Zoom
+        dblClickToZoom:
+          type: boolean
+          label: Double Click To Zoom
+        pinchToZoom:
+          type: boolean
+          label: Pinch To Zoom
+        flickEnabled:
+          type: boolean
+          label: Flick Gesture
+        flickMinSpeed:
+          type: float
+          label: Flick Minimum Speed
+        flickMomentum:
+          type: float
+          label: Flick Momentum
+        pinchRotate:
+          type: boolean
+          label: Pinch Rotate
+    gestureSettingsPen:
+      type: mapping
+      label: Pen Pointer Gesture Settings
+      mapping:
+        scrollToZoom:
+          type: boolean
+          label: Scroll To Zoom
+        clickToZoom:
+          type: boolean
+          label: Click To Zoom
+        dblClickToZoom:
+          type: boolean
+          label: Double Click To Zoom
+        pinchToZoom:
+          type: boolean
+          label: Pinch To Zoom
+        flickEnabled:
+          type: boolean
+          label: Flick Gesture
+        flickMinSpeed:
+          type: float
+          label: Flick Minimum Speed
+        flickMomentum:
+          type: float
+          label: Flick Momentum
+        pinchRotate:
+          type: boolean
+          label: Pinch Rotate
+    gestureSettingsUnknown:
+      type: mapping
+      label: Unknown Pointer Gesture Settings
+      mapping:
+        scrollToZoom:
+          type: boolean
+          label: Scroll To Zoom
+        clickToZoom:
+          type: boolean
+          label: Click To Zoom
+        dblClickToZoom:
+          type: boolean
+          label: Double Click To Zoom
+        pinchToZoom:
+          type: boolean
+          label: Pinch To Zoom
+        flickEnabled:
+          type: boolean
+          label: Flick Gesture
+        flickMinSpeed:
+          type: float
+          label: Flick Minimum Speed
+        flickMomentum:
+          type: float
+          label: Flick Momentum
+        pinchRotate:
+          type: boolean
+          label: Pinch Rotate
+    zoomPerClick:
+      type: float
+      label: Zoom per click
+    zoomPerScroll:
+      type: float
+      label: Zoom per scroll
+    zoomPerSecond:
+      type: float
+      label: Zoom per second
+    showNavigator:
+      type: boolean
+      label: Show Navigator
+      # We don't provide "navigatorId" as configurable to users.
+    navigatorPosition:
+      type: string
+      label: Navigator Position
+    navigatorSizeRatio:
+      type: float
+      label: Navigator Size Ratio
+    navigatorMaintainSizeRatio:
+      type: boolean
+      label: Navigator Maintain Size Ration
+    navigatorTop:
+      type: float
+      label: Navigator Top Position
+    navigatorLeft:
+      type: float
+      label: Navigator Left Position
+    navigatorHeight:
+      type: float
+      label: Navigator Height
+    navigatorWidth:
+      type: float
+      label: Navigator Width
+    navigatorAutoResize:
+      type: boolean
+      label: Navigator Auto Resize
+    navigatorAutoFade:
+      type: boolean
+      label: Navigator Auto Fade
+    navigatorAutoFade:
+      type: boolean
+      label: Navigator Auto Fade
+    navigatorRotate:
+      type: boolean
+      label: Navigator Rotate
+    controlsFadeDelay:
+      type: float
+      label: Controls Fade Delay
+    controlsFadeLength:
+      type: float
+      label: Controls Fade Length
+    controlsFadeDelay:
+      type: float
+      label: Controls Fade Delay
+    maxImageCacheCount:
+      type: float
+      label: Controls Fade Delay
+    timeout:
+      type: float
+      label: timeout
+    useCanvas:
+      type: boolean
+      label: Use Canvas
+    minPixelRatio:
+      type: float
+      label: Minimum Pixel Ratio
+    mouseNavEnabled:
+      type: boolean
+      label: Enable Mouse Navigation
+    showNavigationControl:
+      type: boolean
+      label: Show Navigation Control
+    navigationControlAnchor:
+      type: string
+      label: Navigation Control Anchor
+    showZoomControl:
+      type: boolean
+      label: Show Zoom Control
+    showHomeControl:
+      type: boolean
+      label: Show Home Control
+    showFullPageControl:
+      type: boolean
+      label: Show Full Page Control
+    showRotationControl:
+      type: boolean
+      label: Show Rotation Control
+    sequenceControlAnchor:
+      type: string
+      label: Sequence Control Anchor
+    navPrevNextWrap:
+      type: boolean
+      label: Navigation Previous/Next Wrap
+    # We don't provide "zoomInButton" as configurable to users.
+    # We don't provide "zoomOutButton" as configurable to users.
+    # We don't provide "homeButton" as configurable to users.
+    # We don't provide "fullPageButton" as configurable to users.
+    # We don't provide "rotateLeftButton" as configurable to users.
+    # We don't provide "rotateRightButton" as configurable to users.
+    # We don't provide "previousButton" as configurable to users.
+    # We don't provide "nextButton" as configurable to users.
+    sequenceMode:
+      type: boolean
+      label: Sequence Mode
+    preserveViewport:
+      type: boolean
+      label: Preserve View-port
+    preserveOverlays:
+      type: boolean
+      label: Preserve Overlays
+    showReferenceStrip:
+      type: boolean
+      label: Show Reference Strip
+    referenceStripScroll:
+      type: string
+      label: Reference Strip Scroll
+    # We don't provide "referenceStripElement" as configurable
+    # to users.
+    referenceStripHeight:
+      type: float
+      label: Reference Strip Height
+    referenceStripWidth:
+      type: float
+      label: Reference Strip Width
+    referenceStripPosition:
+      type: string
+      label: Reference Strip Position
+    referenceStripSizeRatio:
+      type: float
+      label: Reference Strip Size Ratio
+    collectionMode:
+      type: boolean
+      label: Enable Collection Mode
+    collectionRows:
+      type: float
+      label: Collection Rows
+    collectionColumns:
+      type: float
+      label: Collection Columns
+    collectionLayout:
+      type: string
+      label: Collection Layout
+    collectionTileSize:
+      type: integer
+      label: Collection Tile Size
+    collectionTileMargin:
+      type: float
+      label: Collection Tile Margin
+    # We don't provide "crossOriginPolicy" as configurable to users.
+    # We don't provide "ajaxWithCredentials" as configurable to users.

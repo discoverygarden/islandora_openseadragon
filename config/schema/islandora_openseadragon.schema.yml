@@ -3,7 +3,7 @@ islandora_openseadragon.settings:
   label: Settings
   mapping:
     islandora_openseadragon_settings:
-      type: sequence
+      type: islandora_openseadragon_js_config
     islandora_openseadragon_tile_size:
       type: integer
     islandora_openseadragon_tile_overlap:
