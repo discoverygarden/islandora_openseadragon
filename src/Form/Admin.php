@@ -85,6 +85,63 @@ class Admin extends ConfigFormBase {
       ],
     ];
 
+    $gesture = function ($name) use ($settings) {
+      return [
+        'scrollToZoom' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Scroll To Zoom'),
+          '#default_value' => $settings[$name]['scrollToZoom'],
+          '#description' => $this->t('Zoom on scroll gesture.'),
+        ],
+        'clickToZoom' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Click To Zoom'),
+          '#default_value' => $settings[$name]['clickToZoom'],
+          '#description' => $this->t('Zoom on click gesture.'),
+        ],
+        'dblClickToZoom' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Double Click To Zoom'),
+          '#default_value' => $settings[$name]['dblClickToZoom'],
+          '#description' => $this->t('Zoom on double-click gesture. Note: If set to true then clickToZoom should be set to false to prevent multiple zooms.'),
+        ],
+        'pinchToZoom' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Pinch To Zoom'),
+          '#default_value' => $settings[$name]['pinchToZoom'],
+          '#description' => $this->t('Zoom on pinch gesture.'),
+        ],
+        'flickEnabled' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Flick Gesture'),
+          '#default_value' => $settings[$name]['flickEnabled'],
+          '#description' => $this->t('Enable flick gesture.'),
+        ],
+        'flickMinSpeed' => [
+          '#type' => 'number',
+          '#step' => 'any',
+          '#title' => $this->t('Flick Minimum Speed'),
+          '#size' => 10,
+          '#default_value' => $settings[$name]['flickMinSpeed'],
+          '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
+        ],
+        'flickMomentum' => [
+          '#type' => 'number',
+          '#step' => 'any',
+          '#title' => $this->t('Flick Momentum'),
+          '#size' => 10,
+          '#default_value' => $settings[$name]['flickMomentum'],
+          '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
+        ],
+        'pinchRotate' => [
+          '#type' => 'checkbox',
+          '#title' => $this->t('Pinch Rotate'),
+          '#default_value' => $settings[$name]['pinchRotate'],
+          '#description' => $this->t('If pinchRotate is true, the user will have the ability to rotate the image using their fingers.'),
+        ],
+      ];
+    };
+
     $form = [
       'islandora_openseadragon_tilesource' => [
         '#type' => 'select',
@@ -205,6 +262,7 @@ class Admin extends ConfigFormBase {
           // We don't provide "tileSources" as configurable to users.
           'tabIndex' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Tab Index'),
             '#default_value' => $settings['tabIndex'],
             '#size' => 10,
@@ -224,6 +282,7 @@ class Admin extends ConfigFormBase {
           ],
           'blendTime' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Blend time'),
             '#size' => 10,
             '#default_value' => $settings['blendTime'],
@@ -249,6 +308,7 @@ class Admin extends ConfigFormBase {
           ],
           'defaultZoomLevel' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Default zoom level'),
             '#size' => 10,
             '#default_value' => $settings['defaultZoomLevel'],
@@ -256,6 +316,7 @@ class Admin extends ConfigFormBase {
           ],
           'opacity' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Opacity'),
             '#size' => 10,
             '#default_value' => $settings['opacity'],
@@ -302,6 +363,7 @@ class Admin extends ConfigFormBase {
           ],
           'degrees' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Initial Rotation'),
             '#size' => 10,
             '#default_value' => $settings['degrees'],
@@ -309,6 +371,7 @@ class Admin extends ConfigFormBase {
           ],
           'minZoomLevel' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Minimum Zoom Level'),
             '#size' => 10,
             '#default_value' => $settings['minZoomLevel'],
@@ -316,6 +379,7 @@ class Admin extends ConfigFormBase {
           ],
           'maxZoomLevel' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Maximum Zoom Level'),
             '#size' => 10,
             '#default_value' => $settings['maxZoomLevel'],
@@ -357,24 +421,24 @@ class Admin extends ConfigFormBase {
             '#description' => $this->t('Set to true to force the image to wrap vertically within the viewport. Useful for maps or images representing the surface of a sphere or cylinder.'),
           ],
           'minZoomImageRatio' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Minimum zoom image ratio'),
             '#size' => 10,
             '#default_value' => $settings['minZoomImageRatio'],
             '#description' => $this->t('The minimum percentage ( expressed as a number between 0 and 1 ) of the viewport height or width at which the zoom out will be constrained. Setting it to 0, for example will allow you to zoom out infinity.'),
           ],
           'maxZoomPixelRatio' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Maximum zoom pixel ratio'),
             '#size' => 10,
             '#default_value' => $settings['maxZoomPixelRatio'],
             '#description' => $this->t('The maximum ratio to allow a zoom-in to affect the highest level pixel ratio. This can be set to Infinity to allow "infinite" zooming into the image though it is less effective visually if the HTML5 Canvas is not available on the viewing device.'),
           ],
           'smoothTileEdgesMinZoom' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Smooth Tile Edges Minimum Zoom'),
             '#size' => 10,
             '#default_value' => $settings['smoothTileEdgesMinZoom'],
@@ -395,6 +459,7 @@ class Admin extends ConfigFormBase {
           ],
           'minScrollDeltaTime' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Minimum Scroll Delta Time'),
             '#size' => 10,
             '#default_value' => $settings['minScrollDeltaTime'],
@@ -402,14 +467,15 @@ class Admin extends ConfigFormBase {
           ],
           'pixelsPerWheelLine' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Pixels Per Wheel Line'),
             '#size' => 10,
             '#default_value' => $settings['pixelsPerWheelLine'],
             '#description' => $this->t('For pixel-resolution scrolling devices, the number of pixels equal to one scroll line.'),
           ],
           'visibilityRatio' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Visibility ratio'),
             '#size' => 10,
             '#default_value' => $settings['visibilityRatio'],
@@ -424,6 +490,7 @@ class Admin extends ConfigFormBase {
           ],
           'clickTimeThreshold' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Click time threshold'),
             '#size' => 10,
             '#default_value' => $settings['clickTimeThreshold'],
@@ -431,6 +498,7 @@ class Admin extends ConfigFormBase {
           ],
           'clickDistThreshold' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Click distance threshold'),
             '#size' => 10,
             '#default_value' => $settings['clickDistThreshold'],
@@ -438,6 +506,7 @@ class Admin extends ConfigFormBase {
           ],
           'dblClickTimeThreshold' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Double click distance threshold'),
             '#size' => 10,
             '#default_value' => $settings['dblClickTimeThreshold'],
@@ -445,22 +514,23 @@ class Admin extends ConfigFormBase {
           ],
           'dblClickDistThreshold' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Double click distance threshold'),
             '#size' => 10,
             '#default_value' => $settings['dblClickDistThreshold'],
             '#description' => $this->t('The maximum distance allowed between two pointer click events to be treated as a double-click gesture.'),
           ],
           'springStiffness' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Spring stiffness'),
             '#size' => 10,
             '#default_value' => $settings['springStiffness'],
             '#description' => $this->t('Determines how sharply the springs used for animations move.'),
           ],
           'animationTime' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Animation time'),
             '#size' => 10,
             '#default_value' => $settings['animationTime'],
@@ -472,242 +542,39 @@ class Admin extends ConfigFormBase {
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
             '#description' => $this->t('<p>Settings for gestures generated by a mouse pointer device. (See <a href="https://openseadragon.github.io/docs/OpenSeadragon.html#.GestureSettings">OpenSeadragon.GestureSettings</a>)</p>'),
-            'scrollToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Scroll To Zoom'),
-              '#default_value' => $settings['gestureSettingsMouse']['scrollToZoom'],
-              '#description' => $this->t('Zoom on scroll gesture.'),
-            ],
-            'clickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsMouse']['clickToZoom'],
-              '#description' => $this->t('Zoom on click gesture.'),
-            ],
-            'dblClickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Double Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsMouse']['dblClickToZoom'],
-              '#description' => $this->t('Zoom on double-click gesture. Note: If set to true then clickToZoom should be set to false to prevent multiple zooms.'),
-            ],
-            'pinchToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch To Zoom'),
-              '#default_value' => $settings['gestureSettingsMouse']['pinchToZoom'],
-              '#description' => $this->t('Zoom on pinch gesture.'),
-            ],
-            'flickEnabled' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Flick Gesture'),
-              '#default_value' => $settings['gestureSettingsMouse']['flickEnabled'],
-              '#description' => $this->t('Enable flick gesture.'),
-            ],
-            'flickMinSpeed' => [
-              '#type' => 'number',
-              '#title' => $this->t('Flick Minimum Speed'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsMouse']['flickMinSpeed'],
-              '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
-            ],
-            'flickMomentum' => [
-              '#type' => 'textfield',
-              '#element_validate' => ['::validateNumber'],
-              '#title' => $this->t('Flick Momentum'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsMouse']['flickMomentum'],
-              '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
-            ],
-            'pinchRotate' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch Rotate'),
-              '#default_value' => $settings['gestureSettingsMouse']['pinchRotate'],
-              '#description' => $this->t('If pinchRotate is true, the user will have the ability to rotate the image using their fingers.'),
-            ],
-          ],
+          ] + $gesture('gestureSettingsMouse'),
           'gestureSettingsTouch' => [
             '#type' => 'fieldset',
             '#title' => $this->t('Touch Pointer Gesture Settings'),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
             '#description' => $this->t('<p>Settings for gestures generated by a touch pointer device. (See <a href="https://openseadragon.github.io/docs/OpenSeadragon.html#.GestureSettings">OpenSeadragon.GestureSettings</a>)</p>'),
-            'scrollToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Scroll To Zoom'),
-              '#default_value' => $settings['gestureSettingsTouch']['scrollToZoom'],
-              '#description' => $this->t('Zoom on scroll gesture.'),
-            ],
-            'clickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsTouch']['clickToZoom'],
-              '#description' => $this->t('Zoom on click gesture.'),
-            ],
-            'dblClickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Double Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsTouch']['dblClickToZoom'],
-              '#description' => $this->t('Zoom on double-click gesture. Note: If set to true then clickToZoom should be set to false to prevent multiple zooms.'),
-            ],
-            'pinchToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch To Zoom'),
-              '#default_value' => $settings['gestureSettingsTouch']['pinchToZoom'],
-              '#description' => $this->t('Zoom on pinch gesture.'),
-            ],
-            'flickEnabled' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Flick Gesture'),
-              '#default_value' => $settings['gestureSettingsTouch']['flickEnabled'],
-              '#description' => $this->t('Enable flick gesture.'),
-            ],
-            'flickMinSpeed' => [
-              '#type' => 'number',
-              '#title' => $this->t('Flick Minimum Speed'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsTouch']['flickMinSpeed'],
-              '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
-            ],
-            'flickMomentum' => [
-              '#type' => 'textfield',
-              '#element_validate' => ['::validateNumber'],
-              '#title' => $this->t('Flick Momentum'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsTouch']['flickMomentum'],
-              '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
-            ],
-            'pinchRotate' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch Rotate'),
-              '#default_value' => $settings['gestureSettingsMouse']['pinchRotate'],
-              '#description' => $this->t('If pinchRotate is true, the user will have the ability to rotate the image using their fingers.'),
-            ],
-          ],
+          ] + $gesture('gestureSettingsTouch'),
           'gestureSettingsPen' => [
             '#type' => 'fieldset',
             '#title' => $this->t('Pen Pointer Gesture Settings'),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
             '#description' => $this->t('<p>Settings for gestures generated by a pen pointer device. (See <a href="https://openseadragon.github.io/docs/OpenSeadragon.html#.GestureSettings">OpenSeadragon.GestureSettings</a>)</p>'),
-            'scrollToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Scroll To Zoom'),
-              '#default_value' => $settings['gestureSettingsPen']['scrollToZoom'],
-              '#description' => $this->t('Zoom on scroll gesture.'),
-            ],
-            'clickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsPen']['clickToZoom'],
-              '#description' => $this->t('Zoom on click gesture.'),
-            ],
-            'dblClickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Double Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsPen']['dblClickToZoom'],
-              '#description' => $this->t('Zoom on double-click gesture. Note: If set to true then clickToZoom should be set to false to prevent multiple zooms.'),
-            ],
-            'pinchToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch To Zoom'),
-              '#default_value' => $settings['gestureSettingsPen']['pinchToZoom'],
-              '#description' => $this->t('Zoom on pinch gesture.'),
-            ],
-            'flickEnabled' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Flick Gesture'),
-              '#default_value' => $settings['gestureSettingsPen']['flickEnabled'],
-              '#description' => $this->t('Enable flick gesture.'),
-            ],
-            'flickMinSpeed' => [
-              '#type' => 'number',
-              '#title' => $this->t('Flick Minimum Speed'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsPen']['flickMinSpeed'],
-              '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
-            ],
-            'flickMomentum' => [
-              '#type' => 'textfield',
-              '#element_validate' => ['::validateNumber'],
-              '#title' => $this->t('Flick Momentum'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsPen']['flickMomentum'],
-              '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
-            ],
-            'pinchRotate' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch Rotate'),
-              '#default_value' => $settings['gestureSettingsMouse']['pinchRotate'],
-              '#description' => $this->t('If pinchRotate is true, the user will have the ability to rotate the image using their fingers.'),
-            ],
-          ],
+          ] + $gesture('gestureSettingsPen'),
           'gestureSettingsUnknown' => [
             '#type' => 'fieldset',
             '#title' => $this->t('Unknown Pointer Gesture Settings'),
             '#collapsible' => TRUE,
             '#collapsed' => TRUE,
             '#description' => $this->t('<p>Settings for gestures generated by a unknown pointer device. (See <a href="https://openseadragon.github.io/docs/OpenSeadragon.html#.GestureSettings">OpenSeadragon.GestureSettings</a>)</p>'),
-            'scrollToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Scroll To Zoom'),
-              '#default_value' => $settings['gestureSettingsUnknown']['scrollToZoom'],
-              '#description' => $this->t('Zoom on scroll gesture.'),
-            ],
-            'clickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsUnknown']['clickToZoom'],
-              '#description' => $this->t('Zoom on click gesture.'),
-            ],
-            'dblClickToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Double Click To Zoom'),
-              '#default_value' => $settings['gestureSettingsUnknown']['dblClickToZoom'],
-              '#description' => $this->t('Zoom on double-click gesture. Note: If set to true then clickToZoom should be set to false to prevent multiple zooms.'),
-            ],
-            'pinchToZoom' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch To Zoom'),
-              '#default_value' => $settings['gestureSettingsUnknown']['pinchToZoom'],
-              '#description' => $this->t('Zoom on pinch gesture.'),
-            ],
-            'flickEnabled' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Flick Gesture'),
-              '#default_value' => $settings['gestureSettingsUnknown']['flickEnabled'],
-              '#description' => $this->t('Enable flick gesture.'),
-            ],
-            'flickMinSpeed' => [
-              '#type' => 'number',
-              '#title' => $this->t('Flick Minimum Speed'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsUnknown']['flickMinSpeed'],
-              '#description' => $this->t('If flickEnabled is true, the minimum speed to initiate a flick gesture (pixels-per-second).'),
-            ],
-            'flickMomentum' => [
-              '#type' => 'textfield',
-              '#element_validate' => ['::validateNumber'],
-              '#title' => $this->t('Flick Momentum'),
-              '#size' => 10,
-              '#default_value' => $settings['gestureSettingsPen']['flickMomentum'],
-              '#description' => $this->t('If flickEnabled is true, the momentum factor for the flick gesture.'),
-            ],
-            'pinchRotate' => [
-              '#type' => 'checkbox',
-              '#title' => $this->t('Pinch Rotate'),
-              '#default_value' => $settings['gestureSettingsMouse']['pinchRotate'],
-              '#description' => $this->t('If pinchRotate is true, the user will have the ability to rotate the image using their fingers.'),
-            ],
-          ],
+          ] + $gesture('gestureSettingsUnknown'),
           'zoomPerClick' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Zoom per click'),
             '#size' => 10,
             '#default_value' => $settings['zoomPerClick'],
             '#description' => $this->t('The "zoom distance" per mouse click or touch tap. Note: Setting this to 1.0 effectively disables the click-to-zoom feature (also see gestureSettings[Mouse|Touch|Pen].clickToZoom/dblClickToZoom).'),
           ],
           'zoomPerScroll' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Zoom per scroll'),
             '#size' => 10,
             '#default_value' => $settings['zoomPerScroll'],
@@ -715,6 +582,7 @@ class Admin extends ConfigFormBase {
           ],
           'zoomPerSecond' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Zoom per second'),
             '#size' => 10,
             '#default_value' => $settings['zoomPerSecond'],
@@ -757,8 +625,8 @@ class Admin extends ConfigFormBase {
                 ]),
               ],
               'navigatorSizeRatio' => [
-                '#type' => 'textfield',
-                '#element_validate' => ['::validateNumber'],
+                '#type' => 'number',
+                '#step' => 'any',
                 '#title' => $this->t('Navigator Size Ratio'),
                 '#size' => 10,
                 '#default_value' => $settings['navigatorSizeRatio'],
@@ -772,6 +640,7 @@ class Admin extends ConfigFormBase {
               ],
               'navigatorTop' => [
                 '#type' => 'number',
+                '#step' => 'any',
                 '#title' => $this->t('Navigator Top Position'),
                 '#size' => 10,
                 '#default_value' => $settings['navigatorTop'],
@@ -779,6 +648,7 @@ class Admin extends ConfigFormBase {
               ],
               'navigatorLeft' => [
                 '#type' => 'number',
+                '#step' => 'any',
                 '#title' => $this->t('Navigator Left Position'),
                 '#size' => 10,
                 '#default_value' => $settings['navigatorLeft'],
@@ -786,6 +656,7 @@ class Admin extends ConfigFormBase {
               ],
               'navigatorHeight' => [
                 '#type' => 'number',
+                '#step' => 'any',
                 '#title' => $this->t('Navigator Height'),
                 '#size' => 10,
                 '#default_value' => $settings['navigatorHeight'],
@@ -793,6 +664,7 @@ class Admin extends ConfigFormBase {
               ],
               'navigatorWidth' => [
                 '#type' => 'number',
+                '#step' => 'any',
                 '#title' => $this->t('Navigator Width'),
                 '#size' => 10,
                 '#default_value' => $settings['navigatorWidth'],
@@ -826,6 +698,7 @@ class Admin extends ConfigFormBase {
           ],
           'controlsFadeDelay' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Controls Fade Delay'),
             '#size' => 10,
             '#default_value' => $settings['controlsFadeDelay'],
@@ -833,6 +706,7 @@ class Admin extends ConfigFormBase {
           ],
           'controlsFadeLength' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Controls Fade Length'),
             '#size' => 10,
             '#default_value' => $settings['controlsFadeLength'],
@@ -840,6 +714,7 @@ class Admin extends ConfigFormBase {
           ],
           'controlsFadeDelay' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Controls Fade Delay'),
             '#size' => 10,
             '#default_value' => $settings['controlsFadeDelay'],
@@ -854,6 +729,7 @@ class Admin extends ConfigFormBase {
           ],
           'timeout' => [
             '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('timeout'),
             '#size' => 10,
             '#default_value' => $settings['timeout'],
@@ -865,8 +741,8 @@ class Admin extends ConfigFormBase {
             '#description' => $this->t('Set to false to not use an HTML canvas element for image rendering even if canvas is supported.'),
           ],
           'minPixelRatio' => [
-            '#type' => 'textfield',
-            '#element_validate' => ['::validateNumber'],
+            '#type' => 'number',
+            '#step' => 'any',
             '#title' => $this->t('Minimum Pixel Ratio'),
             '#size' => 10,
             '#default_value' => $settings['minPixelRatio'],
@@ -1061,8 +937,8 @@ class Admin extends ConfigFormBase {
                   ]),
                 ],
                 'referenceStripSizeRatio' => [
-                  '#type' => 'textfield',
-                  '#element_validate' => ['::validateNumber'],
+                  '#type' => 'number',
+                  '#step' => 'any',
                   '#title' => $this->t('Reference Strip Size Ratio'),
                   '#size' => 10,
                   '#default_value' => $settings['referenceStripSizeRatio'],
@@ -1123,6 +999,7 @@ class Admin extends ConfigFormBase {
               ],
               'collectionTileMargin' => [
                 '#type' => 'number',
+                '#step' => 'any',
                 '#title' => $this->t('Collection Tile Margin'),
                 '#size' => 10,
                 '#default_value' => $settings['collectionTileMargin'],
@@ -1147,18 +1024,6 @@ class Admin extends ConfigFormBase {
     if ($form_state->getValue(['islandora_openseadragon_tilesource']) == 'djatoka') {
       $element = $form['djatoka']['islandora_openseadragon_djatoka_url'];
       islandora_openseadragon_djatoka_url_validate($element, $form_state, $form);
-    }
-  }
-
-  /**
-   * Validate numbers, number type fails on decimals.
-   */
-  public function validateNumber(array &$element, FormStateInterface $form_state) {
-    $value = $element['#value'];
-    if ($value != '' && !is_numeric($value)) {
-      $form_state->setError($element, $this->t('%name must be a number.', [
-        '%name' => $element['#title'],
-      ]));
     }
   }
 
