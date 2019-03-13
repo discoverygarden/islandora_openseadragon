@@ -285,5 +285,5 @@ function islandora_openseadragon_library_info_alter(&$libraries, $extension) {
     return;
   }
   $library_path = libraries_get_path('openseadragon');
-  $libraries['openseadragon']['js'][file_create_url("$library_path/openseadragon.js")] = [];
+  $libraries['openseadragon']['js'][Url::fromUri("base:$library_path/openseadragon.js")->toString()] = [];
 }
