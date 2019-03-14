@@ -7,7 +7,7 @@
 
 use Drupal\Core\Url;
 use Drupal\Component\Utility\Xss;
-use Drupal\user\Entity\User;
+use Drupal\Core\Cache\CacheableMetadata;
 
 // @codingStandardsIgnoreStart
 const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
@@ -74,6 +74,9 @@ function islandora_openseadragon_islandora_viewer_info() {
 function islandora_openseadragon_callback(array $params = [], AbstractObject $object = NULL) {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
 
+  $cache_meta = (new CacheableMetadata())
+    ->addCacheableDependency($object);
+
   if (isset($params['jp2_url']) && !(isset($params['pid']) && isset($params['dsid']) && isset($params['token']))) {
     $message = islandora_deprecated('7.x-1.11', t('The jp2_url parameter has been depreciated. Please update your code before the next release.'));
     trigger_error(Xss::filter($message), E_USER_DEPRECATED);
@@ -101,21 +104,37 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
     $config = \Drupal::config('islandora_openseadragon.settings');
 
     $param_object = islandora_object_load($params['pid']);
+    $cache_meta
+      ->addCacheableDependency($config)
+      ->addCacheableDependency($param_object)
+      ->addCacheableDependency($param_object[$params['dsid']]);
 
     $token_header = $config->get('islandora_openseadragon_tilesource') == 'iiif'
       && $config->get('islandora_openseadragon_iiif_token_header');
+    $tile_sources = islandora_openseadragon_tile_source($params['pid'], $params['dsid'], $params['token']);
     $settings = islandora_openseadragon_get_viewer_settings(
       [
         'pid' => $params['pid'],
-        'tile_sources' => islandora_openseadragon_tile_source($params['pid'], $params['dsid'], $params['token']),
+        'tile_sources' => $tile_sources,
         'token' => $params['token'],
         'token_header' => $token_header,
       ]
     );
+
+    // XXX: islandora_openseadragon_get_viewer_settings() and
+    // islandora_openseadragon_tile_source() makes use of
+    // islandora_openseadragon.settings.
+    $cache_meta->addCacheableDependency(\Drupal::config('islandora_openseadragon.settings'));
+
+    if ($params['token']) {
+      // If a non-empty token was provided, no cache.
+      $cache_meta->mergeCacheMaxAge(0);
+    }
+
     $viewer = [
       '#theme' => 'islandora_openseadragon_viewer',
       '#pid' => $params['pid'],
-      '#tile_sources' => islandora_openseadragon_tile_source($params['pid'], $params['dsid'], $params['token']),
+      '#tile_sources' => $tile_sources,
       '#token' => $params['token'],
       '#token_header' => $token_header,
       '#attached' => [
@@ -123,24 +142,9 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
           'islandoraOpenSeadragon' => $settings,
         ],
       ],
-      '#cache' => [
-        'contexts' => [
-          'user',
-        ],
-        // XXX: Given our response here includes an auth token, let's prevent
-        // caching.
-        'max-age' => 0,
-      ],
     ];
 
-    $renderer->addCacheableDependency($viewer, $config);
-    $renderer->addCacheableDependency($viewer, User::load(\Drupal::currentUser()->id()));
-    // XXX: Our Tuque objects do not (presently) implement the
-    // CacheableDependencyInterface, so adding them effectively prevents
-    // caching of the dependent content.
-    $renderer->addCacheableDependency($viewer, $object);
-    $renderer->addCacheableDependency($viewer, $param_object);
-    $renderer->addCacheableDependency($viewer, $param_object[$params['dsid']]);
+    $cache_meta->applyTo($viewer);
 
     return $renderer->render($viewer);
   }
@@ -154,25 +158,19 @@ function islandora_openseadragon_preprocess_islandora_object_print(array &$varia
     module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
     $clip_parts = islandora_openseadragon_construct_clip_url($_GET['clip']);
     if ($clip_parts) {
-      $renderer = \Drupal::service('renderer');
       $variables['clip'] = $clip_parts['original_params'];
-      $image = [
+      $variables['content']['clip'] = [
+        '#weight' => 0,
         '#theme' => 'image',
         '#uri' => $clip_parts['image_url'],
         '#attributes' => $clip_parts['dimensions'],
-        '#cache' => [
-          'contexts' => [
-            'url.query_args',
-            'user',
+        '#theme_wrappers' => [
+          'container' => [
+            '#attributes' => [
+              'id' => 'clip',
+            ],
           ],
         ],
-      ];
-
-      $variables['content']['clip'] = [
-        '#weight' => 0,
-        '#prefix' => "<div id='clip'>",
-        '#markup' => $renderer->render($image),
-        '#suffix' => '</div>',
         '#cache' => [
           'contexts' => [
             'url.query_args',
