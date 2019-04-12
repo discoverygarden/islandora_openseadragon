@@ -9,6 +9,8 @@ use Drupal\Core\Url;
 use Drupal\Component\Utility\Xss;
 use Drupal\user\Entity\User;
 
+use Drupal\islandora_openseadragon\Form\Admin as AdminForm;
+
 // @codingStandardsIgnoreStart
 const ISLANDORA_OPENSEADRAGON_REQUIRED_VERSION = '2.3.1';
 const ISLANDORA_OPENSEADRAGON_DEFAULT_TILE_SIZE = 256;
@@ -103,7 +105,7 @@ function islandora_openseadragon_callback(array $params = [], AbstractObject $ob
     $param_object = islandora_object_load($params['pid']);
 
     $token_header = $config->get('islandora_openseadragon_tilesource') == 'iiif'
-      && $config->get('islandora_openseadragon_iiif_token_header');
+      && AdminForm::stateGet('islandora_openseadragon_iiif_token_header');
     $settings = islandora_openseadragon_get_viewer_settings(
       [
         'pid' => $params['pid'],

@@ -3,7 +3,3 @@ islandora_openseadragon_tile_size: 256
 islandora_openseadragon_tile_overlap: 0
 islandora_openseadragon_fit_to_aspect_ratio: false
 islandora_openseadragon_tilesource: 'djatoka'
-islandora_openseadragon_djatoka_url: 'adore-djatoka/resolver'
-islandora_openseadragon_iiif_url: 'iiif'
-islandora_openseadragon_iiif_token_header: false
-islandora_openseadragon_iiif_identifier: '[islandora_openseadragon:url_token]'

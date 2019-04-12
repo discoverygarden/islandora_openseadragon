@@ -12,6 +12,8 @@ use Drupal\Core\Url;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Component\Utility\Xss;
 
+use Drupal\islandora_openseadragon\Form\Admin as AdminForm;
+
 /**
  * Get the installed version.
  */
@@ -57,7 +59,7 @@ function islandora_openseadragon_construct_clip_url($params, $download = FALSE) 
     unset($decoded_params['svc_region']);
   }
   if (islandora_openseadragon_use_djatoka_server()) {
-    $djatoka_url = Url::fromUri(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
+    $djatoka_url = Url::fromUri(AdminForm::stateGet('islandora_openseadragon_djatoka_url'),
       ['absolute' => TRUE]
     )->toString();
 
@@ -360,7 +362,7 @@ function islandora_openseadragon_iiif_tile_source($identifier) {
   $message = islandora_deprecated('7.x-1.11', t('Please use islandora_openseadragon_tile_source instead.'));
   trigger_error(Xss::filter($message), E_USER_DEPRECATED);
 
-  $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
+  $base_url = rtrim(AdminForm::stateGet('islandora_openseadragon_iiif_url'), '/');
   $identifier = urlencode($identifier);
   return file_create_url("$base_url/$identifier");
 }
@@ -472,9 +474,9 @@ function islandora_openseadragon_create_replacement_array($pid, $dsid, $token) {
  *   FALSE otherwise.
  */
 function islandora_openseadragon_iiif_pid_tile_source($pid, $dsid, $token) {
-  $identifier_tokens = \Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_identifier');
+  $identifier_tokens = AdminForm::stateGet('islandora_openseadragon_iiif_identifier');
   $identifier = \Drupal::token()->replace($identifier_tokens, islandora_openseadragon_create_replacement_array($pid, $dsid, $token));
-  $base_url = rtrim(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'), '/');
+  $base_url = rtrim(AdminForm::stateGet('islandora_openseadragon_iiif_url'), '/');
   $identifier_encoded = urlencode($identifier);
   return Url::fromUri("$base_url/$identifier_encoded/info.json")->toString();
 }
