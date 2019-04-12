@@ -4,16 +4,17 @@ namespace Drupal\islandora_openseadragon\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\State\StateInterface;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Drupal\token\TreeBuilderInterface;
+use Drupal\islandora\Utility\StateTrait;
 
 /**
  * Module administration form.
  */
 class Admin extends ConfigFormBase {
+  use StateTrait;
 
   protected $treeBuilder;
   protected $state;
@@ -21,9 +22,8 @@ class Admin extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(TreeBuilderInterface $tree_builder, StateInterface $state) {
+  public function __construct(TreeBuilderInterface $tree_builder) {
     $this->treeBuilder = $tree_builder;
-    $this->state = $state;
   }
 
   /**
@@ -31,8 +31,7 @@ class Admin extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('token.tree_builder'),
-      $container->get('state')
+      $container->get('token.tree_builder')
     );
   }
 
@@ -44,32 +43,7 @@ class Admin extends ConfigFormBase {
   }
 
   /**
-   * Helper; get the value from state with its default.
-   *
-   * @param string $var
-   *   The name of the value to fetch from the state API.
-   *
-   * @return mixed
-   *   The value associated.
-   */
-  public static function stateGet($var) {
-    $defaults = static::stateDefaults();
-
-    if (!isset($defaults[$var])) {
-      throw new Exception(t('@var is not one of ours..', [
-        '@var' => $var,
-      ]));
-    }
-
-    return \Drupal::state()->get($var, static::stateDefaults()[$var]);
-  }
-
-  /**
-   * Helper; our mapping of state values.
-   *
-   * @return array
-   *   An associative array mapping the names of values in state to their
-   *   default values.
+   * {@inheritdoc}
    */
   protected static function stateDefaults() {
     return [
@@ -84,9 +58,7 @@ class Admin extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach (static::stateDefaults() as $var => $default) {
-      $this->state->set($var, $form_state->getValue($var, $default));
-    }
+    $this->stateSetAll($form_state);
 
     $config = $this->config('islandora_openseadragon.settings');
     $config->set('islandora_openseadragon_settings', $form_state->getValue('islandora_openseadragon_settings'));
