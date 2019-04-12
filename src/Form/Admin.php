@@ -73,12 +73,14 @@ class Admin extends ConfigFormBase {
 
     $settings = islandora_openseadragon_get_settings(FALSE);
     $version = islandora_openseadragon_get_installed_version();
-    $djatoka_url = $form_state->getValue('islandora_openseadragon_djatoka_url') ?
-      $form_state->getValue('islandora_openseadragon_djatoka_url') :
-      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url');
-    $iiif_url = $form_state->getValue('islandora_openseadragon_iiif_url') ?
-      $form_state->getValue('islandora_openseadragon_iiif_url') :
-      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url');
+    $djatoka_url = $form_state->getValue(
+      'islandora_openseadragon_djatoka_url',
+      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url')
+    );
+    $iiif_url = $form_state->getValue(
+      'islandora_openseadragon_iiif_url',
+      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url')
+    );
     $token_tree = [
       'islandora_openseadragon' => [
         'tokens' => $this->treeBuilder->buildTree('islandora_openseadragon', []),
