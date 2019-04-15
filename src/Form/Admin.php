@@ -17,7 +17,6 @@ class Admin extends ConfigFormBase {
   use StateTrait;
 
   protected $treeBuilder;
-  protected $state;
 
   /**
    * {@inheritdoc}
