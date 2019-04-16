@@ -12,11 +12,3 @@ islandora_openseadragon.settings:
       type: boolean
     islandora_openseadragon_tilesource:
       type: string
-    islandora_openseadragon_djatoka_url:
-      type: string
-    islandora_openseadragon_iiif_url:
-      type: string
-    islandora_openseadragon_iiif_token_header:
-      type: boolean
-    islandora_openseadragon_iiif_identifier:
-      type: string

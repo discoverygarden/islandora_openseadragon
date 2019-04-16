@@ -8,11 +8,13 @@ use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Drupal\token\TreeBuilderInterface;
+use Drupal\islandora\Utility\StateTrait;
 
 /**
  * Module administration form.
  */
 class Admin extends ConfigFormBase {
+  use StateTrait;
 
   protected $treeBuilder;
 
@@ -42,17 +44,27 @@ class Admin extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  protected static function stateDefaults() {
+    return [
+      'islandora_openseadragon_djatoka_url' => 'adore-djatoka/resolver',
+      'islandora_openseadragon_iiif_url' => 'iiif',
+      'islandora_openseadragon_iiif_token_header' => FALSE,
+      'islandora_openseadragon_iiif_identifier' => '[islandora_openseadragon:url_token]',
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $this->stateSetAll($form_state);
+
     $config = $this->config('islandora_openseadragon.settings');
     $config->set('islandora_openseadragon_settings', $form_state->getValue('islandora_openseadragon_settings'));
     $config->set('islandora_openseadragon_tile_size', $form_state->getValue('islandora_openseadragon_tile_size'));
     $config->set('islandora_openseadragon_tile_overlap', $form_state->getValue('islandora_openseadragon_tile_overlap'));
     $config->set('islandora_openseadragon_fit_to_aspect_ratio', $form_state->getValue('islandora_openseadragon_fit_to_aspect_ratio'));
     $config->set('islandora_openseadragon_tilesource', $form_state->getValue('islandora_openseadragon_tilesource'));
-    $config->set('islandora_openseadragon_djatoka_url', $form_state->getValue('islandora_openseadragon_djatoka_url'));
-    $config->set('islandora_openseadragon_iiif_url', $form_state->getValue('islandora_openseadragon_iiif_url'));
-    $config->set('islandora_openseadragon_iiif_token_header', $form_state->getValue('islandora_openseadragon_iiif_token_header'));
-    $config->set('islandora_openseadragon_iiif_identifier', $form_state->getValue('islandora_openseadragon_iiif_identifier'));
     $config->save();
   }
 
@@ -73,12 +85,14 @@ class Admin extends ConfigFormBase {
 
     $settings = islandora_openseadragon_get_settings(FALSE);
     $version = islandora_openseadragon_get_installed_version();
-    $djatoka_url = $form_state->getValue('islandora_openseadragon_djatoka_url') ?
-      $form_state->getValue('islandora_openseadragon_djatoka_url') :
-      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url');
-    $iiif_url = $form_state->getValue('islandora_openseadragon_iiif_url') ?
-      $form_state->getValue('islandora_openseadragon_iiif_url') :
-      $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url');
+    $djatoka_url = $form_state->getValue(
+      'islandora_openseadragon_djatoka_url',
+      static::stateGet('islandora_openseadragon_djatoka_url')
+    );
+    $iiif_url = $form_state->getValue(
+      'islandora_openseadragon_iiif_url',
+      static::stateGet('islandora_openseadragon_iiif_url')
+    );
     $token_tree = [
       'islandora_openseadragon' => [
         'tokens' => $this->treeBuilder->buildTree('islandora_openseadragon', []),
@@ -204,13 +218,13 @@ class Admin extends ConfigFormBase {
         'islandora_openseadragon_iiif_token_header' => [
           '#type' => 'checkbox',
           '#title' => $this->t('Add token as header'),
-          '#default_value' => $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_token_header'),
+          '#default_value' => static::stateGet('islandora_openseadragon_iiif_token_header'),
           '#description' => $this->t('Instead of sending the token as a query parameter, it will be sent in the X-ISLANDORA-TOKEN header.'),
         ],
         'islandora_openseadragon_iiif_identifier' => [
           '#type' => 'textfield',
           '#title' => $this->t('IIIF Identifier'),
-          '#default_value' => $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_identifier'),
+          '#default_value' => static::stateGet('islandora_openseadragon_iiif_identifier'),
           '#element_validate' => ['token_element_validate'],
           '#token_types' => ['islandora_openseadragon'],
         ],

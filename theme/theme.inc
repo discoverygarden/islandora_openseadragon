@@ -9,6 +9,8 @@ use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Component\Utility\Html;
 
+use Drupal\islandora_openseadragon\Form\Admin as AdminForm;
+
 /**
  * Implements template_preprocess_HOOK().
  *
@@ -53,12 +55,12 @@ function islandora_openseadragon_get_viewer_settings(array $variables) {
     ] + islandora_openseadragon_get_settings(),
   ];
   if (islandora_openseadragon_use_djatoka_server()) {
-    $settings['djatokaServerBaseURL'] = Url::fromUri(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_djatoka_url'),
+    $settings['djatokaServerBaseURL'] = Url::fromUri(AdminForm::stateGet('islandora_openseadragon_djatoka_url'),
       ['absolute' => TRUE]
     )->toString();
   }
   else {
-    $settings['iiifServerBaseURL'] = Url::fromUri(\Drupal::config('islandora_openseadragon.settings')->get('islandora_openseadragon_iiif_url'))->toString();
+    $settings['iiifServerBaseURL'] = Url::fromUri(AdminForm::stateGet('islandora_openseadragon_iiif_url'))->toString();
   }
   return $settings;
 }
