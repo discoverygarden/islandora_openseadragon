@@ -224,6 +224,7 @@ class Admin extends ConfigFormBase {
         'islandora_openseadragon_iiif_identifier' => [
           '#type' => 'textfield',
           '#title' => $this->t('IIIF Identifier'),
+          '#maxlength' => 999,
           '#default_value' => static::stateGet('islandora_openseadragon_iiif_identifier'),
           '#element_validate' => ['token_element_validate'],
           '#token_types' => ['islandora_openseadragon'],
