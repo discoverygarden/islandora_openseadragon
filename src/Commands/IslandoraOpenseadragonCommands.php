@@ -47,6 +47,13 @@ class IslandoraOpenseadragonCommands extends AbstractPluginAcquisition {
   /**
    * {@inheritdoc}
    */
+  protected function getUnpackDir($path) {
+    return $path;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getDescriptor() {
     return 'Openseadragon plugin';
   }

@@ -1,5 +1,5 @@
 services:
-  islandora_videojs.commands:
+  islandora_openseadragon.commands:
     class: \Drupal\islandora_openseadragon\Commands\IslandoraOpenseadragonCommands
     tags:
       - name: drush.command
