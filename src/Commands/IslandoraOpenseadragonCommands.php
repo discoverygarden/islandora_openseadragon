@@ -68,8 +68,8 @@ class IslandoraOpenseadragonCommands extends AbstractPluginAcquisition {
    * @command islandora_openseadragon:plugin
    * @aliases openseadragonplugin,openseadragon-plugin
    */
-  public function plugin($path = NULL) {
-    return parent::plugin($path);
+  public function installPlugin($path = NULL) {
+    return $this->plugin($path);
   }
 
 }
