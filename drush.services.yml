@@ -1,0 +1,8 @@
+services:
+  islandora_openseadragon.commands:
+    class: \Drupal\islandora_openseadragon\Commands\IslandoraOpenseadragonCommands
+    tags:
+      - name: drush.command
+    arguments:
+      - '@file_system'
+      - '@plugin.manager.archiver'
