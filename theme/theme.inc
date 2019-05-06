@@ -7,7 +7,6 @@
 
 use Drupal\Core\Url;
 use Drupal\Core\Link;
-use Drupal\Component\Utility\Html;
 
 use Drupal\islandora_openseadragon\Form\Admin as AdminForm;
 
@@ -19,12 +18,6 @@ use Drupal\islandora_openseadragon\Form\Admin as AdminForm;
  */
 function template_preprocess_islandora_openseadragon_viewer(array &$variables) {
   module_load_include('inc', 'islandora_openseadragon', 'includes/utilities');
-  if (isset($variables['fedora_object']) && $variables['fedora_object'] !== NULL) {
-    $message = t("The parameter 'fedora_object' in theme('islandora_openseadragon_viewer') has been deprecated. As of 7.x-1.10, please update your code before the next release.");
-    trigger_error(Html::escape($message), E_USER_DEPRECATED);
-    // Attempt to convert 'fedora_object', to 'pid'.
-    $variables['pid'] = $variables['fedora_object']->id;
-  }
   $variables['id'] = $variables['viewer_id'] = 'islandora-openseadragon';
 
   if (isset($variables['token_header']) && isset($variables['token']) && $variables['token_header']) {
