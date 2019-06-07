@@ -160,7 +160,7 @@ class Admin extends ConfigFormBase {
       'islandora_openseadragon_tilesource' => [
         '#type' => 'select',
         '#title' => $this->t('Image Server'),
-        '#description' => $this->t('Select the image server to use with OpenSeadragon'),
+        '#description' => $this->t('Select the image server to use with OpenSeadragon.'),
         '#default_value' => $this->config('islandora_openseadragon.settings')->get('islandora_openseadragon_tilesource'),
         '#options' => [
           'djatoka' => $this->t('Adore-Djatoka Image Server'),
@@ -340,7 +340,7 @@ class Admin extends ConfigFormBase {
           'compositeOperation' => [
             '#type' => 'select',
             '#title' => $this->t('Composite Operation'),
-            '#description' => $this->t('Select the image server to use with OpenSeadragon'),
+            '#description' => $this->t('Select the image server to use with OpenSeadragon.'),
             '#default_value' => $settings['compositeOperation'],
             '#options' => array_combine([
               NULL,
